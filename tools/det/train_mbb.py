@@ -4,6 +4,7 @@ import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+from copy import deepcopy
 
 from coperception.datasets import V2XSimDet
 from coperception.configs import Config, ConfigGlobal
@@ -12,6 +13,7 @@ from coperception.utils.loss import *
 from coperception.models.det import *
 from coperception.utils import AverageMeter
 from coperception.utils.data_util import apply_pose_noise
+from coperception.utils.mean_ap import eval_map
 
 import glob
 import os
@@ -22,6 +24,298 @@ def check_folder(folder_path):
         os.mkdir(folder_path)
     return folder_path
 
+def test_model(fafmodule, validation_data_loader, flag, device, config, start_epoch, args):
+    fafmodule.model.eval()
+    num_agent = args.num_agent
+    apply_late_fusion = args.apply_late_fusion
+    agent_idx_range = range(num_agent) if args.rsu else range(1, num_agent)
+    save_fig_path = [
+        check_folder(os.path.join(args.test_store, f"vis{i}")) for i in agent_idx_range
+    ]
+    tracking_path = [
+        check_folder(os.path.join(args.test_store, f"tracking{i}"))
+        for i in agent_idx_range
+    ]
+
+    # for local and global mAP evaluation
+    det_results_local = [[] for i in agent_idx_range]
+    annotations_local = [[] for i in agent_idx_range]
+
+    tracking_file = [set()] * num_agent
+    for cnt, sample in enumerate(validation_data_loader):
+        t = time.time()
+        (
+            padded_voxel_point_list,
+            padded_voxel_points_teacher_list,
+            label_one_hot_list,
+            reg_target_list,
+            reg_loss_mask_list,
+            anchors_map_list,
+            vis_maps_list,
+            gt_max_iou,
+            filenames,
+            target_agent_id_list,
+            num_agent_list,
+            trans_matrices_list,
+        ) = zip(*sample)
+
+        print(filenames)
+
+        filename0 = filenames[0]
+        trans_matrices = torch.stack(tuple(trans_matrices_list), 1)
+        target_agent_ids = torch.stack(tuple(target_agent_id_list), 1)
+        num_all_agents = torch.stack(tuple(num_agent_list), 1)
+
+        # add pose noise
+        if args.pose_noise > 0:
+            apply_pose_noise(args.pose_noise, trans_matrices)
+
+        if not args.rsu:
+            num_all_agents -= 1
+
+        if flag == "upperbound":
+            padded_voxel_points = torch.cat(tuple(padded_voxel_points_teacher_list), 0)
+        else:
+            padded_voxel_points = torch.cat(tuple(padded_voxel_point_list), 0)
+
+        label_one_hot = torch.cat(tuple(label_one_hot_list), 0)
+        reg_target = torch.cat(tuple(reg_target_list), 0)
+        reg_loss_mask = torch.cat(tuple(reg_loss_mask_list), 0)
+        anchors_map = torch.cat(tuple(anchors_map_list), 0)
+        vis_maps = torch.cat(tuple(vis_maps_list), 0)
+
+        data = {
+            "bev_seq": padded_voxel_points.to(device),
+            "labels": label_one_hot.to(device),
+            "reg_targets": reg_target.to(device),
+            "anchors": anchors_map.to(device),
+            "vis_maps": vis_maps.to(device),
+            "reg_loss_mask": reg_loss_mask.to(device).type(dtype=torch.bool),
+            "target_agent_ids": target_agent_ids.to(device),
+            "num_agent": num_all_agents.to(device),
+            "trans_matrices": trans_matrices.to(device),
+        }
+
+        if flag == "lowerbound_box_com":
+            loss, cls_loss, loc_loss, result = fafmodule.predict_all_with_box_com(
+                data, data["trans_matrices"]
+            )
+        elif flag == "disco":
+            (
+                loss,
+                cls_loss,
+                loc_loss,
+                result,
+                save_agent_weight_list,
+            ) = fafmodule.predict_all(data, 1, num_agent=num_agent)
+        else:
+            loss, cls_loss, loc_loss, result = fafmodule.predict_all(
+                data, 1, num_agent=num_agent
+            )
+
+        box_color_map = ["red", "yellow", "blue", "purple", "black", "orange"]
+
+        # If has RSU, do not count RSU's output into evaluation
+        eval_start_idx = 1 if args.rsu else 0
+
+        # local qualitative evaluation
+        for k in range(eval_start_idx, num_agent):
+            box_colors = None
+            if apply_late_fusion == 1 and len(result[k]) != 0:
+                pred_restore = result[k][0][0][0]["pred"]
+                score_restore = result[k][0][0][0]["score"]
+                selected_idx_restore = result[k][0][0][0]["selected_idx"]
+
+            data_agents = {
+                "bev_seq": torch.unsqueeze(padded_voxel_points[k, :, :, :, :], 1),
+                "reg_targets": torch.unsqueeze(reg_target[k, :, :, :, :, :], 0),
+                "anchors": torch.unsqueeze(anchors_map[k, :, :, :, :], 0),
+            }
+            temp = gt_max_iou[k]
+
+            if len(temp[0]["gt_box"]) == 0:
+                data_agents["gt_max_iou"] = []
+            else:
+                data_agents["gt_max_iou"] = temp[0]["gt_box"][0, :, :]
+
+            # late fusion
+            if apply_late_fusion == 1 and len(result[k]) != 0:
+                box_colors = late_fusion(
+                    k, num_agent, result, trans_matrices, box_color_map
+                )
+
+            result_temp = result[k]
+
+            temp = {
+                "bev_seq": data_agents["bev_seq"][0, -1].cpu().numpy(),
+                "result": [] if len(result_temp) == 0 else result_temp[0][0],
+                "reg_targets": data_agents["reg_targets"].cpu().numpy()[0],
+                "anchors_map": data_agents["anchors"].cpu().numpy()[0],
+                "gt_max_iou": data_agents["gt_max_iou"],
+            }
+            det_results_local[k], annotations_local[k] = cal_local_mAP(
+                config, temp, det_results_local[k], annotations_local[k]
+            )
+
+            filename = str(filename0[0][0])
+            cut = filename[filename.rfind("agent") + 7 :]
+            seq_name = cut[: cut.rfind("_")]
+            idx = cut[cut.rfind("_") + 1 : cut.rfind("/")]
+            seq_save = os.path.join(save_fig_path[k], seq_name)
+            check_folder(seq_save)
+            idx_save = str(idx) + ".png"
+            temp_ = deepcopy(temp)
+            if args.visualization:
+                visualization(
+                    config,
+                    temp,
+                    box_colors,
+                    box_color_map,
+                    apply_late_fusion,
+                    os.path.join(seq_save, idx_save),
+                )
+
+            # # plot the cell-wise edge
+            # if flag == "disco" and k < len(save_agent_weight_list):
+            #     one_agent_edge = save_agent_weight_list[k]
+            #     for kk in range(len(one_agent_edge)):
+            #         idx_edge_save = (
+            #             str(idx) + "_edge_" + str(kk) + "_to_" + str(k) + ".png"
+            #         )
+            #         savename_edge = os.path.join(seq_save, idx_edge_save)
+            #         sns.set()
+            #         plt.savefig(savename_edge, dpi=500)
+            #         plt.close(0)
+
+            # == tracking ==
+            if args.tracking:
+                scene, frame = filename.split("/")[-2].split("_")
+                det_file = os.path.join(tracking_path[k], f"det_{scene}.txt")
+                if scene not in tracking_file[k]:
+                    det_file = open(det_file, "w")
+                    tracking_file[k].add(scene)
+                else:
+                    det_file = open(det_file, "a")
+                det_corners = get_det_corners(config, temp_)
+                for ic, c in enumerate(det_corners):
+                    det_file.write(
+                        ",".join(
+                            [
+                                str(
+                                    int(frame) + 1
+                                ),  # frame idx is 1-based for tracking
+                                "-1",
+                                "{:.2f}".format(c[0]),
+                                "{:.2f}".format(c[1]),
+                                "{:.2f}".format(c[2]),
+                                "{:.2f}".format(c[3]),
+                                str(result_temp[0][0][0]["score"][ic]),
+                                "-1",
+                                "-1",
+                                "-1",
+                            ]
+                        )
+                        + "\n"
+                    )
+                    det_file.flush()
+
+                det_file.close()
+
+            # restore data before late-fusion
+            if apply_late_fusion == 1 and len(result[k]) != 0:
+                result[k][0][0][0]["pred"] = pred_restore
+                result[k][0][0][0]["score"] = score_restore
+                result[k][0][0][0]["selected_idx"] = selected_idx_restore
+
+        print("Validation scene {}, at frame {}".format(seq_name, idx))
+        print("Takes {} s\n".format(str(time.time() - t)))
+
+    logger_root = args.logpath if args.logpath != "" else "logs"
+    logger_root = os.path.join(
+        logger_root, f"{flag}_eval", "with_rsu" if args.rsu else "no_rsu"
+    )
+    os.makedirs(logger_root, exist_ok=True)
+    log_file_path = os.path.join(logger_root, "log_test.txt")
+    log_file = open(log_file_path, "w")
+
+    def print_and_write_log(log_str):
+        print(log_str)
+        log_file.write(log_str + "\n")
+
+    mean_ap_local = []
+    # local mAP evaluation
+    det_results_all_local = []
+    annotations_all_local = []
+    for k in range(eval_start_idx, num_agent):
+        if type(det_results_local[k]) != list or len(det_results_local[k]) == 0:
+            continue
+
+        print_and_write_log("Local mAP@0.5 from agent {}".format(k))
+        mean_ap, _ = eval_map(
+            det_results_local[k],
+            annotations_local[k],
+            scale_ranges=None,
+            iou_thr=0.5,
+            dataset=None,
+            logger=None,
+        )
+        mean_ap_local.append(mean_ap)
+        print_and_write_log("Local mAP@0.7 from agent {}".format(k))
+
+        ean_ap, _ = eval_map(
+            det_results_local[k],
+            annotations_local[k],
+            scale_ranges=None,
+            iou_thr=0.7,
+            dataset=None,
+            logger=None,
+        )
+        mean_ap_local.append(mean_ap)
+
+        det_results_all_local += det_results_local[k]
+        annotations_all_local += annotations_local[k]
+
+    mean_ap_local_average, _ = eval_map(
+        det_results_all_local,
+        annotations_all_local,
+        scale_ranges=None,
+        iou_thr=0.5,
+        dataset=None,
+        logger=None,
+    )
+    mean_ap_local.append(mean_ap_local_average)
+
+    mean_ap_local_average, _ = eval_map(
+        det_results_all_local,
+        annotations_all_local,
+        scale_ranges=None,
+        iou_thr=0.7,
+        dataset=None,
+        logger=None,
+    )
+    mean_ap_local.append(mean_ap_local_average)
+
+    print_and_write_log(
+        "Quantitative evaluation results of model from {}, at epoch {}".format(
+            args.resume, start_epoch - 1
+        )
+    )
+
+    for k in range(eval_start_idx, num_agent):
+        print_and_write_log(
+            "agent{} mAP@0.5 is {} and mAP@0.7 is {}".format(
+                k + 1 if not args.rsu else k, mean_ap_local[k * 2], mean_ap_local[(k * 2) + 1]
+            )
+        )
+
+    print_and_write_log(
+        "average local mAP@0.5 is {} and average local mAP@0.7 is {}".format(
+            mean_ap_local[-2], mean_ap_local[-1]
+        )
+    )
+
+    #if need_log:
+    #   saver.close()
 
 def main(args):
     config = Config("train", binary=True, only_det=True)
@@ -516,6 +810,12 @@ if __name__ == "__main__":
         default="",
         type=str,
         help="The path to store the output of testing",
+    )
+    parser.add_argument(
+        "--apply_late_fusion",
+        default=0,
+        type=int,
+        help="1: apply late fusion. 0: no late fusion",
     )
     parser.add_argument(
         "--init_resume_path",
