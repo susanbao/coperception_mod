@@ -211,9 +211,10 @@ def main(args):
             break
 
     if not has_valid_pth:
-        print(
-            f"No valid check point file in {auto_resume_path} dir, weights not loaded."
-        )
+        if args.init_resume_path == "":
+            print(
+                f"No valid check point file in {auto_resume_path} and {args.init_resume_path} dir, weights not loaded."
+            )
         auto_resume_path = ""
 
     if args.resume == "" and auto_resume_path == "":
@@ -249,13 +250,17 @@ def main(args):
         saver.write("command line: {}\n".format(" ".join(sys.argv[1:])))
         saver.write(args.__repr__() + "\n\n")
         saver.flush()
-
-        if auto_resume_path != "":
+        if args.init_resume_path != '':
+            checkpoint = torch.load(args.init_resume_path)
+            print("Load pth from init path {args.init_resume_path}")
+        elif auto_resume_path != "":
             list_of_files = glob.glob(f"{model_save_path}/*.pth")
             latest_pth = max(list_of_files, key=os.path.getctime)
             checkpoint = torch.load(latest_pth)
+            print("Load pth from auto resume path {auto_resume_path}")
         else:
             checkpoint = torch.load(args.resume)
+            print("Load pth from resume path {args.resume}")
 
         start_epoch = checkpoint["epoch"] + 1
         faf_module.model.load_state_dict(checkpoint["model_state_dict"])
@@ -478,6 +483,27 @@ if __name__ == "__main__":
         default=0,
         type=int,
         help="1: only v2i, 0: v2v and v2i",
+    )
+    parser.add_argument(
+        "--test", action="store_true", help="Whether to test on the test dataset and store the result",
+    )
+    parser.add_argument(
+        "--test_data",
+        default="",
+        type=str,
+        help="The path to the preprocessed sparse BEV testing data",
+    )
+    parser.add_argument(
+        "--test_store",
+        default="",
+        type=str,
+        help="The path to store the output of testing",
+    )
+    parser.add_argument(
+        "--init_resume_path",
+        default="",
+        type=str,
+        help="The path to reload the initial pth",
     )
 
     torch.multiprocessing.set_sharing_strategy("file_system")
