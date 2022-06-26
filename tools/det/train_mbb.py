@@ -79,6 +79,24 @@ def main(args):
         training_dataset, shuffle=True, batch_size=batch_size, num_workers=num_workers
     )
     print("Training dataset size:", len(training_dataset))
+    if args.test:
+        validation_dataset = V2XSimDet(
+            dataset_roots=[f"{args.test_data}/agent{i}" for i in agent_idx_range],
+            config=config,
+            config_global=config_global,
+            split="val",
+            val=True,
+            bound="upperbound" if args.com == "upperbound" else "lowerbound",
+            kd_flag=args.kd_flag,
+            rsu=args.rsu,
+        )
+        validation_data_loader = DataLoader(
+            validation_dataset, batch_size=1, shuffle=False, num_workers=num_workers
+        )
+        print("Validation dataset size:", len(validation_dataset))
+    else:
+        validation_dataset = None
+        validation_data_loader = None
 
     logger_root = args.logpath if args.logpath != "" else "logs"
 
