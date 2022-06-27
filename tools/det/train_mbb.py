@@ -175,18 +175,6 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, start_ep
                     os.path.join(seq_save, idx_save),
                 )
 
-            # # plot the cell-wise edge
-            # if flag == "disco" and k < len(save_agent_weight_list):
-            #     one_agent_edge = save_agent_weight_list[k]
-            #     for kk in range(len(one_agent_edge)):
-            #         idx_edge_save = (
-            #             str(idx) + "_edge_" + str(kk) + "_to_" + str(k) + ".png"
-            #         )
-            #         savename_edge = os.path.join(seq_save, idx_edge_save)
-            #         sns.set()
-            #         plt.savefig(savename_edge, dpi=500)
-            #         plt.close(0)
-
             # == tracking ==
             if args.tracking:
                 scene, frame = filename.split("/")[-2].split("_")
@@ -720,7 +708,7 @@ if __name__ == "__main__":
         help="The path to the preprocessed sparse BEV training data",
     )
     parser.add_argument("--batch_size", default=4, type=int, help="Batch size")
-    parser.add_argument("--nepoch", default=100, type=int, help="Number of epochs")
+    parser.add_argument("--nepoch", default=100, type=int, help="Number of epochs/boostraps")
     parser.add_argument("--nworker", default=2, type=int, help="Number of workers")
     parser.add_argument("--lr", default=0.001, type=float, help="Initial learning rate")
     parser.add_argument("--log", action="store_true", help="Whether to log")
@@ -822,6 +810,12 @@ if __name__ == "__main__":
         default="",
         type=str,
         help="The path to reload the initial pth",
+    )
+    parser.add_argument(
+        "--block_len",
+        default=16,
+        type=int,
+        help="length of block in MBB method",
     )
 
     torch.multiprocessing.set_sharing_strategy("file_system")
