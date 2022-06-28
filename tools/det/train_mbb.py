@@ -815,7 +815,7 @@ if __name__ == "__main__":
         "--block_len",
         default=16,
         type=int,
-        help="length of block in MBB method",
+        help="Length of block in MBB method",
     )
 
     torch.multiprocessing.set_sharing_strategy("file_system")
