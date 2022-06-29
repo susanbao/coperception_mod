@@ -15,11 +15,10 @@ class MbbSampler(Sampler[int]):
     """
     data_source: Sized
     
-
     def __init__(self, data_source: Sized, block_len: int) -> None:
         self.data_source = data_source
         self.frame_len = data_source.num_sample_seqs
-        self.scene_len = len(data_source.seq_scenes[0])
+        self.scene_len = data_source.scene_len
         self.block_len = block_len
         self.frame_pre_scene = self.frame_len // self.scene_len
         self.iter_len = len(self.data_source) // self.block_len * self.block_len

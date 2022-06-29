@@ -24,7 +24,7 @@ batch_size := 4
 # [train / test / val]
 split := train
 # Where to store the logs
-logpath := logs
+logpath := check
 # Train for how many epochs
 nepoch := 105
 # If given, the model will resume from its most recent (by modification time) check point
@@ -118,7 +118,8 @@ mbb_train:
 	--compress_level $(compress_level) \
 	--pose_noise $(pose_noise) \
 	--only_v2i $(only_v2i) \
-	--block_len $(block_len)
+	--block_len $(block_len) \
+	--init_resume_path logs/$(com)/no_rsu/epoch_100.pth
 
 test:
 	python $(testing_script) \

@@ -519,6 +519,14 @@ def main(args):
         auto_resume_path = ""
 
     if args.resume == "" and auto_resume_path == "":
+        if args.init_resume_path == "":
+            raise ValueError("Error: args.init_resume_path is None")
+        checkpoint = torch.load(args.init_resume_path)
+        print("Load pth from init path {}".format(args.init_resume_path))
+        faf_module.model.load_state_dict(checkpoint["model_state_dict"])
+        faf_module.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        faf_module.scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+        
         log_file_name = os.path.join(model_save_path, "log.txt")
         saver = open(log_file_name, "w")
         saver.write("GPU number: {}\n".format(torch.cuda.device_count()))
@@ -551,10 +559,8 @@ def main(args):
         saver.write("command line: {}\n".format(" ".join(sys.argv[1:])))
         saver.write(args.__repr__() + "\n\n")
         saver.flush()
-        if args.init_resume_path != '':
-            checkpoint = torch.load(args.init_resume_path)
-            print("Load pth from init path {args.init_resume_path}")
-        elif auto_resume_path != "":
+        
+        if auto_resume_path != "":
             list_of_files = glob.glob(f"{model_save_path}/*.pth")
             latest_pth = max(list_of_files, key=os.path.getctime)
             checkpoint = torch.load(latest_pth)
@@ -562,7 +568,7 @@ def main(args):
         else:
             checkpoint = torch.load(args.resume)
             print("Load pth from resume path {args.resume}")
-
+            
         start_epoch = checkpoint["epoch"] + 1
         faf_module.model.load_state_dict(checkpoint["model_state_dict"])
         faf_module.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])

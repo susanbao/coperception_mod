@@ -65,7 +65,8 @@ class V2XSimDet(Dataset):
         self.dataset_roots = dataset_roots
         self.num_agent = len(dataset_roots)
         self.seq_files = [] # (agent, files)
-        self.seq_scenes = [] # (agent, scenes)
+        self.seq_scenes = []
+        scene_set = set()
         for dataset_root in self.dataset_roots:
             # sort directories
             dir_list = [d.split("_") for d in os.listdir(dataset_root)]
@@ -73,6 +74,7 @@ class V2XSimDet(Dataset):
             self.seq_scenes.append(
                 [int(s[0]) for s in dir_list]
             )  # which scene this frame belongs to (required for visualization)
+            scene_set.update([int(s[0]) for s in dir_list])
             dir_list = ["_".join(x) for x in dir_list]
 
             seq_dirs = [
@@ -91,6 +93,7 @@ class V2XSimDet(Dataset):
             )
 
         self.num_sample_seqs = len(self.seq_files[0])
+        self.scene_len = len(scene_set)
         print("The number of {} sequences: {}".format(self.split, self.num_sample_seqs))
         # object information
         self.anchors_map = init_anchors_no_check(
@@ -402,7 +405,6 @@ class V2XSimDet(Dataset):
 
     def __getitem__(self, idx):
         res = []
-        print(idx)
         for i in range(self.num_agent):
             res.append(self.pick_single_agent(i, idx))
         return res
