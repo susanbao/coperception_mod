@@ -64,8 +64,8 @@ class V2XSimDet(Dataset):
             )
         self.dataset_roots = dataset_roots
         self.num_agent = len(dataset_roots)
-        self.seq_files = []
-        self.seq_scenes = []
+        self.seq_files = [] # (agent, files)
+        self.seq_scenes = [] # (agent, scenes)
         for dataset_root in self.dataset_roots:
             # sort directories
             dir_list = [d.split("_") for d in os.listdir(dataset_root)]
