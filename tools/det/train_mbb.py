@@ -24,16 +24,17 @@ def check_folder(folder_path):
         os.mkdir(folder_path)
     return folder_path
 
-def test_model(fafmodule, validation_data_loader, flag, device, config, start_epoch, args):
+def test_model(fafmodule, validation_data_loader, flag, device, config, epoch, args):
     fafmodule.model.eval()
     num_agent = args.num_agent
     apply_late_fusion = args.apply_late_fusion
     agent_idx_range = range(num_agent) if args.rsu else range(1, num_agent)
+    save_epoch_path = check_folder(os.path.join(args.test_store, str(epoch)))
     save_fig_path = [
-        check_folder(os.path.join(args.test_store, f"vis{i}")) for i in agent_idx_range
+        check_folder(os.path.join(save_epoch_path, f"vis{i}")) for i in agent_idx_range
     ]
     tracking_path = [
-        check_folder(os.path.join(args.test_store, f"tracking{i}"))
+        check_folder(os.path.join(save_epoch_path, f"result{i}"))
         for i in agent_idx_range
     ]
 
@@ -175,39 +176,38 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, start_ep
                     os.path.join(seq_save, idx_save),
                 )
 
-            # == tracking ==
-            if args.tracking:
-                scene, frame = filename.split("/")[-2].split("_")
-                det_file = os.path.join(tracking_path[k], f"det_{scene}.txt")
-                if scene not in tracking_file[k]:
-                    det_file = open(det_file, "w")
-                    tracking_file[k].add(scene)
-                else:
-                    det_file = open(det_file, "a")
-                det_corners = get_det_corners(config, temp_)
-                for ic, c in enumerate(det_corners):
-                    det_file.write(
-                        ",".join(
-                            [
-                                str(
-                                    int(frame) + 1
-                                ),  # frame idx is 1-based for tracking
-                                "-1",
-                                "{:.2f}".format(c[0]),
-                                "{:.2f}".format(c[1]),
-                                "{:.2f}".format(c[2]),
-                                "{:.2f}".format(c[3]),
-                                str(result_temp[0][0][0]["score"][ic]),
-                                "-1",
-                                "-1",
-                                "-1",
-                            ]
-                        )
-                        + "\n"
-                    )
-                    det_file.flush()
 
-                det_file.close()
+            scene, frame = filename.split("/")[-2].split("_")
+            det_file = os.path.join(tracking_path[k], f"det_{scene}.txt")
+            if scene not in tracking_file[k]:
+                det_file = open(det_file, "w")
+                tracking_file[k].add(scene)
+            else:
+                det_file = open(det_file, "a")
+            det_corners = get_det_corners(config, temp_)
+            for ic, c in enumerate(det_corners):
+                det_file.write(
+                    ",".join(
+                        [
+                            str(
+                                int(frame) + 1
+                            ),  # frame idx is 1-based for tracking
+                            "-1",
+                            "{:.2f}".format(c[0]),
+                            "{:.2f}".format(c[1]),
+                            "{:.2f}".format(c[2]),
+                            "{:.2f}".format(c[3]),
+                            str(result_temp[0][0][0]["score"][ic]),
+                            str(result_temp[0][0][0]["pred"][ic]),
+                            str([0][0][0]["selected_idx"][ic]),
+                            "-1",
+                        ]
+                    )
+                    + "\n"
+                )
+                det_file.flush()
+
+            det_file.close()
 
             # restore data before late-fusion
             if apply_late_fusion == 1 and len(result[k]) != 0:
@@ -285,7 +285,7 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, start_ep
 
     print_and_write_log(
         "Quantitative evaluation results of model from {}, at epoch {}".format(
-            args.resume, start_epoch - 1
+            args.resume, epoch - 1
         )
     )
 
@@ -301,9 +301,6 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, start_ep
             mean_ap_local[-2], mean_ap_local[-1]
         )
     )
-
-    #if need_log:
-    #   saver.close()
 
 def main(args):
     config = Config("train", binary=True, only_det=True)
@@ -700,6 +697,7 @@ def main(args):
             torch.save(
                 save_dict, os.path.join(model_save_path, "epoch_" + str(epoch) + ".pth")
             )
+        test_model(faf_module, validation_data_loader, flag, device, config, epoch, args)
 
     if need_log:
         saver.close()
@@ -755,7 +753,7 @@ if __name__ == "__main__":
         help="Number of message passing for V2VNet",
     )
     parser.add_argument(
-        "--visualization", default=True, help="Visualize validation result"
+        "--visualization", default=False, help="Visualize validation result"
     )
     parser.add_argument(
         "--com",
