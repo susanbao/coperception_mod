@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from copy import deepcopy
 
-from coperception.datasets import V2XSimDet
+from coperception.datasets import V2XSimDet, MbbSampler
 from coperception.configs import Config, ConfigGlobal
 from coperception.utils.CoDetModule import *
 from coperception.utils.loss import *
@@ -357,8 +357,9 @@ def main(args):
         kd_flag=args.kd_flag,
         rsu=args.rsu,
     )
+    training_sample = MbbSampler(V2XSimDet, args.block_len)
     training_data_loader = DataLoader(
-        training_dataset, shuffle=True, batch_size=batch_size, num_workers=num_workers
+        training_dataset, sample=training_sample, batch_size=batch_size, num_workers=num_workers
     )
     print("Training dataset size:", len(training_dataset))
     if args.test:

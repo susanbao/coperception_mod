@@ -402,6 +402,7 @@ class V2XSimDet(Dataset):
 
     def __getitem__(self, idx):
         res = []
+        print(idx)
         for i in range(self.num_agent):
             res.append(self.pick_single_agent(i, idx))
         return res
