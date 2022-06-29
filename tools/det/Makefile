@@ -1,7 +1,7 @@
 # Path to the original V2X-Sim dataset
-original_data_path := /scratch/dm4524/data/V2X-Sim-2
+original_data_path := /data/v2x-sim
 # Where to save the created data
-create_data_save_path := /scratch/dm4524/data/V2X-Sim-det
+create_data_save_path := /data/v2x-sim-det
 # Index of the begining scene
 scene_begin := 0
  # Index of the ending scene + 1
@@ -26,7 +26,7 @@ split := train
 # Where to store the logs
 logpath := logs
 # Train for how many epochs
-nepoch := 100
+nepoch := 105
 # If given, the model will resume from its most recent (by modification time) check point
 auto_resume_path := $(logpath)
 # compress_level
@@ -46,6 +46,8 @@ warp_flag := 0
 # Used when testing when2com / who2com
 # when2com: activated, who2com: argmax_test
 inference := activated
+#block len for MBB method
+block_len := 16
 
 create_data:
 	python create_data_det.py \
@@ -101,6 +103,22 @@ train_disco_no_rsu:
 	--pose_noise $(pose_noise) \
 	--only_v2i $(only_v2i) \
 	-- rsu 0
+    
+mbb_train:
+	python train_mbb.py \
+	--data $(training_data) \
+	--com $(com) \
+	--log \
+	--batch_size $(batch_size) \
+	--auto_resume_path $(auto_resume_path) \
+	--nepoch $(nepoch) \
+	--logpath $(logpath) \
+	--warp_flag $(warp_flag) \
+	--rsu $(rsu) \
+	--compress_level $(compress_level) \
+	--pose_noise $(pose_noise) \
+	--only_v2i $(only_v2i) \
+	--block_len $(block_len)
 
 test:
 	python $(testing_script) \

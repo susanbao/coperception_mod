@@ -357,9 +357,9 @@ def main(args):
         kd_flag=args.kd_flag,
         rsu=args.rsu,
     )
-    training_sample = MbbSampler(V2XSimDet, args.block_len)
+    training_sample = MbbSampler(training_dataset, args.block_len)
     training_data_loader = DataLoader(
-        training_dataset, sample=training_sample, batch_size=batch_size, num_workers=num_workers
+        training_dataset, sampler=training_sample, batch_size=batch_size, num_workers=num_workers
     )
     print("Training dataset size:", len(training_dataset))
     if args.test:
