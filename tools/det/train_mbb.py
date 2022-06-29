@@ -225,13 +225,11 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, epoch, a
         print("Validation scene {}, at frame {}".format(seq_name, idx))
         print("Takes {} s\n".format(str(time.time() - t)))
 
-    logger_root = args.logpath if args.logpath != "" else "logs"
-    logger_root = os.path.join(
-        logger_root, f"{flag}_eval", "with_rsu" if args.rsu else "no_rsu"
-    )
-    os.makedirs(logger_root, exist_ok=True)
-    log_file_path = os.path.join(logger_root, "log_test.txt")
-    log_file = open(log_file_path, "w")
+    log_file_path = os.path.join(args.test_store, "log_test.txt")
+    if os.path.exists(log_file_path):
+        log_file = open(log_file_path, "a")
+    else:
+        log_file = open(log_file_path, "w")
 
     def print_and_write_log(log_str):
         print(log_str)
