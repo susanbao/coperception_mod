@@ -119,8 +119,11 @@ mbb_train:
 	--pose_noise $(pose_noise) \
 	--only_v2i $(only_v2i) \
 	--block_len $(block_len) \
-	--init_resume_path logs/$(com)/no_rsu/epoch_100.pth
-
+	--init_resume_path logs/$(com)/no_rsu/epoch_100.pth \
+	--test_store $(logpath)/$(com)/no_rsu \
+	--test_data $(testing_data) \
+	--test
+    
 test:
 	python $(testing_script) \
 	--data $(testing_data) \

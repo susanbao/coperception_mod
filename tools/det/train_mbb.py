@@ -42,7 +42,10 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, epoch, a
     det_results_local = [[] for i in agent_idx_range]
     annotations_local = [[] for i in agent_idx_range]
 
+    if not args.rsu:
+        num_agent -= 1
     tracking_file = [set()] * num_agent
+    
     for cnt, sample in enumerate(validation_data_loader):
         t = time.time()
         (
@@ -199,7 +202,7 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, epoch, a
                             "{:.2f}".format(c[3]),
                             str(result_temp[0][0][0]["score"][ic]),
                             str(result_temp[0][0][0]["pred"][ic]),
-                            str([0][0][0]["selected_idx"][ic]),
+                            str(result_temp[0][0][0]["selected_idx"][ic]),
                             "-1",
                         ]
                     )
@@ -533,6 +536,7 @@ def main(args):
         saver.write("command line: {}\n".format(" ".join(sys.argv[0:])))
         saver.write(args.__repr__() + "\n\n")
         saver.flush()
+        test_model(faf_module, validation_data_loader, flag, device, config, 0, args)
     else:
         if auto_resume_path != "":
             model_save_path = os.path.join(auto_resume_path, f"{flag}/{rsu_path}")
@@ -572,6 +576,7 @@ def main(args):
         faf_module.scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
 
         print("Load model from {}, at epoch {}".format(args.resume, start_epoch - 1))
+ 
 
     for epoch in range(start_epoch, num_epochs + 1):
         lr = faf_module.optimizer.param_groups[0]["lr"]
