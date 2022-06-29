@@ -179,8 +179,12 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, epoch, a
                     os.path.join(seq_save, idx_save),
                 )
 
-
             scene, frame = filename.split("/")[-2].split("_")
+            npy_frame_name = filename.split("/")[-2] + ".npy"
+            npy_frame_file = os.path.join(tracking_path[k], npy_frame_name)
+            det_res = {"scene" : scene, "frame": frame, "det_results_local": det_results_local[k], "annotations_local": annotations_local[k]}
+            np.save(npy_frame_file, det_res)
+            
             det_file = os.path.join(tracking_path[k], f"det_{scene}.txt")
             if scene not in tracking_file[k]:
                 det_file = open(det_file, "w")
@@ -201,8 +205,8 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, epoch, a
                             "{:.2f}".format(c[2]),
                             "{:.2f}".format(c[3]),
                             str(result_temp[0][0][0]["score"][ic]),
-                            str(result_temp[0][0][0]["pred"][ic]),
-                            str(result_temp[0][0][0]["selected_idx"][ic]),
+                            "-1",
+                            "-1",
                             "-1",
                         ]
                     )
@@ -536,7 +540,8 @@ def main(args):
         saver.write("command line: {}\n".format(" ".join(sys.argv[0:])))
         saver.write(args.__repr__() + "\n\n")
         saver.flush()
-        test_model(faf_module, validation_data_loader, flag, device, config, 0, args)
+        if args.test:
+            test_model(faf_module, validation_data_loader, flag, device, config, 0, args)
     else:
         if auto_resume_path != "":
             model_save_path = os.path.join(auto_resume_path, f"{flag}/{rsu_path}")
@@ -702,7 +707,8 @@ def main(args):
             torch.save(
                 save_dict, os.path.join(model_save_path, "epoch_" + str(epoch) + ".pth")
             )
-        test_model(faf_module, validation_data_loader, flag, device, config, epoch, args)
+        if args.test:
+            test_model(faf_module, validation_data_loader, flag, device, config, epoch, args)
 
     if need_log:
         saver.close()
