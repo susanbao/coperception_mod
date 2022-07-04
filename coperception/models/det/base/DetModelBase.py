@@ -248,7 +248,7 @@ class DetModelBase(nn.Module):
             loc_preds.size(2),
             self.anchor_num_per_loc,
             self.out_seq_len,
-            self.box_code_size,
+            self.box_code_size, # (x,y,w,h,sin,cos)
         )
 
         # loc_pred (N * T * W * H * loc)

@@ -21,7 +21,8 @@ to_agent := 6
 # Det logs path (to get the tracking input)
 det_logs_path := $(det_path)/check_nyu
 # number of bootstrap for testing
-boot := 2
+boot_start := 0
+boot_end := 25
 
 .PHONY: sort
 
@@ -32,7 +33,7 @@ sort:
 	cd sort && python sort.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path)
     
 sort_mbb:
-	cd sort && python sort_mbb.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --bootstrap $(boot)
+	cd sort && python sort_mbb.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --bootstrap_start $(boot_start) --bootstrap_end ${boot_end}
 
 eval:
 	python run_multi_agent_mot_challenge.py --mode $(mode) --rsu $(rsu) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --split $(split)

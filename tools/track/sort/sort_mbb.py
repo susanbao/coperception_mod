@@ -347,10 +347,16 @@ def parse_args():
     )
     parser.add_argument("--split", type=str, help="[test/val]")
     parser.add_argument(
-        "--bootstrap",
-        help="number of bootstrap",
+        "--bootstrap_start",
+        help="start of bootstrap",
         type=int,
         default=1,
+    )
+    parser.add_argument(
+        "--bootstrap_end",
+        help="end of bootstrap",
+        type=int,
+        default=10,
     )
     args = parser.parse_args()
     return args
@@ -362,58 +368,58 @@ if __name__ == "__main__":
     scene_idxes_file = open(args.scene_idxes_file, "r")
     scene_idxes = [int(line.strip()) for line in scene_idxes_file]
     print(f'scenes to run: {scene_idxes}')
+    for i in range(args.bootstrap_start, args.bootstrap_end):
+        for current_agent in range(args.from_agent, args.to_agent):
+            total_time = 0.0
+            total_frames = 0
+            root = os.path.join(os.path.join(args.det_logs_path, f'{args.mode}/{i}/result{current_agent}'))
+            order_det_res(root)
+            det_results = os.listdir(root)
+            save_path = f"./{args.mode}/{i}/agent{current_agent}"
+            os.makedirs(save_path, exist_ok=True)
+            for seq in det_results:
+                if seq[:3] != 'det':
+                    continue
+                mot_tracker = Sort(
+                    max_age=args.max_age,
+                    min_hits=args.min_hits,
+                    iou_threshold=args.iou_threshold,
+                )  # create instance of the SORT tracker
+                seq_dets = np.loadtxt(os.path.join(root, seq), delimiter=",")
 
-    for current_agent in range(args.from_agent, args.to_agent):
-        total_time = 0.0
-        total_frames = 0
-        root = os.path.join(os.path.join(args.det_logs_path, f'{args.mode}/{args.bootstrap}/result{current_agent}'))
-        order_det_res(root)
-        det_results = os.listdir(root)
-        save_path = f"./{args.mode}/agent{current_agent}"
-        os.makedirs(save_path, exist_ok=True)
-        for seq in det_results:
-            if seq[:3] != 'det':
-                continue
-            mot_tracker = Sort(
-                max_age=args.max_age,
-                min_hits=args.min_hits,
-                iou_threshold=args.iou_threshold,
-            )  # create instance of the SORT tracker
-            seq_dets = np.loadtxt(os.path.join(root, seq), delimiter=",")
+                with open(os.path.join(save_path, seq.replace("det_", "")), "w") as out_file:
+                    if len(seq_dets) == 0:
+                        continue
 
-            with open(os.path.join(save_path, seq.replace("det_", "")), "w") as out_file:
-                if len(seq_dets) == 0:
+                    print("Processing %s." % (os.path.join(root, seq)))
+                    for frame in range(int(seq_dets[:, 0].max())):
+                        frame += 1  # detection and frame numbers begin at 1
+                        dets = seq_dets[seq_dets[:, 0] == frame, 2:7]
+                        dets[:, 2:4] += dets[:, 0:2]  # convert to [x1,y1,w,h] to [x1,y1,x2,y2]
+                        total_frames += 1
+
+                        start_time = time.time()
+                        trackers = mot_tracker.update(dets)
+                        cycle_time = time.time() - start_time
+                        total_time += cycle_time
+
+                        for d in trackers:
+                            print(
+                                "%d,%d,%.2f,%.2f,%.2f,%.2f,1,-1,-1,-1"
+                                % (frame, d[4], d[0], d[1], d[2] - d[0], d[3] - d[1]),
+                                file=out_file,
+                            )
+
+            eval_dir = f"../TrackEval/data/trackers/mot_challenge/V2X-{args.split}{current_agent}/sort-{args.mode}/{i}/data"
+            os.makedirs(eval_dir, exist_ok=True)
+            for seq in scene_idxes:
+                tracker_txt = os.path.join(save_path, f"{seq}.txt")
+                if not os.path.exists(tracker_txt):
                     continue
 
-                print("Processing %s." % (os.path.join(root, seq)))
-                for frame in range(int(seq_dets[:, 0].max())):
-                    frame += 1  # detection and frame numbers begin at 1
-                    dets = seq_dets[seq_dets[:, 0] == frame, 2:7]
-                    dets[:, 2:4] += dets[:, 0:2]  # convert to [x1,y1,w,h] to [x1,y1,x2,y2]
-                    total_frames += 1
-
-                    start_time = time.time()
-                    trackers = mot_tracker.update(dets)
-                    cycle_time = time.time() - start_time
-                    total_time += cycle_time
-
-                    for d in trackers:
-                        print(
-                            "%d,%d,%.2f,%.2f,%.2f,%.2f,1,-1,-1,-1"
-                            % (frame, d[4], d[0], d[1], d[2] - d[0], d[3] - d[1]),
-                            file=out_file,
-                        )
-
-        eval_dir = f"../TrackEval/data/trackers/mot_challenge/V2X-{args.split}{current_agent}/sort-{args.mode}/data"
-        os.makedirs(eval_dir, exist_ok=True)
-        for seq in scene_idxes:
-            tracker_txt = os.path.join(save_path, f"{seq}.txt")
-            if not os.path.exists(tracker_txt):
-                continue
-
-            shutil.copy(tracker_txt, os.path.join(eval_dir, f"{seq}.txt"))
-        print(
-            "Total Tracking took: %.3f seconds for %d frames or %.1f FPS"
-            % (total_time, total_frames, total_frames / total_time)
-        )
-        print("Saved results to ", eval_dir)
+                shutil.copy(tracker_txt, os.path.join(eval_dir, f"{seq}.txt"))
+            print(
+                "Total Tracking took: %.3f seconds for %d frames or %.1f FPS"
+                % (total_time, total_frames, total_frames / total_time)
+            )
+            print("Saved results to ", eval_dir)
