@@ -368,7 +368,7 @@ if __name__ == "__main__":
     scene_idxes_file = open(args.scene_idxes_file, "r")
     scene_idxes = [int(line.strip()) for line in scene_idxes_file]
     print(f'scenes to run: {scene_idxes}')
-    for i in range(args.bootstrap_start, args.bootstrap_end):
+    for i in range(args.bootstrap_start, args.bootstrap_end+1):
         for current_agent in range(args.from_agent, args.to_agent):
             total_time = 0.0
             total_frames = 0
