@@ -23,7 +23,7 @@ det_logs_path := $(det_path)/check_nyu
 # start of bootstrap for testing
 boot_start := 0
 # end of bootstrap for testing, include the boot_end
-boot_end := 25
+boot_end := 2
 
 .PHONY: sort
 
@@ -40,4 +40,4 @@ eval:
 	python run_multi_agent_mot_challenge.py --mode $(mode) --rsu $(rsu) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --split $(split)
 
 mbb_eval:
-	python run_multi_agent_mot_challenge.py --mode $(mode) --rsu $(rsu) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --split $(split) --bootstrap_start $(boot_start) --bootstrap_end ${boot_end}
+	python mbb_run_multi_agent_mot_challenge.py --mode $(mode) --rsu $(rsu) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --split $(split) --bootstrap_start $(boot_start) --bootstrap_end ${boot_end}
