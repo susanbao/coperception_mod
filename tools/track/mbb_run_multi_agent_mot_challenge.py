@@ -47,7 +47,9 @@ if __name__ == "__main__":
     result_dict = {}
     for agent_idx in range(from_agent, to_agent):
         result_dict[agent_idx] = []
-    
+    os.makedirs('logs', exist_ok=True)
+    os.makedirs(f'logs/{mode}', exist_ok=True)
+    meanResult = []
     # run eval for MOTA and MOTP
     for bootstrap in range(bootstrap_start, bootstrap_end+1):
         for current_agent in range(from_agent, to_agent):
@@ -86,6 +88,10 @@ if __name__ == "__main__":
         mat = np.array(all_rows)
         mean = mat.mean(axis=0)
         all_rows.append(['mean'] + list(mean)[1:])
+        meanResult.append([bootstrap] + list(mean)[1:])
         df = pd.DataFrame(all_rows, columns=['agent', 'MOTA', 'MOTP', 'HOTA', 'DetA', 'AssA', 'DetRe', 'DetPr', 'AssRe', 'AssPr', 'LocA'])
-        os.makedirs('logs', exist_ok=True)
-        df.to_csv(f'logs/logs_{mode}_{rsu}_{bootstrap}.csv', sep=',', index=False)
+        
+        df.to_csv(f'logs/{mode}/logs_{rsu}_{bootstrap}.csv', sep=',', index=False)
+    meanPd = pd.DataFrame(meanResult, columns=['bootstrap', 'MOTA', 'MOTP', 'HOTA', 'DetA', 'AssA', 'DetRe', 'DetPr', 'AssRe', 'AssPr', 'LocA'])
+    meanPd.to_csv(f'logs/{mode}/logs_{rsu}_metric_all.csv', sep=',', index=False)
+    np.save(f'logs/{mode}/logs_{rsu}_metric_all.npy', meanResult)
