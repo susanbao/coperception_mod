@@ -168,3 +168,17 @@ test_no_rsu:
 	--inference $(inference) \
 	--warp_flag $(warp_flag) \
 	--rsu 0
+
+mbb_test_no_rsu:
+	python test_mbb.py \
+	--data $(testing_data) \
+	--com $(com) \
+	--resume $(logpath)/$(com)/no_rsu \
+	--tracking \
+	--logpath $(logpath)/${com}/no_rsu \
+	--apply_late_fusion $(apply_late_fusion) \
+	--visualization $(visualization) \
+	--inference $(inference) \
+	--warp_flag $(warp_flag) \
+	--rsu 0 \
+	--test_store $(logpath)/$(com)/no_rsu \
