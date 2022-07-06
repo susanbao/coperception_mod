@@ -43,15 +43,15 @@ if __name__ == "__main__":
     bootstrap_end = args.bootstrap_end
 
     print(args)
-
-    result_dict = {}
-    for agent_idx in range(from_agent, to_agent):
-        result_dict[agent_idx] = []
     os.makedirs('logs', exist_ok=True)
     os.makedirs(f'logs/{mode}', exist_ok=True)
     meanResult = []
+    allResult = []
     # run eval for MOTA and MOTP
     for bootstrap in range(bootstrap_start, bootstrap_end+1):
+        result_dict = {}
+        for agent_idx in range(from_agent, to_agent):
+            result_dict[agent_idx] = []
         for current_agent in range(from_agent, to_agent):
             os.system(f'python ./TrackEval/scripts/run_mot_challenge.py --BENCHMARK V2X --SPLIT_TO_EVAL {split}{current_agent} --TRACKERS_TO_EVAL sort-{mode}/{rsu}/{bootstrap} --METRICS CLEAR --DO_PREPROC False')
 
@@ -84,14 +84,16 @@ if __name__ == "__main__":
         all_rows = []
         for current_agent in range(from_agent, to_agent):
             all_rows.append([current_agent] + result_dict[current_agent])
-
+        
         mat = np.array(all_rows)
         mean = mat.mean(axis=0)
         all_rows.append(['mean'] + list(mean)[1:])
         meanResult.append([bootstrap] + list(mean)[1:])
+        allResult.append(all_rows)
         df = pd.DataFrame(all_rows, columns=['agent', 'MOTA', 'MOTP', 'HOTA', 'DetA', 'AssA', 'DetRe', 'DetPr', 'AssRe', 'AssPr', 'LocA'])
         
         df.to_csv(f'logs/{mode}/logs_{rsu}_{bootstrap}.csv', sep=',', index=False)
     meanPd = pd.DataFrame(meanResult, columns=['bootstrap', 'MOTA', 'MOTP', 'HOTA', 'DetA', 'AssA', 'DetRe', 'DetPr', 'AssRe', 'AssPr', 'LocA'])
     meanPd.to_csv(f'logs/{mode}/logs_{rsu}_metric_all.csv', sep=',', index=False)
-    np.save(f'logs/{mode}/logs_{rsu}_metric_all.npy', meanResult)
+    save_data = {'mean':meanResult, 'detail':allResult}
+    np.save(f'logs/{mode}/logs_{rsu}_metric_all.npy', save_data)
