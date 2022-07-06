@@ -20,7 +20,7 @@ testing_script := test_codet.py
 testing_data := $(create_data_save_path)/test
 # [lowerbound / upperbound / v2v / disco / when2com / max / mean / sum / agent]
 com := upperbound
-batch_size := 4
+batch_size := 1
 # [train / test / val]
 split := train
 # Where to store the logs
@@ -123,6 +123,25 @@ mbb_train:
 	--test_store $(logpath)/$(com)/no_rsu \
 	--test_data $(testing_data) \
 	--test
+    
+mbb_train_disco_no_rsu:
+	python train_mbb.py \
+	--data $(training_data) \
+	--com disco \
+	--log --batch $(batch_size) \
+	--kd_flag 1 \
+	--resume_teacher logs/upperbound/no_rsu/epoch_100.pth \
+	--auto_resume_path $(auto_resume_path) \
+	--logpath $(logpath) \
+	--nepoch $(nepoch) \
+	--compress_level $(compress_level) \
+	--pose_noise $(pose_noise) \
+	--only_v2i $(only_v2i) \
+	--rsu 0 \
+	--block_len $(block_len) \
+	--init_resume_path logs/disco/no_rsu/epoch_100.pth \
+	--test_store $(logpath)/disco/no_rsu \
+	--test_data $(testing_data)
     
 test:
 	python $(testing_script) \

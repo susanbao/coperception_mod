@@ -3,7 +3,7 @@ original_data_path := /data/v2x-sim
 # Path to the dataset for detection
 det_data_path := /data/v2x-sim-nyu/V2X-Sim-det
 # [lowerbound / upperbound/ v2v / disco / when2com / when2com_warp / who2com / who2com_warp]
-mode := upperbound
+mode := lowerbound
 # [with_rsu / no_rsu]
 rsu := no_rsu
 # Index of current agent
@@ -20,8 +20,9 @@ from_agent := 1
 to_agent := 6
 # Det logs path (to get the tracking input)
 det_logs_path := $(det_path)/check_nyu
-# number of bootstrap for testing
+# start of bootstrap for testing
 boot_start := 0
+# end of bootstrap for testing, include the boot_end
 boot_end := 25
 
 .PHONY: sort
