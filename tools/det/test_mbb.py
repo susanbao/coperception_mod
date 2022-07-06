@@ -470,14 +470,16 @@ def main(args):
     saver.flush()
 
     for epoch in range(args.nepoch+1):
-        checkpoint_path = os.path.join(args.resume, f"epoch_{epoch}.pth")
+        if epoch == 0:
+            checkpoint_path = args.init_resume_path
+        else:
+            checkpoint_path = os.path.join(args.resume, f"epoch_{epoch}.pth")
         checkpoint = torch.load(checkpoint_path, map_location="cpu")
-        start_epoch = checkpoint["epoch"]
         fafmodule.model.load_state_dict(checkpoint["model_state_dict"])
         fafmodule.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         fafmodule.scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
-        print("Load model from {}, at epoch {}".format(args.resume, start_epoch))
-        test_model(fafmodule, validation_data_loader, flag, device, config, start_epoch, args)
+        print("Load model from {}, at epoch {}".format(args.resume, epoch))
+        test_model(fafmodule, validation_data_loader, flag, device, config, epoch, args)
 
 
 if __name__ == "__main__":
@@ -575,7 +577,12 @@ if __name__ == "__main__":
         type=str,
         help="The path to store the output of testing",
     )
-
+    parser.add_argument(
+        "--init_resume_path",
+        default="",
+        type=str,
+        help="The path to reload the initial pth",
+    )
     torch.multiprocessing.set_sharing_strategy("file_system")
     args = parser.parse_args()
     print(args)
