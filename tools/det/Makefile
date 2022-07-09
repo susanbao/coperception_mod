@@ -19,7 +19,7 @@ testing_script := test_codet.py
 # Path to the test/val data
 testing_data := $(create_data_save_path)/test
 # [lowerbound / upperbound / v2v / disco / when2com / max / mean / sum / agent]
-com := disco
+com := v2v
 batch_size := 1
 # [train / test / val]
 split := train
@@ -121,8 +121,7 @@ mbb_train:
 	--block_len $(block_len) \
 	--init_resume_path logs/$(com)/no_rsu/epoch_100.pth \
 	--test_store $(logpath)/$(com)/no_rsu \
-	--test_data $(testing_data) \
-	--test
+	--test_data $(testing_data)
     
 mbb_train_disco_no_rsu:
 	python train_mbb.py \
