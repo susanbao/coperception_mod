@@ -234,10 +234,12 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, epoch, a
         print(log_str)
         log_file.write(log_str + "\n")
 
-    mean_ap_local = []
     # local mAP evaluation
     det_results_all_local = []
     annotations_all_local = []
+    mean_ap_5 = []
+    mean_ap_7 = []
+    mean_ap_all = []
     for k in range(eval_start_idx, num_agent):
         if type(det_results_local[k]) != list or len(det_results_local[k]) == 0:
             continue
@@ -251,7 +253,7 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, epoch, a
             dataset=None,
             logger=None,
         )
-        mean_ap_local.append(mean_ap)
+        mean_ap_5.append(mean_ap)
         print_and_write_log("Local mAP@0.7 from agent {}".format(k))
 
         mean_ap, _ = eval_map(
@@ -262,7 +264,7 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, epoch, a
             dataset=None,
             logger=None,
         )
-        mean_ap_local.append(mean_ap)
+        mean_ap_7.append(mean_ap)
 
         det_results_all_local += det_results_local[k]
         annotations_all_local += annotations_local[k]
@@ -281,7 +283,7 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, epoch, a
         dataset=None,
         logger=None,
     )
-    mean_ap_local.append(mean_ap_local_average)
+    mean_ap_all.append(mean_ap_local_average)
 
     mean_ap_local_average, _ = eval_map(
         det_results_all_local,
@@ -291,7 +293,14 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, epoch, a
         dataset=None,
         logger=None,
     )
-    mean_ap_local.append(mean_ap_local_average)
+    mean_ap_all.append(mean_ap_local_average)
+    mean_ap_agents = []
+    mean_ap_agents.append(mean_ap_5)
+    mean_ap_agents.append(mean_ap_7)
+
+    mean_ap_file = os.path.join(save_epoch_path, "all_mean_ap.npy")
+    mean_ap_res = {"agents": mean_ap_agents, "all": mean_ap_all}
+    np.save(mean_ap_file, mean_ap_res)
 
     print_and_write_log(
         "Quantitative evaluation results of model from {}, at epoch {}".format(
@@ -302,12 +311,12 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, epoch, a
     for k in range(eval_start_idx, num_agent):
         print_and_write_log(
             "agent{} mAP@0.5 is {} and mAP@0.7 is {}".format(
-                k + 1 if not args.rsu else k, mean_ap_local[k * 2], mean_ap_local[(k * 2) + 1]
+                k + 1 if not args.rsu else k, mean_ap_5[k], mean_ap_7[k]
             )
         )
 
     print_and_write_log(
         "average local mAP@0.5 is {} and average local mAP@0.7 is {}".format(
-            mean_ap_local[-2], mean_ap_local[-1]
+            mean_ap_all[0], mean_ap_all[1]
         )
     )
