@@ -503,7 +503,7 @@ def bev_box_decode_corner(
     )
 
 
-def cal_local_mAP(config, data, det_results, annotations):
+def cal_local_mAP(config, data, det_results, annotations, return_local = False):
     # voxel_size = config.voxel_size
     # area_extents = config.area_extents
     # anchor_size = config.anchor_size
@@ -528,6 +528,8 @@ def cal_local_mAP(config, data, det_results, annotations):
     #    anchors_map = np.concatenate([anchors_map[:,:,:2],np.zeros_like(anchors_map[:,:,:3]),anchors_map[:,:,2:]],axis=2)
     #    reg_targets = np.concatenate([reg_targets[:,:,:2],np.zeros_like(reg_targets[:,:,:3]),reg_targets[:,:,2:]],axis=2)
     plt.clf()
+    local_det_results = []
+    local_annotations = []
     for p in range(pred_len):
         gt_corners = []
         pred_corners = []
@@ -645,8 +647,12 @@ def cal_local_mAP(config, data, det_results, annotations):
             det_results_multiclass.append(det_results_frame)
             det_results.append(det_results_multiclass)
             annotations.append(annotation_frame)
-
-    return det_results, annotations
+            local_det_results.append(det_results_multiclass)
+            local_annotations.append(annotations)
+    if return_local:
+        return det_results, annotations, local_det_results, local_annotations
+    else:
+        return det_results, annotations
 
 
 def cal_global_mAP(config, data, det_results, annotations):
