@@ -26,7 +26,7 @@ split := train
 # Where to store the logs
 logpath := check_nyu
 # Train for how many epochs
-nepoch := 25
+nepoch := 26
 # If given, the model will resume from its most recent (by modification time) check point
 auto_resume_path := $(logpath)
 # compress_level

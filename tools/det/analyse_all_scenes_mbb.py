@@ -97,8 +97,9 @@ def analyse_one_frame_data(file_path, scene, args):
 def get_all_scene_file_list(files_path):
     fileList = os.listdir(files_path)
     scene_list = set()
+    print(files_path)
     for fname in fileList:
-        if fname[-4:] != '.npy':
+        if fname[-4:] != '.npy' or (not fname[-5].isdigit()):
             continue
         scene, frame = fname.split(".")[0].split("_")
         scene_list.add(scene)
@@ -107,7 +108,7 @@ def get_all_scene_file_list(files_path):
     for i in scene_list:
         scene_dict[i] = []
     for fname in fileList:
-        if fname[-4:] != '.npy':
+        if fname[-4:] != '.npy' or (not fname[-5].isdigit()):
             continue
         scene, frame = fname.split(".")[0].split("_")
         scene_dict[scene].append(fname)
@@ -132,7 +133,7 @@ def analysis_all_data(args):
     for scene, files in scene_dict.items():
         mean_ap_scenes = []
         print_and_write_log("scene: " + scene)
-        for epoch in range(args.nepoch+1):
+        for epoch in range(args.nepoch):
             mean_ap_5 = []
             mean_ap_7 = []
             det_results_all_local = []
@@ -147,7 +148,11 @@ def analysis_all_data(args):
                     annotations_local.extend(data.item()["annotations_frame"])
                 det_results_all_local.extend(det_results_local)
                 annotations_all_local.extend(annotations_local)
-                print_and_write_log("Local mAP@0.5 from agent {}".format(k))
+                if len(det_results_local) == 0:
+                    mean_ap_5.append(0) # 0 means there is no data for this agent 
+                    mean_ap_7.append(0)
+                    continue
+                print_and_write_log("Local mAP@0.5 from agent {}".format(agent))
                 mean_ap, _ = eval_map(
                     det_results_local,
                     annotations_local,
@@ -157,7 +162,7 @@ def analysis_all_data(args):
                     logger=None,
                 )
                 mean_ap_5.append(mean_ap)
-                print_and_write_log("Local mAP@0.7 from agent {}".format(k))
+                print_and_write_log("Local mAP@0.7 from agent {}".format(agent))
 
                 mean_ap, _ = eval_map(
                     det_results_local,
@@ -187,17 +192,19 @@ def analysis_all_data(args):
                 logger=None,
             )
             mean_ap_7.append(mean_ap_local_average)
-            mean_ap_scenes.append([mean_ap_5, mean_ap_7])
+            mean_ap_scenes.append(mean_ap_5)
+            mean_ap_scenes.append(mean_ap_7)
+            print(mean_ap_scenes)
             for idx, agent in enumerate(agent_idx_range):
                 print_and_write_log(
-                    "agent{} mAP@0.5 is {} and mAP@0.7 is {}".format(
-                        agent, mean_ap_scenes[0][idx], mean_ap_scenes[1][idx]
+                    "scene {}: agent{} mAP@0.5 is {} and mAP@0.7 is {}".format(
+                        scene, agent, mean_ap_scenes[0][idx], mean_ap_scenes[1][idx]
                     )
                 )
 
             print_and_write_log(
-                "average local mAP@0.5 is {} and average local mAP@0.7 is {}".format(
-                    mean_ap_scenes[0][-1], mean_ap_scenes[1][-1]
+                "scene {}: average local mAP@0.5 is {} and average local mAP@0.7 is {}".format(
+                    scene, mean_ap_scenes[0][-1], mean_ap_scenes[1][-1]
                 )
             )
         mean_ap_all_scenes_dic[scene] = mean_ap_scenes
@@ -216,7 +223,6 @@ if __name__ == "__main__":
         "--num_agent", default=6, type=int, help="The total number of agents"
     )
     parser.add_argument("--rsu", default=0, type=int, help="0: no RSU, 1: RSU")
-    torch.multiprocessing.set_sharing_strategy("file_system")
     args = parser.parse_args()
     print(args)
     if args.analyse_all:
