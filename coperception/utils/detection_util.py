@@ -519,17 +519,20 @@ def cal_local_mAP(config, data, det_results, annotations, return_local = False):
     reg_targets = data["reg_targets"]
     pred_selected = data["result"]
     gt_max_iou_idx = data["gt_max_iou"]
+    local_det_results = []
+    local_annotations = []
 
     # empty
     if len(gt_max_iou_idx) == 0:
+        if return_local:
+            return det_results, annotations, local_det_results, local_annotations
         return det_results, annotations
 
     # if anchors_map.shape[2] < 7:#binary classification only has 4 anchors
     #    anchors_map = np.concatenate([anchors_map[:,:,:2],np.zeros_like(anchors_map[:,:,:3]),anchors_map[:,:,2:]],axis=2)
     #    reg_targets = np.concatenate([reg_targets[:,:,:2],np.zeros_like(reg_targets[:,:,:3]),reg_targets[:,:,2:]],axis=2)
     plt.clf()
-    local_det_results = []
-    local_annotations = []
+    
     for p in range(pred_len):
         gt_corners = []
         pred_corners = []

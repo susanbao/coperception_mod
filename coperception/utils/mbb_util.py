@@ -157,7 +157,7 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, epoch, a
                 "gt_max_iou": data_agents["gt_max_iou"],
             }
             det_results_local[k], annotations_local[k], det_results_frame, annotations_frame = cal_local_mAP(
-                config, temp, det_results_local[k], annotations_local[k]
+                config, temp, det_results_local[k], annotations_local[k], True
             )
 
             filename = str(filename0[0][0])
