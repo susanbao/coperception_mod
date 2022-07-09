@@ -216,12 +216,6 @@ if __name__ == "__main__":
         "--num_agent", default=6, type=int, help="The total number of agents"
     )
     parser.add_argument("--rsu", default=0, type=int, help="0: no RSU, 1: RSU")
-    parser.add_argument(
-        "--com",
-        default="",
-        type=str,
-        help="lowerbound/upperbound/disco/when2com/v2v/sum/mean/max/cat/agent",
-    )
     torch.multiprocessing.set_sharing_strategy("file_system")
     args = parser.parse_args()
     print(args)

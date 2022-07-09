@@ -19,7 +19,7 @@ testing_script := test_codet.py
 # Path to the test/val data
 testing_data := $(create_data_save_path)/test
 # [lowerbound / upperbound / v2v / disco / when2com / max / mean / sum / agent]
-com := v2v
+com := upperbound
 batch_size := 1
 # [train / test / val]
 split := train
@@ -181,4 +181,12 @@ mbb_test_no_rsu:
 	--warp_flag $(warp_flag) \
 	--rsu 0 \
 	--test_store $(logpath)/$(com)/no_rsu \
-	--init_resume_path logs/disco/no_rsu/epoch_100.pth
+	--init_resume_path logs/$(com)/no_rsu/epoch_100.pth
+    
+mbb_analyse_all_scenes:
+	python analyse_all_scenes_mbb.py \
+	--path $(logpath)/$(com)/no_rsu \
+	--save_path $(logpath)/${com}/no_rsu \
+	--nepoch $(nepoch) \
+	--analyse_all \
+	--rsu 0
