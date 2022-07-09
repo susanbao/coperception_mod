@@ -94,7 +94,7 @@ def analyse_one_frame_data(file_path, scene, args):
         )
     )
 
-def get_all_scene(files_path):
+def get_all_scene_file_list(files_path):
     fileList = os.listdir(files_path)
     scene_list = set()
     for fname in fileList:
@@ -102,24 +102,102 @@ def get_all_scene(files_path):
             continue
         scene, frame = fname.split(".")[0].split("_")
         scene_list.add(scene)
-    return list(scene_list)
-    
-def analysis_all_data(args):
-    # generate mean_ap of each agent and all agents in one scene and store as {scene}_mean_ap.npy of all epoch which will be epoch*2*(num_agent+1)
-    mean_ap_all = []
-    agent_idx_range = [i for i in range(1-args.rsu, args.num_agent)]
-    num_agent = args.num_agent if args.rsu else args.num_agent-1
-    files_path = os.path.join(args.path, args.com)
-    files_path = os.path.join(files_path, args.rsu)
-    scene_list = get_all_scene(os.path.join(files_path, "0"))
+    scene_list = list(scene_list)
     scene_dict = {}
     for i in scene_list:
         scene_dict[i] = []
-    for i in range(args.nepoch+1):
-        npy_files_path = os.path.join(files_path, str(i))
-        det_results_all = [[] for i in agent_idx_range]
-        annotations_all = [[] for i in agent_idx_range]
+    for fname in fileList:
+        if fname[-4:] != '.npy':
+            continue
+        scene, frame = fname.split(".")[0].split("_")
+        scene_dict[scene].append(fname)
+    return scene_dict
+    
+def analysis_all_data(args):
+    # generate mean_ap of each agent and all agents in one scene and store as {scene}_mean_ap.npy of all epoch which will be epoch*2*(num_agent+1)
+    agent_idx_range = [i for i in range(1-args.rsu, args.num_agent)]
+    num_agent = args.num_agent if args.rsu else args.num_agent-1
+    files_path = args.path
+    scene_dict = get_all_scene_file_list(files_path+"/0/result1")
+    agents_data_path = [os.path.join(files_path+"/0", f"result{i}") for i in agent_idx_range]
+    save_path = args.save_path
+    os.makedirs(save_path, exist_ok=True)
+    log_file_path = os.path.join(args.save_path, "scene_log_test.txt")
+    log_file = open(log_file_path, "w")
+    def print_and_write_log(log_str):
+        print(log_str)
+        log_file.write(log_str + "\n")
+    for scene, files in scene_dict.items():
+        mean_ap_scenes = []
+        print_and_write_log("scene: " + scene)
+        for epoch in range(args.nepoch+1):
+            mean_ap_5 = []
+            mean_ap_7 = []
+            det_results_all_local = []
+            annotations_all_local = []
+            for idx, agent in enumerate(agent_idx_range):
+                det_results_local = []
+                annotations_local = []
+                for file in files:
+                    file_path = os.path.join(agents_data_path[idx], file)
+                    data = np.load(file_path, allow_pickle=True)
+                    det_results_local.extend(data.item()["det_results_frame"])
+                    annotations_local.extend(data.item()["annotations_frame"])
+                det_results_all_local.extend(det_results_local)
+                annotations_all_local.extend(annotations_local)
+                print_and_write_log("Local mAP@0.5 from agent {}".format(k))
+                mean_ap, _ = eval_map(
+                    det_results_local,
+                    annotations_local,
+                    scale_ranges=None,
+                    iou_thr=0.5,
+                    dataset=None,
+                    logger=None,
+                )
+                mean_ap_5.append(mean_ap)
+                print_and_write_log("Local mAP@0.7 from agent {}".format(k))
 
+                mean_ap, _ = eval_map(
+                    det_results_local,
+                    annotations_local,
+                    scale_ranges=None,
+                    iou_thr=0.7,
+                    dataset=None,
+                    logger=None,
+                )
+                mean_ap_7.append(mean_ap)
+            mean_ap_local_average, _ = eval_map(
+                det_results_all_local,
+                annotations_all_local,
+                scale_ranges=None,
+                iou_thr=0.5,
+                dataset=None,
+                logger=None,
+            )
+            mean_ap_5.append(mean_ap_local_average)
+
+            mean_ap_local_average, _ = eval_map(
+                det_results_all_local,
+                annotations_all_local,
+                scale_ranges=None,
+                iou_thr=0.7,
+                dataset=None,
+                logger=None,
+            )
+            mean_ap_7.append(mean_ap_local_average)
+            mean_ap_scenes.append([mean_ap_5, mean_ap_7])
+            for idx, agent in enumerate(agent_idx_range):
+                print_and_write_log(
+                    "agent{} mAP@0.5 is {} and mAP@0.7 is {}".format(
+                        agent, mean_ap_scenes[0][idx], mean_ap_scenes[1][idx]
+                    )
+                )
+
+            print_and_write_log(
+                "average local mAP@0.5 is {} and average local mAP@0.7 is {}".format(
+                    mean_ap_scenes[0][-1], mean_ap_scenes[1][-1]
+                )
+            )
     
 
     return
