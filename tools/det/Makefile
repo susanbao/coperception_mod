@@ -19,14 +19,14 @@ testing_script := test_codet.py
 # Path to the test/val data
 testing_data := $(create_data_save_path)/test
 # [lowerbound / upperbound / v2v / disco / when2com / max / mean / sum / agent]
-com := upperbound
+com := disco
 batch_size := 1
 # [train / test / val]
 split := train
 # Where to store the logs
 logpath := check_nyu
 # Train for how many epochs
-nepoch := 26
+nepoch := 25
 # If given, the model will resume from its most recent (by modification time) check point
 auto_resume_path := $(logpath)
 # compress_level
@@ -181,7 +181,8 @@ mbb_test_no_rsu:
 	--warp_flag $(warp_flag) \
 	--rsu 0 \
 	--test_store $(logpath)/$(com)/no_rsu \
-	--init_resume_path logs/$(com)/no_rsu/epoch_100.pth
+	--init_resume_path logs/$(com)/no_rsu/epoch_100.pth \
+	--nepoch ${nepoch}
     
 mbb_analyse_all_scenes:
 	python analyse_all_scenes_mbb.py \

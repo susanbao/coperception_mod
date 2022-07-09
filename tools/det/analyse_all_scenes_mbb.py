@@ -133,7 +133,7 @@ def analysis_all_data(args):
     for scene, files in scene_dict.items():
         mean_ap_scenes = []
         print_and_write_log("scene: " + scene)
-        for epoch in range(args.nepoch):
+        for epoch in range(args.nepoch+1):
             mean_ap_5 = []
             mean_ap_7 = []
             det_results_all_local = []
