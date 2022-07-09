@@ -114,7 +114,8 @@ def get_all_scene_file_list(files_path):
     return scene_dict
     
 def analysis_all_data(args):
-    # generate mean_ap of each agent and all agents in one scene and store as {scene}_mean_ap.npy of all epoch which will be epoch*2*(num_agent+1)
+    # generate mean_ap of each agent and all agents in one scene and store in mean_ap_all_scenes_dic's value which will be epoch*2*(num_agent+1)
+    # store in all_scenes_mean_ap.npy
     agent_idx_range = [i for i in range(1-args.rsu, args.num_agent)]
     num_agent = args.num_agent if args.rsu else args.num_agent-1
     files_path = args.path
@@ -127,6 +128,7 @@ def analysis_all_data(args):
     def print_and_write_log(log_str):
         print(log_str)
         log_file.write(log_str + "\n")
+    mean_ap_all_scenes_dic = {}
     for scene, files in scene_dict.items():
         mean_ap_scenes = []
         print_and_write_log("scene: " + scene)
@@ -198,7 +200,9 @@ def analysis_all_data(args):
                     mean_ap_scenes[0][-1], mean_ap_scenes[1][-1]
                 )
             )
-    
+        mean_ap_all_scenes_dic[scene] = mean_ap_scenes
+    npy_frame_file = os.path.join(files_path, "all_scenes_mean_ap.npy")
+    np.save(npy_frame_file, mean_ap_all_scenes_dic)
 
     return
     
