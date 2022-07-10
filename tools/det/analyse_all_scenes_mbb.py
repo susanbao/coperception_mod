@@ -121,7 +121,6 @@ def analysis_all_data(args):
     num_agent = args.num_agent if args.rsu else args.num_agent-1
     files_path = args.path
     scene_dict = get_all_scene_file_list(files_path+"/0/result1")
-    agents_data_path = [os.path.join(files_path+"/0", f"result{i}") for i in agent_idx_range]
     save_path = args.save_path
     os.makedirs(save_path, exist_ok=True)
     log_file_path = os.path.join(args.save_path, "scene_log_test.txt")
@@ -138,6 +137,9 @@ def analysis_all_data(args):
             mean_ap_7 = []
             det_results_all_local = []
             annotations_all_local = []
+            epoch_path = os.path.join(files_path, f"{epoch}")
+            agents_data_path = [os.path.join(epoch_path, f"result{i}") for i in agent_idx_range]
+            print_and_write_log("Epoch {}".format(epoch))
             for idx, agent in enumerate(agent_idx_range):
                 det_results_local = []
                 annotations_local = []
@@ -192,19 +194,17 @@ def analysis_all_data(args):
                 logger=None,
             )
             mean_ap_7.append(mean_ap_local_average)
-            mean_ap_scenes.append(mean_ap_5)
-            mean_ap_scenes.append(mean_ap_7)
-            print(mean_ap_scenes)
+            mean_ap_scenes.append([mean_ap_5, mean_ap_7])
             for idx, agent in enumerate(agent_idx_range):
                 print_and_write_log(
                     "scene {}: agent{} mAP@0.5 is {} and mAP@0.7 is {}".format(
-                        scene, agent, mean_ap_scenes[0][idx], mean_ap_scenes[1][idx]
+                        scene, agent, mean_ap_scenes[-1][0][idx], mean_ap_scenes[-1][1][idx]
                     )
                 )
 
             print_and_write_log(
                 "scene {}: average local mAP@0.5 is {} and average local mAP@0.7 is {}".format(
-                    scene, mean_ap_scenes[0][-1], mean_ap_scenes[1][-1]
+                    scene, mean_ap_scenes[-1][0][-1], mean_ap_scenes[-1][1][-1]
                 )
             )
         mean_ap_all_scenes_dic[scene] = mean_ap_scenes
