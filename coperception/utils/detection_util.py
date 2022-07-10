@@ -651,7 +651,7 @@ def cal_local_mAP(config, data, det_results, annotations, return_local = False):
             det_results.append(det_results_multiclass)
             annotations.append(annotation_frame)
             local_det_results.append(det_results_multiclass)
-            local_annotations.append(annotations)
+            local_annotations.append(annotation_frame)
     if return_local:
         return det_results, annotations, local_det_results, local_annotations
     else:

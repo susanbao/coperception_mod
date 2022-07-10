@@ -19,7 +19,7 @@ testing_script := test_codet.py
 # Path to the test/val data
 testing_data := $(create_data_save_path)/test
 # [lowerbound / upperbound / v2v / disco / when2com / max / mean / sum / agent]
-com := v2v
+com := when2com
 batch_size := 1
 # [train / test / val]
 split := train
