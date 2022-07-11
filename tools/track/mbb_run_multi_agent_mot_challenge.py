@@ -56,7 +56,7 @@ if __name__ == "__main__":
             os.system(f'python ./TrackEval/scripts/run_mot_challenge.py --BENCHMARK V2X --SPLIT_TO_EVAL {split}{current_agent} --TRACKERS_TO_EVAL sort-{mode}/{rsu}/{bootstrap} --METRICS CLEAR --DO_PREPROC False')
 
             # copy cvs to pedestrian_summary_mota.cvs
-            command = "cp " + f'./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary.cvs' + f'./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary_mota.cvs'
+            command = "cp " + f'./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary.cvs' + f' ./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary_mota.cvs'
             os.system(command)
             # collect results
             eval_output_path = f'./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary.txt'
@@ -74,7 +74,7 @@ if __name__ == "__main__":
             os.system(f'python ./TrackEval/scripts/run_mot_challenge.py --BENCHMARK V2X --SPLIT_TO_EVAL {split}{current_agent} --TRACKERS_TO_EVAL sort-{mode}/{rsu}/{bootstrap} --METRICS HOTA --DO_PREPROC False')
 
              # copy cvs to pedestrian_summary_hota.cvs
-            command = "cp " + f'./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary.cvs' + f'./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary_hota.cvs'
+            command = "cp " + f'./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary.cvs' + f' ./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary_hota.cvs'
             os.system(command)
             # collect results
             eval_output_path = f'./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary.txt'
