@@ -2,6 +2,7 @@ import os
 import argparse
 import pandas as pd
 import numpy as np
+import time
 
 def parse_args():
     """Parse input arguments."""
@@ -54,9 +55,12 @@ if __name__ == "__main__":
             result_dict[agent_idx] = []
         for current_agent in range(from_agent, to_agent):
             os.system(f'python ./TrackEval/scripts/run_mot_challenge.py --BENCHMARK V2X --SPLIT_TO_EVAL {split}{current_agent} --TRACKERS_TO_EVAL sort-{mode}/{rsu}/{bootstrap} --METRICS CLEAR --DO_PREPROC False')
-
+            time.sleep(0.1)
             # copy cvs to pedestrian_summary_mota.cvs
-            command = "cp " + f'./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary.cvs' + f' ./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary_mota.cvs'
+            command = "cp " + f'./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_detailed.csv' + f' ./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_detailed_mota.csv'
+            os.system(command)
+            time.sleep(0.1)
+            command = "cp " + f'./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary.txt' + f' ./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary_mota.txt'
             os.system(command)
             # collect results
             eval_output_path = f'./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary.txt'
@@ -72,9 +76,12 @@ if __name__ == "__main__":
         # run eval for other metrics
         for current_agent in range(from_agent, to_agent):
             os.system(f'python ./TrackEval/scripts/run_mot_challenge.py --BENCHMARK V2X --SPLIT_TO_EVAL {split}{current_agent} --TRACKERS_TO_EVAL sort-{mode}/{rsu}/{bootstrap} --METRICS HOTA --DO_PREPROC False')
-
-             # copy cvs to pedestrian_summary_hota.cvs
-            command = "cp " + f'./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary.cvs' + f' ./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary_hota.cvs'
+            time.sleep(0.1)
+             # copy cvs to pedestrian_detailed_hota.cvs
+            command = "cp " + f'./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_detailed.csv' + f' ./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_detailed_hota.csv'
+            os.system(command)
+            time.sleep(0.1)
+            command = "cp " + f'./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary.txt' + f' ./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary_hota.txt'
             os.system(command)
             # collect results
             eval_output_path = f'./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/{bootstrap}/pedestrian_summary.txt'

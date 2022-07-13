@@ -22,7 +22,7 @@ to_agent := 6
 det_logs_path := $(det_path)/check_nyu
 # start of bootstrap for testing
 boot_start := 0
-# end of bootstrap for testing, include the boot_end
+# end of bootstrap for testing, include the boot_end 25
 boot_end := 25
 
 .PHONY: sort
