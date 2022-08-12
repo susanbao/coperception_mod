@@ -38,7 +38,7 @@ class DetModelBase(nn.Module):
         self.out_seq_len = 1 if config.only_det else config.pred_len
         self.box_code_size = config.box_code_size
         self.covar_length = config.covar_length
-        self.need_covar = config.loss_type == "kl_loss_center"
+        self.loss_type = config.loss_type
         self.category_num = config.category_num
         self.use_map = config.use_map
         self.anchor_num_per_loc = len(config.anchor_size)
@@ -245,13 +245,16 @@ class DetModelBase(nn.Module):
         # Detection head
         loc_preds = self.regression(x)
         loc_preds = loc_preds.permute(0, 2, 3, 1).contiguous()
+        box_code_size = self.box_code_size
+        if self.loss_type == "kl_loss_center_add":
+            box_code_size += self.covar_length
         loc_preds = loc_preds.view(
             -1,
             loc_preds.size(1),
             loc_preds.size(2),
             self.anchor_num_per_loc,
             self.out_seq_len,
-            self.box_code_size, # (x,y,w,h,sin,cos)
+            box_code_size, # (x,y,w,h,sin,cos) + covariance
         )
 
 
@@ -259,7 +262,7 @@ class DetModelBase(nn.Module):
         result = {"loc": loc_preds, "cls": cls_preds}
 
         # location covariance pred
-        if self.need_covar:
+        if self.loss_type == "kl_loss_center":
             loc_covar = self.covariance(x)
             loc_covar = loc_covar.permute(0, 2, 3, 1).contiguous()
             loc_covar = loc_covar.view(

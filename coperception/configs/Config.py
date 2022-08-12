@@ -111,7 +111,7 @@ class Config(object):
         self.code_type = "faf"
         self.pred_type = "motion"
         # debug Loss
-        self.loss_type = "corner_loss"
+        # self.loss_type = "corner_loss"
         # debug MGDA
         self.MGDA = False
         # debug when2com

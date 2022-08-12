@@ -109,16 +109,17 @@ class FaFModule(object):
     def cal_kl_loss(self, pred_decode, target_decode, covariance_pred, N):
         pred_diff = target_decode - pred_decode
         pred_diff = torch.unsqueeze(pred_diff, 1)
-        covar_matrix = torch.zeros((covariance_pred.shape[0], self.covar_matrix_size, self.covar_matrix_size)) # T*6*6
-        indices = np.triu_indices(self.covar_matrix_size)
-        first_indices = np.expand_dims(np.array([i for i in range(covariance_pred.shape[0])]), axis = 1)
+        covar_matrix = torch.zeros((covariance_pred.shape[0], self.covar_matrix_size, self.covar_matrix_size), device='cuda') # T*6*6
+        indices = torch.triu_indices(self.covar_matrix_size, self.covar_matrix_size, device='cuda')
+        first_indices = torch.unsqueeze(torch.arange(0, covariance_pred.shape[0], dtype = torch.long, device='cuda'), 1)
         covar_matrix[first_indices, indices[0], indices[1]] = covariance_pred
-        diagional = np.array([i for i in range(self.covar_matrix_size)])
+        diagional = torch.arange(0, self.covar_matrix_size, dtype = torch.long, device='cuda')
         covar_matrix[first_indices, diagional, diagional] = torch.exp(covar_matrix[first_indices, diagional, diagional])
         sigma_inverse = torch.matmul(torch.transpose(covar_matrix, 1, 2), covar_matrix)
-        reg_loss = torch.matmul(torch.matmul(pred_diff, sigma_inverse), torch.transpose(pred_diff, 2))
+        reg_loss = torch.matmul(torch.matmul(pred_diff, sigma_inverse), torch.transpose(pred_diff, 1, 2))
         reg_loss_sum = torch.sum(reg_loss) / N
-        matrix_det = 1/(torch.sum(covar_matrix[first_indices, diagional, diagional], axis=1))
+        matrix_det = 1/(torch.prod(covar_matrix[first_indices, diagional, diagional], axis=1))
+        matrix_det = matrix_det * matrix_det
         matrix_det_sum = torch.sum(matrix_det) / N
 
         reg_loss_sum -= matrix_det_sum
@@ -165,7 +166,7 @@ class FaFModule(object):
         pred_decode = bev_box_decode_torch(assigned_pred, assigned_anchor)
         target_decode = bev_box_decode_torch(assigned_target, assigned_anchor)
 
-        return self.cal_kl_loss(pred_decode, target_decode, covariance_pred)
+        return self.cal_kl_loss(pred_decode, target_decode, covariance_pred, N)
     
     # increase the number of output of original regression head for covariance
     def kl_loss_center_add(self, anchors, reg_loss_mask, reg_targets, pred_result):
@@ -186,7 +187,7 @@ class FaFModule(object):
         pred_decode = bev_box_decode_torch(assigned_pred, assigned_anchor)
         target_decode = bev_box_decode_torch(assigned_target, assigned_anchor)
 
-        return self.cal_kl_loss(pred_decode, target_decode, covariance_pred)
+        return self.cal_kl_loss(pred_decode, target_decode, covariance_pred, N)
 
     def loss_calculator(
         self,
@@ -342,7 +343,7 @@ class FaFModule(object):
                 )
             else:
                 result = self.model(
-                    bev_seq, trans_matrices, num_all_agents, batch_size=batch_size
+                    bev_seq, maps = trans_matrices, vis = num_all_agents, batch_size=batch_size
                 )
 
         if self.kd_flag:
