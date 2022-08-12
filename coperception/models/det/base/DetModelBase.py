@@ -37,11 +37,14 @@ class DetModelBase(nn.Module):
         self.motion_state = config.motion_state
         self.out_seq_len = 1 if config.only_det else config.pred_len
         self.box_code_size = config.box_code_size
+        self.covar_length = config.covar_length
+        self.need_covar = config.loss_type == "kl_loss_center"
         self.category_num = config.category_num
         self.use_map = config.use_map
         self.anchor_num_per_loc = len(config.anchor_size)
         self.classification = ClassificationHead(config)
         self.regression = SingleRegressionHead(config)
+        self.covariance = RegressionCovarianceHead(config)
         self.agent_num = num_agent
         self.kd_flag = kd_flag
         self.layer = layer
@@ -251,8 +254,24 @@ class DetModelBase(nn.Module):
             self.box_code_size, # (x,y,w,h,sin,cos)
         )
 
+
         # loc_pred (N * T * W * H * loc)
         result = {"loc": loc_preds, "cls": cls_preds}
+
+        # location covariance pred
+        if self.need_covar:
+            loc_covar = self.covariance(x)
+            loc_covar = loc_covar.permute(0, 2, 3, 1).contiguous()
+            loc_covar = loc_covar.view(
+                -1,
+                loc_preds.size(1),
+                loc_preds.size(2),
+                self.anchor_num_per_loc,
+                self.out_seq_len,
+                self.covar_length, # decomposition matrix for covariance matrix, for multivariate Gaussian of (x,y,w,h,sin,cos), it should be 21
+            )
+            result["loc_covar"] = loc_covar
+
 
         # MotionState head
         if self.motion_state:
@@ -313,6 +332,8 @@ class SingleRegressionHead(nn.Module):
         anchor_num_per_loc = len(config.anchor_size)
         box_code_size = config.box_code_size
         out_seq_len = 1 if config.only_det else config.pred_len
+        if config.loss_type == "kl_loss_center_add":
+            box_code_size += config.covar_length
 
         if config.binary:
             if config.only_det:
@@ -339,6 +360,58 @@ class SingleRegressionHead(nn.Module):
                     nn.Conv2d(
                         128,
                         anchor_num_per_loc * box_code_size * out_seq_len,
+                        kernel_size=1,
+                        stride=1,
+                        padding=0,
+                    ),
+                )
+
+    def forward(self, x):
+        box = self.box_prediction(x)
+
+        return box
+
+class RegressionCovarianceHead(nn.Module):
+    """The regression head."""
+
+    def __init__(self, config):
+        super(RegressionCovarianceHead, self).__init__()
+
+        channel = 32
+        if config.use_map:
+            channel += 6
+        if config.use_vis:
+            channel += 13
+
+        anchor_num_per_loc = len(config.anchor_size)
+        covariance_size = config.covar_length
+        out_seq_len = 1 if config.only_det else config.pred_len
+
+        if config.binary:
+            if config.only_det:
+                self.box_prediction = nn.Sequential(
+                    nn.Conv2d(channel, channel, kernel_size=3, stride=1, padding=1),
+                    nn.BatchNorm2d(channel),
+                    nn.ReLU(),
+                    nn.Conv2d(
+                        channel,
+                        anchor_num_per_loc * covariance_size * out_seq_len,
+                        kernel_size=1,
+                        stride=1,
+                        padding=0,
+                    ),
+                )
+            else:
+                self.box_prediction = nn.Sequential(
+                    nn.Conv2d(channel, 128, kernel_size=3, stride=1, padding=1),
+                    nn.BatchNorm2d(128),
+                    nn.ReLU(),
+                    nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1),
+                    nn.BatchNorm2d(128),
+                    nn.ReLU(),
+                    nn.Conv2d(
+                        128,
+                        anchor_num_per_loc * covariance_size * out_seq_len,
                         kernel_size=1,
                         stride=1,
                         padding=0,
