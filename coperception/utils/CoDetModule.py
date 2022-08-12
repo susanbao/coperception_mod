@@ -118,11 +118,16 @@ class FaFModule(object):
         sigma_inverse = torch.matmul(torch.transpose(covar_matrix, 1, 2), covar_matrix)
         reg_loss = torch.matmul(torch.matmul(pred_diff, sigma_inverse), torch.transpose(pred_diff, 1, 2))
         reg_loss_sum = torch.sum(reg_loss) / N
-        matrix_det = 1/(torch.prod(covar_matrix[first_indices, diagional, diagional], axis=1))
-        matrix_det = matrix_det * matrix_det
+        matrix_diagonal = sigma_inverse[first_indices, diagional, diagional]
+        matrix_det = (torch.prod(matrix_diagonal, axis=1))
+        matrix_det = 1/(matrix_det * matrix_det)
+        matrix_det = torch.log(matrix_det)
         matrix_det_sum = torch.sum(matrix_det) / N
 
-        reg_loss_sum -= matrix_det_sum
+        reg_loss_sum += matrix_det_sum
+        reg_loss_sum = reg_loss_sum/2 * self.config.loss_loc_weight
+        
+        """
         print("covariance_pred")
         print(covariance_pred.shape)
         print(covariance_pred[1])
@@ -141,9 +146,12 @@ class FaFModule(object):
         print("matrix_det")
         print(matrix_det.shape)
         print(matrix_det[1])
+        print("matrix_diagonal")
+        print(matrix_diagonal.shape)
+        print(matrix_diagonal[1])
         print(matrix_det_sum)
         print(reg_loss_sum)
-        exit()
+        """
         return reg_loss_sum
 
     # calculate the kl loss for (x,y,w,h,sin,cos) with multivariate Gaussian Distruction
@@ -297,6 +305,12 @@ class FaFModule(object):
             loss = loss_cls + loss_loc + loss_motion
         else:
             loss = loss_cls + loss_loc
+        """
+        print("loss: {}".format(loss))
+        print("loss_cls: {}".format(loss_cls))
+        print("loss_loc: {}".format(loss_loc))
+        exit()
+        """
 
         if loss_num == 2:
             return loss_num, loss, loss_cls, loss_loc

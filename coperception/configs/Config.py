@@ -73,6 +73,7 @@ class Config(object):
         self.loss_type = loss_type  # corner_loss faf_loss kl_loss_center kl_loss_center_add
         self.covar_length = 21 # number of variables in the covariance matrix
         self.covar_matrix_size = 6 # one dimensional size of the covariance matrix
+        self.loss_loc_weight = 0.1
 
         # The specifications for BEV maps
         self.voxel_size = (0.25, 0.25, 0.4)

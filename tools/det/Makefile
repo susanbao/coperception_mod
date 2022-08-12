@@ -19,14 +19,14 @@ testing_script := test_codet.py
 # Path to the test/val data
 testing_data := $(create_data_save_path)/test
 # [lowerbound / upperbound / v2v / disco / when2com / max / mean / sum / agent]
-com := when2com
+com := upperbound
 batch_size := 1
 # [train / test / val]
 split := train
 # Where to store the logs
-logpath := check_nyu
+logpath := check_loss_center_add
 # Train for how many epochs
-nepoch := 25
+nepoch := 100
 # If given, the model will resume from its most recent (by modification time) check point
 auto_resume_path := $(logpath)
 # compress_level

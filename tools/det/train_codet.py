@@ -24,7 +24,7 @@ def check_folder(folder_path):
 
 
 def main(args):
-    config = Config("train", binary=True, only_det=True)
+    config = Config("train", binary=True, only_det=True, loss_type = "kl_loss_center_add")
     config_global = ConfigGlobal("train", binary=True, only_det=True)
 
     num_epochs = args.nepoch
