@@ -168,7 +168,7 @@ class FaFModule(object):
         return self.cal_kl_loss(pred_decode, target_decode, covariance_pred)
     
     # increase the number of output of original regression head for covariance
-    def kl_loss_center(self, anchors, reg_loss_mask, reg_targets, pred_result):
+    def kl_loss_center_add(self, anchors, reg_loss_mask, reg_targets, pred_result):
         N = pred_result.shape[0]
         anchors = anchors.unsqueeze(-2).expand(
             anchors.shape[0],
