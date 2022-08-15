@@ -262,7 +262,7 @@ def apply_nms_det(
         len(batch_box_preds.shape) == 6
     ), "bbox must have shape [N ,W , H , num_per_loc, T, box_code]"
     
-    if config.loss_type != "corner_loss" and config.loss_type != "faf_loss":
+    if config.loss_type == "kl_loss_center_add":
         shape = batch_box_preds.shape
         batch_box_preds_loc = batch_box_preds[:,:,:,:,:,:(shape[-1] - config.covar_length)]
     else:

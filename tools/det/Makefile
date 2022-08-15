@@ -1,7 +1,7 @@
 # Path to the original V2X-Sim dataset
 original_data_path := /data/v2x-sim
 # Where to save the created data
-create_data_save_path := /data/v2x-sim-nyu/V2X-Sim-det
+create_data_save_path := /data/v2x-sim-nyu/V2X-Sim-demo
 # Index of the begining scene
 scene_begin := 0
  # Index of the ending scene + 1
@@ -24,11 +24,11 @@ batch_size := 1
 # [train / test / val]
 split := train
 # Where to store the logs
-logpath := check_loss_center
+logpath := check_loss_origin
 # Train for how many epochs
 nepoch := 30
 # loss type: corner_loss, faf_loss, kl_loss_center, kl_loss_center_add
-loss_type = kl_loss_center
+loss_type = corner_loss
 # If given, the model will resume from its most recent (by modification time) check point
 auto_resume_path := $(logpath)
 # compress_level
