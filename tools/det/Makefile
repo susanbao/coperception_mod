@@ -24,9 +24,11 @@ batch_size := 1
 # [train / test / val]
 split := train
 # Where to store the logs
-logpath := check_loss_center_add
+logpath := check_loss_center
 # Train for how many epochs
-nepoch := 100
+nepoch := 30
+# loss type: corner_loss, faf_loss, kl_loss_center, kl_loss_center_add
+loss_type = kl_loss_center
 # If given, the model will resume from its most recent (by modification time) check point
 auto_resume_path := $(logpath)
 # compress_level
@@ -72,7 +74,8 @@ train:
 	--rsu $(rsu) \
 	--compress_level $(compress_level) \
 	--pose_noise $(pose_noise) \
-	--only_v2i $(only_v2i)
+	--only_v2i $(only_v2i) \
+	--loss_type $(loss_type)
 
 train_disco:
 	python $(training_script) \
@@ -87,7 +90,8 @@ train_disco:
 	--compress_level $(compress_level) \
 	--pose_noise $(pose_noise) \
 	--only_v2i $(only_v2i) \
-	-- rsu 1
+	-- rsu 1 \
+	--loss_type $(loss_type)
 
 train_disco_no_rsu:
 	python $(training_script) \
@@ -102,7 +106,8 @@ train_disco_no_rsu:
 	--compress_level $(compress_level) \
 	--pose_noise $(pose_noise) \
 	--only_v2i $(only_v2i) \
-	-- rsu 0
+	-- rsu 0 \
+	--loss_type $(loss_type)
     
 mbb_train:
 	python train_mbb.py \
@@ -153,7 +158,8 @@ test:
 	--visualization $(visualization) \
 	--inference $(inference) \
 	--warp_flag $(warp_flag) \
-	--rsu 1
+	--rsu 1 \
+	--loss_type $(loss_type)
 
 test_no_rsu:
 	python $(testing_script) \
@@ -166,7 +172,8 @@ test_no_rsu:
 	--visualization $(visualization) \
 	--inference $(inference) \
 	--warp_flag $(warp_flag) \
-	--rsu 0
+	--rsu 0 \
+	--loss_type $(loss_type)
 
 mbb_test_no_rsu:
 	python test_mbb.py \

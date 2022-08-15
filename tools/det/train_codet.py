@@ -24,8 +24,8 @@ def check_folder(folder_path):
 
 
 def main(args):
-    config = Config("train", binary=True, only_det=True, loss_type = "kl_loss_center_add")
-    config_global = ConfigGlobal("train", binary=True, only_det=True)
+    config = Config("train", binary=True, only_det=True, loss_type = args.loss_type)
+    config_global = ConfigGlobal("train", binary=True, only_det=True, loss_type = args.loss_type)
 
     num_epochs = args.nepoch
     need_log = args.log
@@ -478,6 +478,12 @@ if __name__ == "__main__":
         default=0,
         type=int,
         help="1: only v2i, 0: v2v and v2i",
+    )
+    parser.add_argument(
+        "--loss_type",
+        default="corner_loss",
+        type=str,
+        help="corner_loss, faf_loss, kl_loss_center, kl_loss_center_add",
     )
 
     torch.multiprocessing.set_sharing_strategy("file_system")

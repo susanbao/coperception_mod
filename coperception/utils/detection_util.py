@@ -258,17 +258,22 @@ def apply_nms_det(
 ):
 
     predictions_dicts = []
-    batch_anchors = anchors.view(
-        batch_box_preds.shape[0], -1, batch_box_preds.shape[-1]
-    )
-
     assert (
         len(batch_box_preds.shape) == 6
     ), "bbox must have shape [N ,W , H , num_per_loc, T, box_code]"
-
+    
+    if config.loss_type != "corner_loss" and config.loss_type != "faf_loss":
+        shape = batch_box_preds.shape
+        batch_box_preds_loc = batch_box_preds[:,:,:,:,:,:(shape[-1] - config.covar_length)]
+    else:
+        batch_box_preds_loc = batch_box_preds
+    batch_anchors = anchors.view(
+        batch_box_preds.shape[0], -1, batch_box_preds_loc.shape[-1]
+    )
+    
     batch_id = 0
     for box_preds, cls_preds, anchors in zip(
-        batch_box_preds, batch_cls_preds, batch_anchors
+        batch_box_preds_loc, batch_cls_preds, batch_anchors
     ):
 
         # N  * (W X H) * T * decoded_loc_dim(6)

@@ -3,3 +3,8 @@ dist/
 site/
 *.egg-info/
 logs
+.ipynb_checkpoints
+check_*
+check
+err_logs
+v2x-sim*
