@@ -326,6 +326,13 @@ def main(args):
             det_results_local[k], annotations_local[k] = cal_local_mAP(
                 config, temp, det_results_local[k], annotations_local[k]
             )
+            """
+            print("det_results_local[k]:")
+            print(det_results_local[k])
+            print("annotations_local[k]:")
+            print(annotations_local[k])
+            exit()
+            """
 
             filename = str(filename0[0][0])
             cut = filename[filename.rfind("agent") + 7 :]

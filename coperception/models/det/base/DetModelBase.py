@@ -262,7 +262,7 @@ class DetModelBase(nn.Module):
         result = {"loc": loc_preds, "cls": cls_preds}
 
         # location covariance pred
-        if self.loss_type == "kl_loss_center":
+        if self.loss_type == "kl_loss_center" or self.loss_type == "kl_loss_corner" or self.loss_type == "kl_loss_center_ind" or self.loss_type == "kl_loss_center_offset_ind":
             loc_covar = self.covariance(x)
             loc_covar = loc_covar.permute(0, 2, 3, 1).contiguous()
             loc_covar = loc_covar.view(

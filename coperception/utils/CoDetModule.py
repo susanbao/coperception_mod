@@ -4,6 +4,7 @@ from coperception.utils.min_norm_solvers import MinNormSolver
 import numpy as np
 import torch
 import torch.nn.functional as F
+import math
 
 
 class FaFModule(object):
@@ -106,6 +107,51 @@ class FaFModule(object):
 
         return loss_loc
     
+    def kl_loss_corner(self, anchors, reg_loss_mask, reg_targets, pred_result, pred_cov):
+        N = pred_result.shape[0]
+        anchors = anchors.unsqueeze(-2).expand(
+            anchors.shape[0],
+            anchors.shape[1],
+            anchors.shape[2],
+            anchors.shape[3],
+            reg_loss_mask.shape[-1],
+            anchors.shape[-1],
+        )
+        assigned_anchor = anchors[reg_loss_mask]
+        assigned_target = reg_targets[reg_loss_mask]
+        assigned_pred = pred_result[reg_loss_mask]
+        assigned_cov = pred_cov[reg_loss_mask]
+        # print(assigned_anchor.shape,assigned_pred.shape,assigned_target.shape)
+        # exit()
+        pred_decode = bev_box_decode_torch(assigned_pred, assigned_anchor)
+        target_decode = bev_box_decode_torch(assigned_target, assigned_anchor)
+        pred_corners = center_to_corner_box2d_torch(
+            pred_decode[..., :2], pred_decode[..., 2:4], pred_decode[..., 4:]
+        )
+        target_corners = center_to_corner_box2d_torch(
+            target_decode[..., :2], target_decode[..., 2:4], target_decode[..., 4:]
+        )
+        
+        l1_loss = nn.functional.smooth_l1_loss(pred_corners, target_corners, reduction='none')
+        pred_diff = torch.reshape(l1_loss, (l1_loss.shape[0], l1_loss.shape[1]*l1_loss.shape[2]))
+        loss_loc = pred_diff * torch.exp(-assigned_cov) + assigned_cov/2
+        loss_loc_sum = torch.sum(loss_loc)/N
+        """
+        print("pred_diff:")
+        print(pred_diff.shape)
+        print(pred_diff[1])
+        print("assigned_cov")
+        print(assigned_cov.shape)
+        print(assigned_cov[1])
+        print("loss_loc:")
+        print(loss_loc.shape)
+        print(loss_loc[1])
+        print("loss_loc_sum:")
+        print(loss_loc_sum)
+        """
+
+        return loss_loc_sum
+    
     def cal_kl_loss(self, pred_decode, target_decode, covariance_pred, N):
         pred_diff = target_decode - pred_decode
         pred_diff = torch.unsqueeze(pred_diff, 1)
@@ -114,18 +160,19 @@ class FaFModule(object):
         first_indices = torch.unsqueeze(torch.arange(0, covariance_pred.shape[0], dtype = torch.long, device='cuda'), 1)
         covar_matrix[first_indices, indices[0], indices[1]] = covariance_pred
         diagional = torch.arange(0, self.covar_matrix_size, dtype = torch.long, device='cuda')
+        
+        matrix_diagonal = covar_matrix[first_indices, diagional, diagional]
+        matrix_log_det_sum = -(torch.sum(matrix_diagonal) * 2 / N)
+        #matrix_log_det = torch.sum(matrix_diagonal*2, axis=1)
+        #matrix_log_det_sum = - (torch.sum(matrix_log_det) / N)
+        
         covar_matrix[first_indices, diagional, diagional] = torch.exp(covar_matrix[first_indices, diagional, diagional])
         sigma_inverse = torch.matmul(torch.transpose(covar_matrix, 1, 2), covar_matrix)
         reg_loss = torch.matmul(torch.matmul(pred_diff, sigma_inverse), torch.transpose(pred_diff, 1, 2))
         reg_loss_sum = torch.sum(reg_loss) / N
-        matrix_diagonal = sigma_inverse[first_indices, diagional, diagional]
-        matrix_det = (torch.prod(matrix_diagonal, axis=1))
-        matrix_det = 1/(matrix_det * matrix_det)
-        matrix_det = torch.log(matrix_det)
-        matrix_det_sum = torch.sum(matrix_det) / N
-
-        reg_loss_sum += matrix_det_sum
-        reg_loss_sum = reg_loss_sum/2 * self.config.loss_loc_weight
+        
+        reg_loss_sum_all = reg_loss_sum + matrix_log_det_sum * self.config.loc_det_weight
+        reg_loss_sum_all = reg_loss_sum_all/2 * self.config.loss_loc_weight
         
         """
         print("covariance_pred")
@@ -143,16 +190,14 @@ class FaFModule(object):
         print("pred_diff")
         print(pred_diff.shape)
         print(pred_diff[1])
-        print("matrix_det")
-        print(matrix_det.shape)
-        print(matrix_det[1])
-        print("matrix_diagonal")
-        print(matrix_diagonal.shape)
-        print(matrix_diagonal[1])
-        print(matrix_det_sum)
-        print(reg_loss_sum)
+        print("sum:")
+        print(matrix_log_det_sum/2)
+        print(reg_loss_sum/2)
+        print(reg_loss_sum_all)
+        #exit()
         """
-        return reg_loss_sum
+        
+        return reg_loss_sum_all
 
     # calculate the kl loss for (x,y,w,h,sin,cos) with multivariate Gaussian Distruction
     # add one additional regression head to output the covariance
@@ -196,6 +241,42 @@ class FaFModule(object):
         target_decode = bev_box_decode_torch(assigned_target, assigned_anchor)
 
         return self.cal_kl_loss(pred_decode, target_decode, covariance_pred, N)
+    
+    def kl_loss_center_independent(self, anchors, reg_loss_mask, reg_targets, pred_result, pred_covar):
+        N = pred_result.shape[0]
+        anchors = anchors.unsqueeze(-2).expand(
+            anchors.shape[0],
+            anchors.shape[1],
+            anchors.shape[2],
+            anchors.shape[3],
+            reg_loss_mask.shape[-1],
+            anchors.shape[-1],
+        )
+        assigned_anchor = anchors[reg_loss_mask]
+        assigned_target = reg_targets[reg_loss_mask]
+        assigned_pred = pred_result[reg_loss_mask]
+        covariance_pred = pred_covar[reg_loss_mask]
+
+        pred_decode = bev_box_decode_torch(assigned_pred, assigned_anchor)
+        target_decode = bev_box_decode_torch(assigned_target, assigned_anchor)
+        
+        l1_loss = nn.functional.smooth_l1_loss(pred_decode, target_decode, reduction='none')
+        loss_loc = l1_loss * torch.exp(-covariance_pred) + covariance_pred/2
+        loss_loc_sum = torch.sum(loss_loc)/N
+        
+        return loss_loc_sum
+    
+    def kl_loss_center_offset_independent(self, anchors, reg_loss_mask, reg_targets, pred_result, pred_covar):
+        N = pred_result.shape[0]
+        assigned_target = reg_targets[reg_loss_mask]
+        assigned_pred = pred_result[reg_loss_mask]
+        covariance_pred = pred_covar[reg_loss_mask]
+        
+        l1_loss = nn.functional.smooth_l1_loss(assigned_pred, assigned_target, reduction='none')
+        loss_loc = l1_loss * torch.exp(-covariance_pred) + covariance_pred/2
+        loss_loc_sum = torch.sum(loss_loc)
+        
+        return loss_loc_sum
 
     def loss_calculator(
         self,
@@ -272,11 +353,20 @@ class FaFModule(object):
                         anchors, reg_loss_mask, reg_targets, result["loc"]
                     )
                     loss_num += 1
+            elif self.loss_type == "kl_loss_corner":
+                loss_loc = self.kl_loss_corner(anchors, reg_loss_mask, reg_targets, result["loc"], result["loc_covar"])
+                loss_num += 1
             elif self.loss_type == "kl_loss_center_add":
                 loss_loc = self.kl_loss_center_add(anchors, reg_loss_mask, reg_targets, result["loc"])
                 loss_num += 1
             elif self.loss_type == "kl_loss_center":
                 loss_loc = self.kl_loss_center(anchors, reg_loss_mask, reg_targets, result["loc"], result["loc_covar"])
+                loss_num += 1
+            elif self.loss_type == "kl_loss_center_ind":
+                loss_loc = self.kl_loss_center_independent(anchors, reg_loss_mask, reg_targets, result["loc"], result["loc_covar"])
+                loss_num += 1
+            elif self.loss_type == "kl_loss_center_offset_ind":
+                loss_loc = self.kl_loss_center_offset_independent(anchors, reg_loss_mask, reg_targets, result["loc"], result["loc_covar"])
                 loss_num += 1
             else:
 
@@ -306,6 +396,10 @@ class FaFModule(object):
         else:
             loss = loss_cls + loss_loc
         """
+        print("cls pred:")
+        d = result["cls"]
+        print(d.shape)
+        print(d[0][1])
         print("loss: {}".format(loss))
         print("loss_cls: {}".format(loss_cls))
         print("loss_loc: {}".format(loss_loc))
@@ -597,7 +691,12 @@ class FaFModule(object):
                 batch_cls_preds = torch.unsqueeze(result["cls"][k, :, :], 0)
                 anchors = torch.unsqueeze(data["anchors"][k, :, :, :, :], 0)
                 batch_motion_preds = None
-
+                """
+                print("batch_box_preds:")
+                print(batch_box_preds)
+                print("batch_cls_preds:")
+                print(batch_cls_preds)
+                """
                 if not self.only_det:
                     if self.config.pred_type == "center":
                         batch_box_preds[:, :, :, :, 1:, 2:] = batch_box_preds[
@@ -612,7 +711,11 @@ class FaFModule(object):
                     self.config,
                     batch_motion_preds,
                 )
-
+                """
+                print("class_selected:")
+                print(class_selected)
+                exit()
+                """
                 seq_results[k] = class_selected
 
                 # global_points[k], cls_preds[k] = apply_box_global_transform(trans_matrices_map[k],batch_box_preds,batch_cls_preds,anchors,self.code_type,self.config,batch_motion_preds)

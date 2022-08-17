@@ -70,10 +70,15 @@ class Config(object):
         self.binary = binary
         self.only_det = only_det
         self.code_type = code_type
-        self.loss_type = loss_type  # corner_loss faf_loss kl_loss_center kl_loss_center_add
+        self.loss_type = loss_type  # corner_loss faf_loss kl_loss_center kl_loss_center_add, kl_loss_corner, kl_loss_center_ind, kl_loss_center_offset_ind
         self.covar_length = 21 # number of variables in the covariance matrix
+        if self.loss_type == "kl_loss_corner":
+            self.covar_length = 8
+        elif self.loss_type == "kl_loss_center_ind" or self.loss_type == "kl_loss_center_offset_ind":
+            self.covar_length = 6
         self.covar_matrix_size = 6 # one dimensional size of the covariance matrix
         self.loss_loc_weight = 0.1
+        self.loc_det_weight = 0.1
 
         # The specifications for BEV maps
         self.voxel_size = (0.25, 0.25, 0.4)
