@@ -2,7 +2,7 @@
 original_data_path := /data/v2x-sim
 # Where to save the created data
 #V2X-Sim-det  V2X-Sim-demo
-create_data_save_path := /data/v2x-sim-nyu/V2X-Sim-demo
+create_data_save_path := /data/v2x-sim-nyu/V2X-Sim-det
 # Index of the begining scene
 scene_begin := 0
  # Index of the ending scene + 1
@@ -25,11 +25,11 @@ batch_size := 1
 # [train / test / val]
 split := train
 # Where to store the logs
-logpath := check_loss_train_based
+logpath := check/check_loss_corner
 # Train for how many epochs
-nepoch := 32
+nepoch := 100
 # loss type: corner_loss, faf_loss, kl_loss_center, kl_loss_center_add, kl_loss_corner, kl_loss_center_ind, kl_loss_center_offset_ind 
-loss_type = kl_loss_center
+loss_type = kl_loss_corner
 # If given, the model will resume from its most recent (by modification time) check point
 auto_resume_path := $(logpath)
 # compress_level
@@ -37,7 +37,7 @@ compress_level := 0
 # 1: apply late fusion. 0: no late fusion
 apply_late_fusion := 0
 # 1: do visualizaton. 0: no visualization
-visualization := 1
+visualization := 0
 # pose_noise in meters
 pose_noise := 0
 # only apply v2i communication
@@ -51,6 +51,8 @@ warp_flag := 0
 inference := activated
 #block len for MBB method
 block_len := 16
+# Whether to use wandb to record parameters and loss
+use_wandb := 1
 
 create_data:
 	python create_data_det.py \
@@ -76,7 +78,9 @@ train:
 	--compress_level $(compress_level) \
 	--pose_noise $(pose_noise) \
 	--only_v2i $(only_v2i) \
+	--use_wandb $(use_wandb) \
 	--loss_type $(loss_type)
+
 
 train_disco:
 	python $(training_script) \

@@ -6,7 +6,6 @@ import torch
 import torch.nn.functional as F
 import math
 
-
 class FaFModule(object):
     def __init__(self, model, teacher, config, optimizer, criterion, kd_flag):
         self.MGDA = config.MGDA
