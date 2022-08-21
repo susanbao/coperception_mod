@@ -490,9 +490,15 @@ if __name__ == "__main__":
         "--loss_type",
         default="corner_loss",
         type=str,
-        help="corner_loss, faf_loss, kl_loss_center, kl_loss_center_add",
+        help="corner_loss faf_loss kl_loss_center kl_loss_center_add, kl_loss_corner, kl_loss_center_ind, kl_loss_center_offset_ind, kl_loss_corner_pair_ind",
     )
     parser.add_argument("--use_wandb", default=0, type=int, help="Whether to use wandb to record parameters and loss")
+    parser.add_argument(
+        "--exp_name",
+        default="exp",
+        type=str,
+        help="experiment name",
+    )
 
     torch.multiprocessing.set_sharing_strategy("file_system")
     args = parser.parse_args()
@@ -505,7 +511,7 @@ if __name__ == "__main__":
                project="kl_loss",
                entity="susanbao",
                notes=socket.gethostname(),
-               name=str(args.com) + "_" + str(args.loss_type) + "_" + str(args.nepoch),
+               name=str(args.com) + "_"+ args.exp_name +"_"+ str(args.loss_type) + "_" + str(args.nepoch),
                dir=run_dir,
                job_type="training",
                reinit=True)

@@ -44,7 +44,11 @@ class DetModelBase(nn.Module):
         self.anchor_num_per_loc = len(config.anchor_size)
         self.classification = ClassificationHead(config)
         self.regression = SingleRegressionHead(config)
-        self.covariance = RegressionCovarianceHead(config)
+        #self.covariance = RegressionCovarianceHead(config)
+        self.centerReg = CenterRegressionHead(config)
+        self.centerIndReg = CenterIndRegressionHead(config)
+        self.cornerIndReg = CornerIndRegressionHead(config)
+        self.cornerPairIndReg = CornerPairIndRegressionHead(config)
         self.agent_num = num_agent
         self.kd_flag = kd_flag
         self.layer = layer
@@ -262,8 +266,18 @@ class DetModelBase(nn.Module):
         result = {"loc": loc_preds, "cls": cls_preds}
 
         # location covariance pred
-        if self.loss_type == "kl_loss_center" or self.loss_type == "kl_loss_corner" or self.loss_type == "kl_loss_center_ind" or self.loss_type == "kl_loss_center_offset_ind":
-            loc_covar = self.covariance(x)
+        if self.loss_type == "kl_loss_center":
+            covRegHead = self.centerReg
+        elif self.loss_type == "kl_loss_center_ind" or self.loss_type == "kl_loss_center_offset_ind":
+            covRegHead = self.centerIndReg
+        elif self.loss_type == "kl_loss_corner":
+            covRegHead = self.cornerIndReg
+        elif self.loss_type == "kl_loss_corner_pair_ind":
+            covRegHead = self.cornerPairIndReg
+        else:
+            covRegHead = None
+        if covRegHead is not None:
+            loc_covar = covRegHead(x)
             loc_covar = loc_covar.permute(0, 2, 3, 1).contiguous()
             loc_covar = loc_covar.view(
                 -1,
@@ -271,7 +285,7 @@ class DetModelBase(nn.Module):
                 loc_preds.size(2),
                 self.anchor_num_per_loc,
                 self.out_seq_len,
-                self.covar_length, # decomposition matrix for covariance matrix, for multivariate Gaussian of (x,y,w,h,sin,cos), it should be 21
+                self.covar_length,
             )
             result["loc_covar"] = loc_covar
 
@@ -374,6 +388,57 @@ class SingleRegressionHead(nn.Module):
 
         return box
 
+class CenterRegressionHead(nn.Module):
+    """The regression head."""
+
+    def __init__(self, config):
+        super(CenterRegressionHead, self).__init__()
+
+        channel = 32
+        if config.use_map:
+            channel += 6
+        if config.use_vis:
+            channel += 13
+
+        anchor_num_per_loc = len(config.anchor_size)
+        out_seq_len = 1 if config.only_det else config.pred_len
+
+        if config.binary:
+            if config.only_det:
+                self.box_prediction = nn.Sequential(
+                    nn.Conv2d(channel, channel, kernel_size=3, stride=1, padding=1),
+                    nn.BatchNorm2d(channel),
+                    nn.ReLU(),
+                    nn.Conv2d(
+                        channel,
+                        anchor_num_per_loc * 21 * out_seq_len,
+                        kernel_size=1,
+                        stride=1,
+                        padding=0,
+                    ),
+                )
+            else:
+                self.box_prediction = nn.Sequential(
+                    nn.Conv2d(channel, 128, kernel_size=3, stride=1, padding=1),
+                    nn.BatchNorm2d(128),
+                    nn.ReLU(),
+                    nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1),
+                    nn.BatchNorm2d(128),
+                    nn.ReLU(),
+                    nn.Conv2d(
+                        128,
+                        anchor_num_per_loc * 21 * out_seq_len,
+                        kernel_size=1,
+                        stride=1,
+                        padding=0,
+                    ),
+                )
+
+    def forward(self, x):
+        box = self.box_prediction(x)
+
+        return box
+
 class RegressionCovarianceHead(nn.Module):
     """The regression head."""
 
@@ -415,6 +480,210 @@ class RegressionCovarianceHead(nn.Module):
                     nn.Conv2d(
                         128,
                         anchor_num_per_loc * covariance_size * out_seq_len,
+                        kernel_size=1,
+                        stride=1,
+                        padding=0,
+                    ),
+                )
+
+    def forward(self, x):
+        box = self.box_prediction(x)
+
+        return box
+
+class CenterRegressionHead(nn.Module):
+    """The regression head."""
+
+    def __init__(self, config):
+        super(CenterRegressionHead, self).__init__()
+
+        channel = 32
+        if config.use_map:
+            channel += 6
+        if config.use_vis:
+            channel += 13
+
+        anchor_num_per_loc = len(config.anchor_size)
+        out_seq_len = 1 if config.only_det else config.pred_len
+
+        if config.binary:
+            if config.only_det:
+                self.box_prediction = nn.Sequential(
+                    nn.Conv2d(channel, channel, kernel_size=3, stride=1, padding=1),
+                    nn.BatchNorm2d(channel),
+                    nn.ReLU(),
+                    nn.Conv2d(
+                        channel,
+                        anchor_num_per_loc * 21 * out_seq_len,
+                        kernel_size=1,
+                        stride=1,
+                        padding=0,
+                    ),
+                )
+            else:
+                self.box_prediction = nn.Sequential(
+                    nn.Conv2d(channel, 128, kernel_size=3, stride=1, padding=1),
+                    nn.BatchNorm2d(128),
+                    nn.ReLU(),
+                    nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1),
+                    nn.BatchNorm2d(128),
+                    nn.ReLU(),
+                    nn.Conv2d(
+                        128,
+                        anchor_num_per_loc * 21 * out_seq_len,
+                        kernel_size=1,
+                        stride=1,
+                        padding=0,
+                    ),
+                )
+
+    def forward(self, x):
+        box = self.box_prediction(x)
+
+        return box
+
+class CornerIndRegressionHead(nn.Module):
+    """The regression head."""
+
+    def __init__(self, config):
+        super(CenterRegressionHead, self).__init__()
+
+        channel = 32
+        if config.use_map:
+            channel += 6
+        if config.use_vis:
+            channel += 13
+
+        anchor_num_per_loc = len(config.anchor_size)
+        out_seq_len = 1 if config.only_det else config.pred_len
+
+        if config.binary:
+            if config.only_det:
+                self.box_prediction = nn.Sequential(
+                    nn.Conv2d(channel, channel, kernel_size=3, stride=1, padding=1),
+                    nn.BatchNorm2d(channel),
+                    nn.ReLU(),
+                    nn.Conv2d(
+                        channel,
+                        anchor_num_per_loc * 8 * out_seq_len,
+                        kernel_size=1,
+                        stride=1,
+                        padding=0,
+                    ),
+                )
+            else:
+                self.box_prediction = nn.Sequential(
+                    nn.Conv2d(channel, 128, kernel_size=3, stride=1, padding=1),
+                    nn.BatchNorm2d(128),
+                    nn.ReLU(),
+                    nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1),
+                    nn.BatchNorm2d(128),
+                    nn.ReLU(),
+                    nn.Conv2d(
+                        128,
+                        anchor_num_per_loc * 8 * out_seq_len,
+                        kernel_size=1,
+                        stride=1,
+                        padding=0,
+                    ),
+                )
+
+    def forward(self, x):
+        box = self.box_prediction(x)
+
+        return box
+
+class CenterIndRegressionHead(nn.Module):
+    """The regression head."""
+
+    def __init__(self, config):
+        super(CenterRegressionHead, self).__init__()
+
+        channel = 32
+        if config.use_map:
+            channel += 6
+        if config.use_vis:
+            channel += 13
+
+        anchor_num_per_loc = len(config.anchor_size)
+        out_seq_len = 1 if config.only_det else config.pred_len
+
+        if config.binary:
+            if config.only_det:
+                self.box_prediction = nn.Sequential(
+                    nn.Conv2d(channel, channel, kernel_size=3, stride=1, padding=1),
+                    nn.BatchNorm2d(channel),
+                    nn.ReLU(),
+                    nn.Conv2d(
+                        channel,
+                        anchor_num_per_loc * 6 * out_seq_len,
+                        kernel_size=1,
+                        stride=1,
+                        padding=0,
+                    ),
+                )
+            else:
+                self.box_prediction = nn.Sequential(
+                    nn.Conv2d(channel, 128, kernel_size=3, stride=1, padding=1),
+                    nn.BatchNorm2d(128),
+                    nn.ReLU(),
+                    nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1),
+                    nn.BatchNorm2d(128),
+                    nn.ReLU(),
+                    nn.Conv2d(
+                        128,
+                        anchor_num_per_loc * 6 * out_seq_len,
+                        kernel_size=1,
+                        stride=1,
+                        padding=0,
+                    ),
+                )
+
+    def forward(self, x):
+        box = self.box_prediction(x)
+
+        return box
+
+class CornerPairIndRegressionHead(nn.Module):
+    """The regression head."""
+
+    def __init__(self, config):
+        super(CenterRegressionHead, self).__init__()
+
+        channel = 32
+        if config.use_map:
+            channel += 6
+        if config.use_vis:
+            channel += 13
+
+        anchor_num_per_loc = len(config.anchor_size)
+        out_seq_len = 1 if config.only_det else config.pred_len
+
+        if config.binary:
+            if config.only_det:
+                self.box_prediction = nn.Sequential(
+                    nn.Conv2d(channel, channel, kernel_size=3, stride=1, padding=1),
+                    nn.BatchNorm2d(channel),
+                    nn.ReLU(),
+                    nn.Conv2d(
+                        channel,
+                        anchor_num_per_loc * 12 * out_seq_len,
+                        kernel_size=1,
+                        stride=1,
+                        padding=0,
+                    ),
+                )
+            else:
+                self.box_prediction = nn.Sequential(
+                    nn.Conv2d(channel, 128, kernel_size=3, stride=1, padding=1),
+                    nn.BatchNorm2d(128),
+                    nn.ReLU(),
+                    nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1),
+                    nn.BatchNorm2d(128),
+                    nn.ReLU(),
+                    nn.Conv2d(
+                        128,
+                        anchor_num_per_loc * 12 * out_seq_len,
                         kernel_size=1,
                         stride=1,
                         padding=0,
