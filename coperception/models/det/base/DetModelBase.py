@@ -388,57 +388,6 @@ class SingleRegressionHead(nn.Module):
 
         return box
 
-class CenterRegressionHead(nn.Module):
-    """The regression head."""
-
-    def __init__(self, config):
-        super(CenterRegressionHead, self).__init__()
-
-        channel = 32
-        if config.use_map:
-            channel += 6
-        if config.use_vis:
-            channel += 13
-
-        anchor_num_per_loc = len(config.anchor_size)
-        out_seq_len = 1 if config.only_det else config.pred_len
-
-        if config.binary:
-            if config.only_det:
-                self.box_prediction = nn.Sequential(
-                    nn.Conv2d(channel, channel, kernel_size=3, stride=1, padding=1),
-                    nn.BatchNorm2d(channel),
-                    nn.ReLU(),
-                    nn.Conv2d(
-                        channel,
-                        anchor_num_per_loc * 21 * out_seq_len,
-                        kernel_size=1,
-                        stride=1,
-                        padding=0,
-                    ),
-                )
-            else:
-                self.box_prediction = nn.Sequential(
-                    nn.Conv2d(channel, 128, kernel_size=3, stride=1, padding=1),
-                    nn.BatchNorm2d(128),
-                    nn.ReLU(),
-                    nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1),
-                    nn.BatchNorm2d(128),
-                    nn.ReLU(),
-                    nn.Conv2d(
-                        128,
-                        anchor_num_per_loc * 21 * out_seq_len,
-                        kernel_size=1,
-                        stride=1,
-                        padding=0,
-                    ),
-                )
-
-    def forward(self, x):
-        box = self.box_prediction(x)
-
-        return box
-
 class RegressionCovarianceHead(nn.Module):
     """The regression head."""
 
@@ -546,7 +495,7 @@ class CornerIndRegressionHead(nn.Module):
     """The regression head."""
 
     def __init__(self, config):
-        super(CenterRegressionHead, self).__init__()
+        super(CornerIndRegressionHead, self).__init__()
 
         channel = 32
         if config.use_map:
@@ -597,7 +546,7 @@ class CenterIndRegressionHead(nn.Module):
     """The regression head."""
 
     def __init__(self, config):
-        super(CenterRegressionHead, self).__init__()
+        super(CenterIndRegressionHead, self).__init__()
 
         channel = 32
         if config.use_map:
@@ -648,7 +597,7 @@ class CornerPairIndRegressionHead(nn.Module):
     """The regression head."""
 
     def __init__(self, config):
-        super(CenterRegressionHead, self).__init__()
+        super(CornerPairIndRegressionHead, self).__init__()
 
         channel = 32
         if config.use_map:
