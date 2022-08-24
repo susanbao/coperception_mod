@@ -172,6 +172,7 @@ def main(args):
     model = nn.DataParallel(model)
     model = model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
+    #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.8)
     criterion = {
         "cls": SoftmaxFocalClassificationLoss(),
         "loc": WeightedSmoothL1LocalizationLoss(),
@@ -303,7 +304,7 @@ def main(args):
             trans_matrices = torch.stack(tuple(trans_matrices_list), 1)
             target_agent_id = torch.stack(tuple(target_agent_id_list), 1)
             num_all_agents = torch.stack(tuple(num_agent_list), 1)
-
+            #scheduler.step()
             # add pose noise
             if pose_noise > 0:
                 apply_pose_noise(pose_noise, trans_matrices)

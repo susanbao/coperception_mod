@@ -147,8 +147,8 @@ class FaFModule(object):
         print(loss_loc[1])
         print("loss_loc_sum:")
         print(loss_loc_sum)
+        print("N: {}".format(N))
         """
-
         return loss_loc_sum
     
     def cal_kl_loss(self, pred_decode, target_decode, covariance_pred, N):
@@ -317,7 +317,7 @@ class FaFModule(object):
         reg_loss_sum = torch.sum(reg_loss) / N
 
         reg_loss_sum_all = (reg_loss_sum + matrix_log_det_sum) / 2
-
+        """
         print("pred_diff:")
         print(pred_diff.shape)
         print(pred_diff[1])
@@ -336,6 +336,7 @@ class FaFModule(object):
         print("matrix_log_det_sum: {}".format(matrix_log_det_sum))
         print("reg_loss_sum: {}".format(reg_loss_sum))
         print("reg_loss_sum_all: {}".format(reg_loss_sum_all))
+        """
         return reg_loss_sum_all
 
     def loss_calculator(

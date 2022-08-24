@@ -25,15 +25,15 @@ batch_size := 1
 # [train / test / val]
 split := train
 # Where to store the logs
-logpath := check/check_loss_base
+logpath := check/check_loss_two_step_center
 # Train for how many epochs
-nepoch := 100
+nepoch := 80
 # loss type: corner_loss faf_loss kl_loss_center kl_loss_center_add, kl_loss_corner, kl_loss_center_ind, kl_loss_center_offset_ind, kl_loss_corner_pair_ind 
-loss_type = corner_loss
+loss_type = kl_loss_center
 # If given, the model will resume from its most recent (by modification time) check point
 auto_resume_path := $(logpath)
 # experiment name
-exp_name = base
+exp_name = two_step
 # compress_level
 compress_level := 0
 # 1: apply late fusion. 0: no late fusion
