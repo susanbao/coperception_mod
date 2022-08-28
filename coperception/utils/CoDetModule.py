@@ -369,6 +369,10 @@ class FaFModule(object):
         # ).size(0)
         # print(loss_mask_num)
         # print(torch.sum(reg_targets[:,:,:,:,0][reg_loss_mask[:,:,:,:,2]]))
+        if self.config.regMeanCovToge:
+            loc_result = result["loc"][:,:,:,:,:,:6]
+        else:
+            loc_result = result["loc"]
 
         if self.code_type in ["corner_1", "corner_2", "corner_3"]:
             target = reg_targets[reg_loss_mask].reshape(-1, 5, 2)
@@ -376,7 +380,7 @@ class FaFModule(object):
                 [target[:, 0], target[:, 3], target[:, 4], target[:, 1], target[:, 2]],
                 dim=-2,
             )
-            pred = result["loc"][reg_loss_mask].reshape(-1, 5, 2)
+            pred = loc_result[reg_loss_mask].reshape(-1, 5, 2)
             t = torch.sum(torch.norm(pred - target, dim=-1), dim=-1)
             f = torch.sum(torch.norm(pred - flip_target, dim=-1), dim=-1)
             loss_loc = torch.sum(torch.min(t, f)) / N
@@ -385,7 +389,7 @@ class FaFModule(object):
             if self.loss_type == "corner_loss":
                 if self.only_det:
                     loss_loc = self.corner_loss(
-                        anchors, reg_loss_mask, reg_targets, result["loc"]
+                        anchors, reg_loss_mask, reg_targets, loc_result
                     )
                     loss_num += 1
                 elif self.config.pred_type in ["motion", "center"]:
@@ -396,13 +400,13 @@ class FaFModule(object):
                         anchors,
                         reg_loss_mask[..., 0][..., [0]],
                         reg_targets[..., [0], :],
-                        result["loc"][..., [0], :],
+                        loc_result[..., [0], :],
                     )
                     pred_reg_loss_mask = reg_loss_mask[..., 1:, :]
                     if self.config.motion_state:
                         pred_reg_loss_mask = motion_mask  # mask out static object
                     loss_loc_2 = F.smooth_l1_loss(
-                        result["loc"][..., 1:, :][pred_reg_loss_mask],
+                        loc_result[..., 1:, :][pred_reg_loss_mask],
                         reg_targets[..., 1:, :][pred_reg_loss_mask],
                     )
                     loss_loc = loss_loc_1 + loss_loc_2
@@ -411,30 +415,33 @@ class FaFModule(object):
                 # corners for pred
                 else:
                     loss_loc = self.corner_loss(
-                        anchors, reg_loss_mask, reg_targets, result["loc"]
+                        anchors, reg_loss_mask, reg_targets, loc_result
                     )
                     loss_num += 1
             elif self.loss_type == "kl_loss_corner":
-                loss_loc = self.kl_loss_corner(anchors, reg_loss_mask, reg_targets, result["loc"], result["loc_covar"])
+                loss_loc = self.kl_loss_corner(anchors, reg_loss_mask, reg_targets, loc_result, result["loc_covar"])
                 loss_num += 1
             elif self.loss_type == "kl_loss_center_add":
-                loss_loc = self.kl_loss_center_add(anchors, reg_loss_mask, reg_targets, result["loc"])
+                loss_loc = self.kl_loss_center_add(anchors, reg_loss_mask, reg_targets, loc_result)
                 loss_num += 1
             elif self.loss_type == "kl_loss_center":
-                loss_loc = self.kl_loss_center(anchors, reg_loss_mask, reg_targets, result["loc"], result["loc_covar"])
+                loss_loc = self.kl_loss_center(anchors, reg_loss_mask, reg_targets, loc_result, result["loc_covar"])
                 loss_num += 1
             elif self.loss_type == "kl_loss_center_ind":
-                loss_loc = self.kl_loss_center_independent(anchors, reg_loss_mask, reg_targets, result["loc"], result["loc_covar"])
+                loss_loc = self.kl_loss_center_independent(anchors, reg_loss_mask, reg_targets, loc_result, result["loc_covar"])
                 loss_num += 1
             elif self.loss_type == "kl_loss_center_offset_ind":
-                loss_loc = self.kl_loss_center_offset_independent(anchors, reg_loss_mask, reg_targets, result["loc"], result["loc_covar"])
+                loss_loc = self.kl_loss_center_offset_independent(anchors, reg_loss_mask, reg_targets, loc_result, result["loc_covar"])
                 loss_num += 1
             elif self.loss_type == "kl_loss_corner_pair_ind":
-                loss_loc = self.kl_loss_corner_pair_independent(anchors, reg_loss_mask, reg_targets, result["loc"], result["loc_covar"])
+                if self.config.regMeanCovToge:
+                    loss_loc = self.kl_loss_corner_pair_independent(anchors, reg_loss_mask, reg_targets, loc_result, result["loc"][:,:,:,:,:,6:18])
+                else:
+                    loss_loc = self.kl_loss_corner_pair_independent(anchors, reg_loss_mask, reg_targets, loc_result, result["loc_covar"])
                 loss_num += 1
             else:
                 loss_loc = F.smooth_l1_loss(
-                    result["loc"][reg_loss_mask], reg_targets[reg_loss_mask]
+                    loc_result[reg_loss_mask], reg_targets[reg_loss_mask]
                 )
                 loss_num += 1
 

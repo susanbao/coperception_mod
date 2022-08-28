@@ -45,6 +45,7 @@ class DetModelBase(nn.Module):
         self.classification = ClassificationHead(config)
         self.regression = SingleRegressionHead(config)
         self.oneStepTrain = False
+        self.regMeanCovToge = config.regMeanCovToge
         # only for one step training
         if self.oneStepTrain:
             self.covariance = RegressionCovarianceHead(config)
@@ -254,8 +255,8 @@ class DetModelBase(nn.Module):
         loc_preds = self.regression(x)
         loc_preds = loc_preds.permute(0, 2, 3, 1).contiguous()
         box_code_size = self.box_code_size
-        if self.loss_type == "kl_loss_center_add":
-            box_code_size += self.covar_length
+        if self.regMeanCovToge:
+            box_code_size += 36
         loc_preds = loc_preds.view(
             -1,
             loc_preds.size(1),
@@ -356,8 +357,8 @@ class SingleRegressionHead(nn.Module):
         anchor_num_per_loc = len(config.anchor_size)
         box_code_size = config.box_code_size
         out_seq_len = 1 if config.only_det else config.pred_len
-        if config.loss_type == "kl_loss_center_add":
-            box_code_size += config.covar_length
+        if config.regMeanCovToge:
+            box_code_size += 36
 
         if config.binary:
             if config.only_det:

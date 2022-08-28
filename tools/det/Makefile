@@ -20,16 +20,16 @@ testing_script := test_codet.py
 # Path to the test/val data
 testing_data := $(create_data_save_path)/test
 # [lowerbound / upperbound / v2v / disco / when2com / max / mean / sum / agent]
-com := upperbound
+com := disco
 batch_size := 1
 # [train / test / val]
 split := train
 # Where to store the logs
-logpath := check/check_loss_two_step_center
+logpath := check/check_loss_base
 # Train for how many epochs
-nepoch := 80
+nepoch := 100
 # loss type: corner_loss faf_loss kl_loss_center kl_loss_center_add, kl_loss_corner, kl_loss_center_ind, kl_loss_center_offset_ind, kl_loss_corner_pair_ind 
-loss_type = kl_loss_center
+loss_type = corner_loss
 # If given, the model will resume from its most recent (by modification time) check point
 auto_resume_path := $(logpath)
 # experiment name
@@ -107,15 +107,17 @@ train_disco_no_rsu:
 	--com disco \
 	--log --batch $(batch_size) \
 	--kd_flag 1 \
-	--resume_teacher $(logpath)/upperbound/no_rsu/epoch_$(nepoch).pth \
+	--resume_teacher check/check_loss_base/upperbound/no_rsu/epoch_90.pth \
 	--auto_resume_path $(auto_resume_path) \
 	--logpath $(logpath) \
 	--nepoch $(nepoch) \
 	--compress_level $(compress_level) \
 	--pose_noise $(pose_noise) \
 	--only_v2i $(only_v2i) \
-	-- rsu 0 \
-	--loss_type $(loss_type)
+	--rsu 0 \
+	--use_wandb $(use_wandb) \
+	--loss_type $(loss_type) \
+	--exp_name $(exp_name)
     
 mbb_train:
 	python train_mbb.py \
