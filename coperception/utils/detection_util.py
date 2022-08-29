@@ -252,7 +252,7 @@ def apply_box_local_transform(class_selected_global, trans_matrices_map):
 
     return predictions_dicts, len(local_index)
 
-def apply_nms_det_one(box_preds, cls_preds, anchors, config, batch_motion=None, box_preds_covar=None):
+def apply_nms_det_one(box_preds, cls_preds, anchors, code_type, config, batch_motion=None, box_preds_covar=None):
     # N  * (W X H) * T * decoded_loc_dim(6)
     predictions_dicts = []
     total_scores = F.softmax(cls_preds, dim=-1)[..., 1:]
@@ -386,13 +386,13 @@ def apply_nms_det(
         for box_preds, cls_preds, anchors in zip(
             batch_box_preds_loc, batch_cls_preds, batch_anchors
         ):
-            class_selected, cls_pred_first_nms = apply_nms_det_one(box_preds, cls_preds, anchors, config, batch_motion)
+            class_selected, cls_pred_first_nms = apply_nms_det_one(box_preds, cls_preds, anchors, code_type, config, batch_motion)
             predictions_dicts.append(class_selected)
     else:
         for box_preds, cls_preds, anchors, box_preds_covar in zip(
             batch_box_preds_loc, batch_cls_preds, batch_anchors, batch_box_preds_covar
         ):
-            class_selected, cls_pred_first_nms = apply_nms_det_one(box_preds, cls_preds, anchors, config, batch_motion, box_preds_covar)
+            class_selected, cls_pred_first_nms = apply_nms_det_one(box_preds, cls_preds, anchors, code_type, config, batch_motion, box_preds_covar)
             predictions_dicts.append(class_selected)
     return predictions_dicts, cls_pred_first_nms
 """
