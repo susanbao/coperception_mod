@@ -81,7 +81,7 @@ class Config(object):
         self.covar_matrix_size = 6 # one dimensional size of the covariance matrix
         self.loss_loc_weight = 0.1
         self.loc_det_weight = 0.1
-        self.regMeanCovToge = True
+        self.regMeanCovToge = False # always be False
 
         # The specifications for BEV maps
         self.voxel_size = (0.25, 0.25, 0.4)
