@@ -252,9 +252,152 @@ def apply_box_local_transform(class_selected_global, trans_matrices_map):
 
     return predictions_dicts, len(local_index)
 
+def apply_nms_det_one(box_preds, cls_preds, anchors, config, batch_motion=None, box_preds_covar=None):
+    # N  * (W X H) * T * decoded_loc_dim(6)
+    predictions_dicts = []
+    total_scores = F.softmax(cls_preds, dim=-1)[..., 1:]
+    total_scores = total_scores.cpu().detach().numpy()
+
+    if config.motion_state:
+        total_motion = F.softmax(batch_motion[batch_id], dim=-1)[..., 1:]
+        total_motion = total_motion.cpu().detach().numpy()
+        total_motion = np.argmax(total_motion, axis=-1)
+        batch_id += 1
+
+    boxes_for_nms = box_preds.view(
+        -1, box_preds.shape[-2], box_preds.shape[-1]
+    )  # [N,pred_len,code_size]
+    box_corners = np.random.rand(
+        boxes_for_nms.shape[0], boxes_for_nms.shape[1], 4, 2
+    )  # [N, pred_len,4 ,2]
+    if box_preds_covar is not None:
+        box_corner_covar = box_preds_covar.view(-1, box_preds_covar.shape[-2], box_preds_covar.shape[-1])
+
+    if config.pred_type == "motion":
+        cur_det = None
+    for i in range(boxes_for_nms.shape[1]):
+        if code_type[0] == "f":
+
+            if config.pred_type == "motion":
+                # motion _a
+                """
+                if i==0:
+                    decoded_boxes = bev_box_decode_torch(boxes_for_nms[:,i],anchors).cpu().detach().numpy()
+                    cur_det = decoded_boxes
+                else:
+                    decoded_boxes = cur_det
+                    decoded_boxes[:,:2] += boxes_for_nms[:,i,:2].cpu().detach().numpy()
+                #print(decoded_boxes.shape)
+                """
+                # motion _b
+                if i == 0:
+                    decoded_boxes = (
+                        bev_box_decode_torch(boxes_for_nms[:, i], anchors)
+                        .cpu()
+                        .detach()
+                        .numpy()
+                    )
+                    cur_det = decoded_boxes.copy()
+                else:
+                    decoded_boxes = cur_det
+                    if config.motion_state:
+                        moving_idx = total_motion == 1
+                        moving_box = (
+                            boxes_for_nms.cpu().detach().numpy()[moving_idx, i]
+                        )
+                        decoded_boxes[moving_idx, :2] += moving_box[:, :2]
+                    else:
+                        decoded_boxes[:, :2] += (
+                            boxes_for_nms[:, i, :2].cpu().detach().numpy()
+                        )
+                    cur_det = decoded_boxes.copy()
+            else:
+                decoded_boxes = (
+                    bev_box_decode_torch(boxes_for_nms[:, i], anchors)
+                    .cpu()
+                    .detach()
+                    .numpy()
+                )
+            # print(w_id,decoded_boxes[w_id])
+
+            box_pred_corners = center_to_corner_box2d(
+                decoded_boxes[:, :2], decoded_boxes[:, 2:4], decoded_boxes[:, 4:]
+            )  # corners: [N, 4, 2]
+        elif code_type[0] == "c":
+            box_pred_corners = (
+                bev_box_decode_corner(boxes_for_nms[:, i], anchors)
+                .cpu()
+                .detach()
+                .numpy()
+            )
+            box_pred_corners = box_pred_corners.reshape(
+                -1, 4, 2
+            )  # corners: [N, 4, 2]
+
+        box_corners[:, i] = box_pred_corners
+
+    class_selected = []
+    # print(box_preds.shape, cls_preds.shape, total_scores.shape)
+    for i in range(total_scores.shape[1]):
+        selected_idx = non_max_suppression(
+            box_corners[:, 0], total_scores[:, i], threshold=0.01
+        )
+        if box_preds_covar is None:
+            class_selected.append(
+                {
+                    "pred": box_corners[selected_idx],
+                    "score": total_scores[selected_idx, i],
+                    "selected_idx": selected_idx,
+                }
+            )
+        else:
+            class_selected.append(
+                {
+                    "pred": box_corners[selected_idx],
+                    "score": total_scores[selected_idx, i],
+                    "selected_idx": selected_idx,
+                    "pred_covar": box_corner_covar[selected_idx]
+                }
+            )
+
+        cls_pred_first_nms = cls_preds[selected_idx, :]
+        # break
+    return class_selected, cls_pred_first_nms
 
 def apply_nms_det(
-    batch_box_preds, batch_cls_preds, anchors, code_type, config, batch_motion=None
+    batch_box_preds, batch_cls_preds, anchors, code_type, config, batch_motion=None, batch_box_preds_covar=None
+):
+
+    predictions_dicts = []
+    assert (
+        len(batch_box_preds.shape) == 6
+    ), "bbox must have shape [N ,W , H , num_per_loc, T, box_code]"
+    
+    if config.loss_type == "kl_loss_corner_pair_ind":
+        batch_box_preds_loc = batch_box_preds[:,:,:,:,:,:6]
+    else:
+        batch_box_preds_loc = batch_box_preds
+    batch_anchors = anchors.view(
+        batch_box_preds.shape[0], -1, batch_box_preds_loc.shape[-1]
+    )
+    
+    batch_id = 0
+    if batch_box_preds_covar is None:
+        for box_preds, cls_preds, anchors in zip(
+            batch_box_preds_loc, batch_cls_preds, batch_anchors
+        ):
+            class_selected, cls_pred_first_nms = apply_nms_det_one(box_preds, cls_preds, anchors, config, batch_motion)
+            predictions_dicts.append(class_selected)
+    else:
+        for box_preds, cls_preds, anchors, box_preds_covar in zip(
+            batch_box_preds_loc, batch_cls_preds, batch_anchors, batch_box_preds_covar
+        ):
+            class_selected, cls_pred_first_nms = apply_nms_det_one(box_preds, cls_preds, anchors, config, batch_motion, box_preds_covar)
+            predictions_dicts.append(class_selected)
+    return predictions_dicts, cls_pred_first_nms
+"""
+def apply_nms_det(
+    batch_box_preds, batch_cls_preds, anchors, code_type, config, batch_motion=None, batch_box_preds_covar=None
 ):
 
     predictions_dicts = []
@@ -299,15 +442,6 @@ def apply_nms_det(
 
                 if config.pred_type == "motion":
                     # motion _a
-                    """
-                    if i==0:
-                        decoded_boxes = bev_box_decode_torch(boxes_for_nms[:,i],anchors).cpu().detach().numpy()
-                        cur_det = decoded_boxes
-                    else:
-                        decoded_boxes = cur_det
-                        decoded_boxes[:,:2] += boxes_for_nms[:,i,:2].cpu().detach().numpy()
-                    #print(decoded_boxes.shape)
-                    """
                     # motion _b
                     if i == 0:
                         decoded_boxes = (
@@ -375,7 +509,7 @@ def apply_nms_det(
         predictions_dicts.append(class_selected)
 
     return predictions_dicts, cls_pred_first_nms
-
+"""
 
 def bev_box_decode_torch(
     box_encodings, anchors, encode_angle_to_vector=False, smooth_dim=False

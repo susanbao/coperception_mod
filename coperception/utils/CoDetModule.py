@@ -761,6 +761,10 @@ class FaFModule(object):
                 batch_cls_preds = torch.unsqueeze(result["cls"][k, :, :], 0)
                 anchors = torch.unsqueeze(data["anchors"][k, :, :, :, :], 0)
                 batch_motion_preds = None
+                if result.has_key("loc_covar"):
+                    batch_box_preds_covar = torch.unsqueeze(result["loc_covar"][k, :, :, :, :, :], 0)
+                else:
+                    batch_box_preds_covar = None
                 """
                 print("batch_box_preds:")
                 print(batch_box_preds)
@@ -780,6 +784,7 @@ class FaFModule(object):
                     self.code_type,
                     self.config,
                     batch_motion_preds,
+                    batch_box_preds_covar,
                 )
                 """
                 print("class_selected:")
