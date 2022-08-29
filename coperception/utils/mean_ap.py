@@ -147,7 +147,7 @@ def tpfp_default(
     # for each det, which gt overlaps most with it
     ious_argmax = ious.argmax(axis=1)
     # sort all dets in descending order by scores
-    sort_inds = np.argsort(-det_bboxes[:, -1])
+    sort_inds = np.argsort(-det_bboxes[:, 8])
     for k, (min_area, max_area) in enumerate(area_ranges):
         gt_covered = np.zeros(num_gts, dtype=bool)
         # if no area range is specified, gt_area_ignore is all False
@@ -215,6 +215,7 @@ def eval_map(
         tuple: (mAP, [dict, dict, ...])
     """
     assert len(det_results) == len(annotations)
+    assert (len(det_results[0][0][0]) == 21) or (len(det_results[0][0][0]) == 9)
 
     num_imgs = len(det_results)
     num_scales = len(scale_ranges) if scale_ranges is not None else 1
@@ -256,7 +257,7 @@ def eval_map(
         # sort all det bboxes by score, also sort tp and fp
         cls_dets = np.vstack(cls_dets)
         num_dets = cls_dets.shape[0]
-        sort_inds = np.argsort(-cls_dets[:, -1])
+        sort_inds = np.argsort(-cls_dets[:, 8])
         tp = np.hstack(tp)[:, sort_inds]
         fp = np.hstack(fp)[:, sort_inds]
         # calculate recall and precision with tp and fp

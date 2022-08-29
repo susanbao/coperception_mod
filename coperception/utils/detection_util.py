@@ -676,6 +676,8 @@ def cal_local_mAP(config, data, det_results, annotations, return_local = False):
         pred_corners = []
         cls_score = []
         det_results_multiclass = []
+        pred_corners_covar = []
+        covar_exist = False
 
         for k in range(len(gt_max_iou_idx)):
 
@@ -699,6 +701,9 @@ def cal_local_mAP(config, data, det_results, annotations, return_local = False):
             # cls_pred_idx = pred_selected[k]['selected_idx']
             pred_corners = cls_pred_corners
             cls_score = cls_pred_scores
+            if "pred_covar" in pred_selected[k]:
+                pred_corners_covar = pred_selected[k]["pred_covar"][:, p].cpu().numpy()
+                covar_exist = True
 
         ## iou calculation
         gt_corners = np.asarray(gt_corners)
@@ -763,6 +768,8 @@ def cal_local_mAP(config, data, det_results, annotations, return_local = False):
                     cls_score[k],
                 ]
             )
+            if covar_exist:
+                detection_result = np.append(detection_result, pred_corners_covar[k])
             if k == 0:
                 det_results_frame = np.array(
                     [
@@ -777,6 +784,8 @@ def cal_local_mAP(config, data, det_results, annotations, return_local = False):
                         cls_score[k],
                     ]
                 )
+                if covar_exist:
+                    det_results_frame = np.append(det_results_frame, pred_corners_covar[k])
             else:
                 det_results_frame = np.vstack((det_results_frame, detection_result))
 
