@@ -434,8 +434,8 @@ def match_tp_fp(
     num_scales = len(area_ranges)
     # tp and fp are of shape (num_scales, num_gts), each row is tp or fp of
     # a certain scale
-    tp = np.zeros((num_scales, num_dets), dtype=np.float32)
-    fp = np.zeros((num_scales, num_dets), dtype=np.float32)
+    tp = np.zeros((num_scales, num_dets), dtype=np.int)
+    fp = np.zeros((num_scales, num_dets), dtype=np.int)
 
     # if there is no gt bboxes in this image, then all det bboxes
     # within area range are false positives
@@ -529,6 +529,25 @@ def match_tp_fp(
                     fp[k, i] = 1
     return tp, fp
 
+def compute_reg_nll(dets, gt):
+    assert len(dets) == len(gt)
+    dets_loc = torch.from_numpy(dets[:,:8])
+    dets_covar = torch.from_numpy(dets[:,9:])
+    dets_loc = torch.reshape(dets_loc, (-1, 2))
+    dets_covar = torch.reshape(dets_covar, (-1, 3))
+    gt_loc = torch.from_numpy(gt)
+    gt_loc = torch.reshape(gt_loc, (-1, 2))
+    covar_matrix = torch.zeros((dets_covar.shape[0], 2, 2))
+    covar_matrix[:, 0, 0] = torch.exp(dets_covar[:, 0])
+    covar_matrix[:, 0, 1] = dets_covar[:, 1]
+    covar_matrix[:, 1, 1] = torch.exp(dets_covar[:, 2])
+    sigma_inverse = torch.matmul(torch.transpose(covar_matrix, 1, 2), covar_matrix)
+    predicted_multivariate_normal_dists = torch.distributions.multivariate_normal.MultivariateNormal(dets_loc, precision_matrix = sigma_inverse)
+    negative_log_prob = - \
+        predicted_multivariate_normal_dists.log_prob(gt_loc)
+    negative_log_prob_mean = negative_log_prob.mean()
+    return negative_log_prob_mean
+
 def eval_nll(
     det_results,
     annotations,
@@ -581,6 +600,8 @@ def eval_nll(
     for i in range(num_classes):
         # get gt and det bboxes of this class
         cls_dets, cls_gts, cls_gts_ignore = get_cls_results(det_results, annotations, i)
+        tp_nll = []
+        fp_entropy = []
         tpfp_func = match_tp_fp
         # compute tp and fp for each image with multiple processes
         tpfp = pool.starmap(
@@ -593,7 +614,27 @@ def eval_nll(
                 [area_ranges for _ in range(num_imgs)],
             ),
         )
-        tp, fp = tuple(zip(*tpfp))
-        print(tp)
-        print(fp)
-        #tp_nll = compute_reg_true_nll(cls_dets[tp], cls_gts[tp])
+        tp_all, fp_all = list(zip(*tpfp))
+        # calculate gt number of each scale
+        # ignored gts or gts beyond the specific scale are not counted
+        num_gts = np.zeros(num_scales, dtype=int)
+        for j, bbox in enumerate(cls_gts):
+            if area_ranges is None:
+                num_gts[0] += bbox.shape[0]
+            else:
+                gt_areas = (bbox[:, 2] - bbox[:, 0]) * (bbox[:, 3] - bbox[:, 1])
+                for k, (min_area, max_area) in enumerate(area_ranges):
+                    num_gts[k] += np.sum((gt_areas >= min_area) & (gt_areas < max_area))
+        # sort all det bboxes by score, also sort tp and fp
+        for dets, gt, match, fp in zip(cls_dets, cls_gts, tp_all, fp_all):
+            fp = fp.astype(bool)
+            tp_dets = dets[fp]
+            tp_match = match[fp]
+            tp_gt = gt[tp_match]
+            nll = compute_reg_nll(tp_dets, tp_gt)
+            tp_nll.append(nll)
+        eval_results.append({
+            "num_gts": num_gts,
+            "NLL": np.mean(tp_nll)
+        })
+    return eval_results
