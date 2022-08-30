@@ -400,6 +400,134 @@ def print_map_summary(mean_ap, results, dataset=None, scale_ranges=None, logger=
         table.inner_footing_row_border = True
         print_log("\n" + table.table, logger=logger)
 
+def match_tp_fp(
+    det_bboxes, gt_bboxes, gt_bboxes_ignore=None, iou_thr=0.5, area_ranges=None
+):
+    """Check if detected bboxes are true positive or false positive.
+    Args:
+        det_bbox (ndarray): Detected bboxes of this image, of shape (m, 5).
+        gt_bboxes (ndarray): GT bboxes of this image, of shape (n, 4).
+        gt_bboxes_ignore (ndarray): Ignored gt bboxes of this image,
+            of shape (k, 4). Default: None
+        iou_thr (float): IoU threshold to be considered as matched.
+            Default: 0.5.
+        area_ranges (list[tuple] | None): Range of bbox areas to be evaluated,
+            in the format [(min1, max1), (min2, max2), ...]. Default: None.
+    Returns:
+        tuple[np.ndarray]: (tp, fp) whose elements are 0 and 1. The shape of
+            each array is (num_scales, m).
+    """
+    # an indicator of ignored gts
+    gt_ignore_inds = np.concatenate(
+        (
+            np.zeros(gt_bboxes.shape[0], dtype=np.bool),
+            np.ones(gt_bboxes_ignore.shape[0], dtype=np.bool),
+        )
+    )
+    # stack gt_bboxes and gt_bboxes_ignore for convenience
+    gt_bboxes = np.vstack((gt_bboxes, gt_bboxes_ignore))
+
+    num_dets = det_bboxes.shape[0]
+    num_gts = gt_bboxes.shape[0]
+    if area_ranges is None:
+        area_ranges = [(None, None)]
+    num_scales = len(area_ranges)
+    # tp and fp are of shape (num_scales, num_gts), each row is tp or fp of
+    # a certain scale
+    tp = np.zeros((num_scales, num_dets), dtype=np.float32)
+    fp = np.zeros((num_scales, num_dets), dtype=np.float32)
+
+    # if there is no gt bboxes in this image, then all det bboxes
+    # within area range are false positives
+    if gt_bboxes.shape[0] == 0:
+        if area_ranges == [(None, None)]:
+            fp[...] = 1
+        else:
+            det_areas = (det_bboxes[:, 2] - det_bboxes[:, 0]) * (
+                det_bboxes[:, 3] - det_bboxes[:, 1]
+            )
+            for i, (min_area, max_area) in enumerate(area_ranges):
+                fp[i, (det_areas >= min_area) & (det_areas < max_area)] = 1
+        return tp, fp
+
+    gt_corners = np.zeros((gt_bboxes.shape[0], 4, 2), dtype=np.float32)
+    pred_corners = np.zeros((det_bboxes.shape[0], 4, 2), dtype=np.float32)
+
+    for k in range(gt_bboxes.shape[0]):
+        gt_corners[k, 0, 0] = gt_bboxes[k][0]
+        gt_corners[k, 0, 1] = gt_bboxes[k][1]
+        gt_corners[k, 1, 0] = gt_bboxes[k][2]
+        gt_corners[k, 1, 1] = gt_bboxes[k][3]
+        gt_corners[k, 2, 0] = gt_bboxes[k][4]
+        gt_corners[k, 2, 1] = gt_bboxes[k][5]
+        gt_corners[k, 3, 0] = gt_bboxes[k][6]
+        gt_corners[k, 3, 1] = gt_bboxes[k][7]
+
+    if det_bboxes.ndim == 1:
+        det_bboxes = np.array([det_bboxes])
+
+    for k in range(det_bboxes.shape[0]):
+        pred_corners[k, 0, 0] = det_bboxes[k][0]
+        pred_corners[k, 0, 1] = det_bboxes[k][1]
+        pred_corners[k, 1, 0] = det_bboxes[k][2]
+        pred_corners[k, 1, 1] = det_bboxes[k][3]
+        pred_corners[k, 2, 0] = det_bboxes[k][4]
+        pred_corners[k, 2, 1] = det_bboxes[k][5]
+        pred_corners[k, 3, 0] = det_bboxes[k][6]
+        pred_corners[k, 3, 1] = det_bboxes[k][7]
+
+    gt_box = convert_format(gt_corners)
+    pred_box = convert_format(pred_corners)
+    save_flag = False
+    for gt in gt_box:
+        iou = np.array(compute_iou(gt, pred_box))
+        if not save_flag:
+            box_iou = iou
+            save_flag = True
+        else:
+            box_iou = np.vstack((box_iou, iou))
+
+    # make dimension the same
+    if len(gt_box) == 1:
+        box_iou = np.array([box_iou])
+
+    ious = box_iou.T
+    #    ious = bbox_overlaps(det_bboxes, gt_bboxes)
+    # for each det, the max iou with all gts
+    ious_max = ious.max(axis=1)
+
+    # for each det, which gt overlaps most with it
+    ious_argmax = ious.argmax(axis=1)
+    # sort all dets in descending order by scores
+    sort_inds = np.argsort(-det_bboxes[:, 8])
+    for k, (min_area, max_area) in enumerate(area_ranges):
+        gt_covered = np.zeros(num_gts, dtype=bool)
+        # if no area range is specified, gt_area_ignore is all False
+        if min_area is None:
+            gt_area_ignore = np.zeros_like(gt_ignore_inds, dtype=bool)
+        else:
+            gt_areas = (gt_bboxes[:, 2] - gt_bboxes[:, 0]) * (
+                gt_bboxes[:, 3] - gt_bboxes[:, 1]
+            )
+            gt_area_ignore = (gt_areas < min_area) | (gt_areas >= max_area)
+        for i in sort_inds:
+            if ious_max[i] >= iou_thr:
+                matched_gt = ious_argmax[i]
+                if not (gt_ignore_inds[matched_gt] or gt_area_ignore[matched_gt]):
+                    if not gt_covered[matched_gt]:
+                        gt_covered[matched_gt] = True
+                        tp[k, i] = matched_gt
+                    else:
+                        fp[k, i] = 1
+                # otherwise ignore this detected bbox, tp = 0, fp = 0
+            elif min_area is None:
+                fp[k, i] = 1
+            else:
+                bbox = det_bboxes[i, :4]
+                area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
+                if area >= min_area and area < max_area:
+                    fp[k, i] = 1
+    return tp, fp
 
 def eval_nll(
     det_results,
@@ -453,7 +581,7 @@ def eval_nll(
     for i in range(num_classes):
         # get gt and det bboxes of this class
         cls_dets, cls_gts, cls_gts_ignore = get_cls_results(det_results, annotations, i)
-        tpfp_func = tpfp_default
+        tpfp_func = match_tp_fp
         # compute tp and fp for each image with multiple processes
         tpfp = pool.starmap(
             tpfp_func,
@@ -466,10 +594,6 @@ def eval_nll(
             ),
         )
         tp, fp = tuple(zip(*tpfp))
-        tp = tp.astype(bool)
-        fp = fp.astype(bool)
-        print(cls_dets[tp])
-        print(cls_gts[tp])
-        print(cls_dets[fp])
-        print(cls_gts[fp])
+        print(tp)
+        print(fp)
         #tp_nll = compute_reg_true_nll(cls_dets[tp], cls_gts[tp])
