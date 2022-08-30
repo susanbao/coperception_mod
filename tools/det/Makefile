@@ -2,7 +2,7 @@
 original_data_path := /data/v2x-sim
 # Where to save the created data
 #V2X-Sim-det  V2X-Sim-demo
-create_data_save_path := /data/v2x-sim-nyu/V2X-Sim-det
+create_data_save_path := /data/v2x-sim-nyu/V2X-Sim-demo
 # Index of the begining scene
 scene_begin := 0
  # Index of the ending scene + 1
@@ -20,16 +20,16 @@ testing_script := test_codet.py
 # Path to the test/val data
 testing_data := $(create_data_save_path)/test
 # [lowerbound / upperbound / v2v / disco / when2com / max / mean / sum / agent]
-com := disco
+com := upperbound
 batch_size := 1
 # [train / test / val]
 split := train
-# Where to store the logs
-logpath := check/check_loss_base
+# Where to store the logs check_loss_base check_loss_two_step_corner_pair_ind
+logpath := check/check_loss_two_step_corner_pair_ind
 # Train for how many epochs
-nepoch := 100
+nepoch := 80
 # loss type: corner_loss faf_loss kl_loss_center kl_loss_center_add, kl_loss_corner, kl_loss_center_ind, kl_loss_center_offset_ind, kl_loss_corner_pair_ind 
-loss_type = corner_loss
+loss_type = kl_loss_corner_pair_ind
 # If given, the model will resume from its most recent (by modification time) check point
 auto_resume_path := $(logpath)
 # experiment name

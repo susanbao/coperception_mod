@@ -537,16 +537,33 @@ def compute_reg_nll(dets, gt):
     dets_covar = torch.reshape(dets_covar, (-1, 3))
     gt_loc = torch.from_numpy(gt)
     gt_loc = torch.reshape(gt_loc, (-1, 2))
-    covar_matrix = torch.zeros((dets_covar.shape[0], 2, 2))
-    covar_matrix[:, 0, 0] = torch.exp(dets_covar[:, 0])
-    covar_matrix[:, 0, 1] = dets_covar[:, 1]
-    covar_matrix[:, 1, 1] = torch.exp(dets_covar[:, 2])
-    sigma_inverse = torch.matmul(torch.transpose(covar_matrix, 1, 2), covar_matrix)
-    predicted_multivariate_normal_dists = torch.distributions.multivariate_normal.MultivariateNormal(dets_loc, precision_matrix = sigma_inverse)
+    u_matrix = torch.zeros((dets_covar.shape[0], 2, 2))
+    u_matrix[:, 0, 0] = torch.exp(dets_covar[:, 0])
+    u_matrix[:, 0, 1] = dets_covar[:, 1]
+    u_matrix[:, 1, 1] = torch.exp(dets_covar[:, 2])
+    sigma_inverse = torch.matmul(torch.transpose(u_matrix, 1, 2), u_matrix)
+    covar_matrix = torch.linalg.inv(sigma_inverse)
+    predicted_multivariate_normal_dists = torch.distributions.multivariate_normal.MultivariateNormal(dets_loc, covariance_matrix = covar_matrix + 1e-2 * torch.eye(2))
     negative_log_prob = - \
         predicted_multivariate_normal_dists.log_prob(gt_loc)
     negative_log_prob_mean = negative_log_prob.mean()
     return negative_log_prob_mean
+
+def compute_reg_entropy(dets):
+    dets_loc = torch.from_numpy(dets[:,:8])
+    dets_covar = torch.from_numpy(dets[:,9:])
+    dets_loc = torch.reshape(dets_loc, (-1, 2))
+    dets_covar = torch.reshape(dets_covar, (-1, 3))
+    u_matrix = torch.zeros((dets_covar.shape[0], 2, 2))
+    u_matrix[:, 0, 0] = torch.exp(dets_covar[:, 0])
+    u_matrix[:, 0, 1] = dets_covar[:, 1]
+    u_matrix[:, 1, 1] = torch.exp(dets_covar[:, 2])
+    sigma_inverse = torch.matmul(torch.transpose(u_matrix, 1, 2), u_matrix)
+    covar_matrix = torch.linalg.inv(sigma_inverse)
+    predicted_multivariate_normal_dists = torch.distributions.multivariate_normal.MultivariateNormal(dets_loc, covariance_matrix = covar_matrix + 1e-2 * torch.eye(2))
+    total_entropy = predicted_multivariate_normal_dists.entropy()
+    total_entropy_mean = total_entropy.mean()
+    return total_entropy_mean
 
 def eval_nll(
     det_results,
@@ -629,13 +646,21 @@ def eval_nll(
         for dets, gt, match, fp in zip(cls_dets, cls_gts, tp_all, fp_all):
             tp = np.squeeze((1 - fp).astype(bool))
             fp = np.squeeze(fp.astype(bool))
+            match = np.squeeze(match)
             tp_dets = dets[tp]
             tp_match = match[tp]
             tp_gt = gt[tp_match]
             nll = compute_reg_nll(tp_dets, tp_gt)
             tp_nll.append(nll)
+            if len(dets[fp]) == 0:
+                fp_entropy.append(0.0)
+            else:
+                fp_dets = dets[fp]
+                entropy = compute_reg_entropy(fp_dets)
+                fp_entropy.append(entropy)
         eval_results.append({
             "num_gts": num_gts,
-            "NLL": np.mean(tp_nll)
+            "NLL": np.mean(tp_nll),
+            "FP_entropy": np.mean(fp_entropy)
         })
     return eval_results

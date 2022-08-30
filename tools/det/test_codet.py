@@ -10,10 +10,11 @@ from coperception.datasets import V2XSimDet
 from coperception.configs import Config, ConfigGlobal
 from coperception.utils.CoDetModule import *
 from coperception.utils.loss import *
-from coperception.utils.mean_ap import eval_map
+from coperception.utils.mean_ap import eval_map, eval_nll
 from coperception.models.det import *
 from coperception.utils.detection_util import late_fusion
 from coperception.utils.data_util import apply_pose_noise
+import ipdb
 
 
 def check_folder(folder_path):
@@ -423,10 +424,10 @@ def main(args):
     # local mAP evaluation
     det_results_all_local = []
     annotations_all_local = []
+    #ipdb.set_trace()
     for k in range(eval_start_idx, num_agent):
         if type(det_results_local[k]) != list or len(det_results_local[k]) == 0:
             continue
-
         print_and_write_log("Local mAP@0.5 from agent {}".format(k))
         mean_ap, _ = eval_map(
             det_results_local[k],
@@ -437,6 +438,8 @@ def main(args):
             logger=None,
         )
         mean_ap_local.append(mean_ap)
+        covar_nll = eval_nll(det_results_local[k], annotations_local[k], scale_ranges=None, iou_thr=0.5)
+        print(covar_nll)
         print_and_write_log("Local mAP@0.7 from agent {}".format(k))
 
         ean_ap, _ = eval_map(
@@ -448,6 +451,8 @@ def main(args):
             logger=None,
         )
         mean_ap_local.append(mean_ap)
+        covar_nll = eval_nll(det_results_local[k], annotations_local[k], scale_ranges=None, iou_thr=0.7)
+        print(covar_nll)
 
         det_results_all_local += det_results_local[k]
         annotations_all_local += annotations_local[k]
@@ -461,6 +466,8 @@ def main(args):
         logger=None,
     )
     mean_ap_local.append(mean_ap_local_average)
+    covar_nll = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.5)
+    print(covar_nll)
 
     mean_ap_local_average, _ = eval_map(
         det_results_all_local,
@@ -471,6 +478,8 @@ def main(args):
         logger=None,
     )
     mean_ap_local.append(mean_ap_local_average)
+    covar_nll = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.5)
+    print(covar_nll)
 
     print_and_write_log(
         "Quantitative evaluation results of model from {}, at epoch {}".format(
