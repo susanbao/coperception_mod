@@ -627,9 +627,10 @@ def eval_nll(
                     num_gts[k] += np.sum((gt_areas >= min_area) & (gt_areas < max_area))
         # sort all det bboxes by score, also sort tp and fp
         for dets, gt, match, fp in zip(cls_dets, cls_gts, tp_all, fp_all):
-            fp = fp.astype(bool)
-            tp_dets = dets[fp]
-            tp_match = match[fp]
+            tp = np.squeeze((1 - fp).astype(bool))
+            fp = np.squeeze(fp.astype(bool))
+            tp_dets = dets[tp]
+            tp_match = match[tp]
             tp_gt = gt[tp_match]
             nll = compute_reg_nll(tp_dets, tp_gt)
             tp_nll.append(nll)
