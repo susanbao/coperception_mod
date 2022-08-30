@@ -208,3 +208,8 @@ mbb_analyse_all_scenes:
 	--nepoch $(nepoch) \
 	--analyse_all \
 	--rsu 0
+
+prob_measure:
+	python prob_measure.py
+	--resume $(logpath)/$(com)/no_rsu/all_data_$(nepoch).pth \
+	--nepoch $(nepoch)
