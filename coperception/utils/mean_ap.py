@@ -399,3 +399,77 @@ def print_map_summary(mean_ap, results, dataset=None, scale_ranges=None, logger=
         table = AsciiTable(table_data)
         table.inner_footing_row_border = True
         print_log("\n" + table.table, logger=logger)
+
+
+def eval_nll(
+    det_results,
+    annotations,
+    scale_ranges=None,
+    iou_thr=0.5,
+    logger=None,
+    nproc=4,
+):
+    """Evaluate mAP of a dataset.
+    Args:
+        det_results (list[list]): [[cls1_det, cls2_det, ...], ...].
+            The outer list indicates images, and the inner list indicates
+            per-class detected bboxes.
+        annotations (list[dict]): Ground truth annotations where each item of
+            the list indicates an image. Keys of annotations are:
+            - `bboxes`: numpy array of shape (n, 4)
+            - `labels`: numpy array of shape (n, )
+            - `bboxes_ignore` (optional): numpy array of shape (k, 4)
+            - `labels_ignore` (optional): numpy array of shape (k, )
+        scale_ranges (list[tuple] | None): Range of scales to be evaluated,
+            in the format [(min1, max1), (min2, max2), ...]. A range of
+            (32, 64) means the area range between (32**2, 64**2).
+            Default: None.
+        iou_thr (float): IoU threshold to be considered as matched.
+            Default: 0.5.
+        dataset (list[str] | str | None): Dataset name or dataset classes,
+            there are minor differences in metrics for different datsets, e.g.
+            "voc07", "imagenet_det", etc. Default: None.
+        logger (logging.Logger | str | None): The way to print the mAP
+            summary. See `mmdet.utils.print_log()` for details. Default: None.
+        nproc (int): Processes used for computing TP and FP.
+            Default: 4.
+    Returns:
+        tuple: [[tp_nll, fp_entropy]]
+    """
+    assert len(det_results) == len(annotations)
+    assert len(det_results[0][0][0]) == 21
+
+    num_imgs = len(det_results)
+    num_scales = len(scale_ranges) if scale_ranges is not None else 1
+    num_classes = len(det_results[0])  # positive class num
+    area_ranges = (
+        [(rg[0] ** 2, rg[1] ** 2) for rg in scale_ranges]
+        if scale_ranges is not None
+        else None
+    )
+
+    pool = Pool(nproc)
+    eval_results = []
+    for i in range(num_classes):
+        # get gt and det bboxes of this class
+        cls_dets, cls_gts, cls_gts_ignore = get_cls_results(det_results, annotations, i)
+        tpfp_func = tpfp_default
+        # compute tp and fp for each image with multiple processes
+        tpfp = pool.starmap(
+            tpfp_func,
+            zip(
+                cls_dets,
+                cls_gts,
+                cls_gts_ignore,
+                [iou_thr for _ in range(num_imgs)],
+                [area_ranges for _ in range(num_imgs)],
+            ),
+        )
+        tp, fp = tuple(zip(*tpfp))
+        tp = tp.astype(bool)
+        fp = fp.astype(bool)
+        print(cls_dets[tp])
+        print(cls_gts[tp])
+        print(cls_dets[fp])
+        print(cls_gts[fp])
+        #tp_nll = compute_reg_true_nll(cls_dets[tp], cls_gts[tp])
