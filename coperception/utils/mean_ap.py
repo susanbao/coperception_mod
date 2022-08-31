@@ -431,6 +431,7 @@ def match_tp_fp(
     num_gts = gt_bboxes.shape[0]
     if area_ranges is None:
         area_ranges = [(None, None)]
+        
     num_scales = len(area_ranges)
     # tp and fp are of shape (num_scales, num_gts), each row is tp or fp of
     # a certain scale
@@ -546,8 +547,8 @@ def compute_reg_nll(dets, gt):
     predicted_multivariate_normal_dists = torch.distributions.multivariate_normal.MultivariateNormal(dets_loc, covariance_matrix = covar_matrix + 1e-2 * torch.eye(2))
     negative_log_prob = - \
         predicted_multivariate_normal_dists.log_prob(gt_loc)
-    negative_log_prob_mean = negative_log_prob.mean()
-    return negative_log_prob_mean
+    #negative_log_prob_mean = negative_log_prob.mean()
+    return negative_log_prob.tolist()
 
 def compute_reg_entropy(dets):
     dets_loc = torch.from_numpy(dets[:,:8])
@@ -562,8 +563,8 @@ def compute_reg_entropy(dets):
     covar_matrix = torch.linalg.inv(sigma_inverse)
     predicted_multivariate_normal_dists = torch.distributions.multivariate_normal.MultivariateNormal(dets_loc, covariance_matrix = covar_matrix + 1e-2 * torch.eye(2))
     total_entropy = predicted_multivariate_normal_dists.entropy()
-    total_entropy_mean = total_entropy.mean()
-    return total_entropy_mean
+    #total_entropy_mean = total_entropy.mean()
+    return total_entropy.tolist()
 
 def eval_nll(
     det_results,
@@ -647,17 +648,21 @@ def eval_nll(
             tp = np.squeeze((1 - fp).astype(bool))
             fp = np.squeeze(fp.astype(bool))
             match = np.squeeze(match)
-            tp_dets = dets[tp]
-            tp_match = match[tp]
-            tp_gt = gt[tp_match]
-            nll = compute_reg_nll(tp_dets, tp_gt)
-            tp_nll.append(nll)
-            if len(dets[fp]) == 0:
-                fp_entropy.append(0.0)
-            else:
+            if tp.shape is ():
+                tp = np.array([tp])
+                match = np.array([match])
+            if fp.shape is ():
+                fp = np.array([fp])
+            if len(tp) != 0:
+                tp_dets = dets[tp]
+                tp_match = match[tp]
+                tp_gt = gt[tp_match]
+                nll = compute_reg_nll(tp_dets, tp_gt)
+                tp_nll.extend(nll)
+            if len(dets[fp]) != 0:
                 fp_dets = dets[fp]
                 entropy = compute_reg_entropy(fp_dets)
-                fp_entropy.append(entropy)
+                fp_entropy.extend(entropy)
         eval_results.append({
             "num_gts": num_gts,
             "NLL": np.mean(tp_nll),

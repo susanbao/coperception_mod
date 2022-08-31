@@ -36,6 +36,7 @@ def main(args):
         logger=None,
     )
     print("mAP: {}".format(mean_ap_local_average_5))
+    #ipdb.set_trace()
     covar_nll_5 = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.5)
     print(covar_nll_5)
     print("Average measure with IOU threshold=0.7: ")
