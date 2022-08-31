@@ -523,7 +523,7 @@ class FaFModule(object):
                 )
             else:
                 result = self.model(
-                    bev_seq, maps = trans_matrices, vis = num_all_agents, batch_size=batch_size
+                    bev_seq, trans_matrices, num_all_agents, batch_size=batch_size
                 )
 
         if self.kd_flag:

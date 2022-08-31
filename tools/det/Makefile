@@ -27,7 +27,7 @@ split := train
 # Where to store the logs check_loss_base check_loss_two_step_corner_pair_ind
 logpath := check/check_loss_two_step_corner_pair_ind
 # Train for how many epochs
-nepoch := 80
+nepoch := 100
 # loss type: corner_loss faf_loss kl_loss_center kl_loss_center_add, kl_loss_corner, kl_loss_center_ind, kl_loss_center_offset_ind, kl_loss_corner_pair_ind 
 loss_type = kl_loss_corner_pair_ind
 # If given, the model will resume from its most recent (by modification time) check point
