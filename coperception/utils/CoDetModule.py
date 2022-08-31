@@ -303,6 +303,8 @@ class FaFModule(object):
         pred_diff = target_corners - pred_corners 
         pred_diff = torch.unsqueeze(pred_diff, 2) # N * 4 * 1 * 2
         covariance_pred = covariance_pred.reshape(covariance_pred.shape[0], 4, 3)
+        if False:
+            covariance_pred = torch.clamp(covariance_pred, -0.5, 0.5)
         covar_matrix = torch.zeros((covariance_pred.shape[0], 4, 2, 2), device='cuda') # N * 4 * 2 * 2
         
         matrix_log_det_sum = torch.sum(covariance_pred[:, :, 0])

@@ -438,9 +438,9 @@ def main(args):
             logger=None,
         )
         mean_ap_local.append(mean_ap)
-        if args.loss_type == "kl_loss_corner_pair_ind":
-            covar_nll = eval_nll(det_results_local[k], annotations_local[k], scale_ranges=None, iou_thr=0.5)
-            print(covar_nll)
+        #if args.loss_type == "kl_loss_corner_pair_ind":
+        #    covar_nll = eval_nll(det_results_local[k], annotations_local[k], scale_ranges=None, iou_thr=0.5)
+        #    print(covar_nll)
         print_and_write_log("Local mAP@0.7 from agent {}".format(k))
 
         ean_ap, _ = eval_map(
@@ -452,9 +452,9 @@ def main(args):
             logger=None,
         )
         mean_ap_local.append(mean_ap)
-        if args.loss_type == "kl_loss_corner_pair_ind":
-            covar_nll = eval_nll(det_results_local[k], annotations_local[k], scale_ranges=None, iou_thr=0.7)
-            print(covar_nll)
+        #if args.loss_type == "kl_loss_corner_pair_ind":
+        #    covar_nll = eval_nll(det_results_local[k], annotations_local[k], scale_ranges=None, iou_thr=0.7)
+        #    print(covar_nll)
 
         det_results_all_local += det_results_local[k]
         annotations_all_local += annotations_local[k]
@@ -468,9 +468,9 @@ def main(args):
         logger=None,
     )
     mean_ap_local.append(mean_ap_local_average)
-    if args.loss_type == "kl_loss_corner_pair_ind":
-        covar_nll = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.5)
-        print(covar_nll)
+    #if args.loss_type == "kl_loss_corner_pair_ind":
+    #    covar_nll = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.5)
+    #    print(covar_nll)
     npy_frame_file = os.path.join(model_save_path, "all_data_{}.npy".format(start_epoch - 1))
     det_res = {"det_results_frame": det_results_all_local, "annotations_frame": annotations_all_local}
     np.save(npy_frame_file, det_res)
@@ -483,9 +483,9 @@ def main(args):
         logger=None,
     )
     mean_ap_local.append(mean_ap_local_average)
-    if args.loss_type == "kl_loss_corner_pair_ind":
-        covar_nll = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.7)
-        print(covar_nll)
+    #if args.loss_type == "kl_loss_corner_pair_ind":
+    #    covar_nll = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.7)
+    #    print(covar_nll)
 
     print_and_write_log(
         "Quantitative evaluation results of model from {}, at epoch {}".format(

@@ -2,7 +2,7 @@
 original_data_path := /data/v2x-sim
 # Where to save the created data
 #V2X-Sim-det  V2X-Sim-demo
-create_data_save_path := /data/v2x-sim-nyu/V2X-Sim-demo
+create_data_save_path := /data/v2x-sim-nyu/V2X-Sim-det
 # Index of the begining scene
 scene_begin := 0
  # Index of the ending scene + 1

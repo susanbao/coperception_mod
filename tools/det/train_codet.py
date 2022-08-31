@@ -18,6 +18,7 @@ import os
 import ipdb
 import wandb
 import socket
+import ipdb
 
 def check_folder(folder_path):
     if not os.path.exists(folder_path):
@@ -269,6 +270,11 @@ def main(args):
     num_step = 0
     if args.use_wandb:
         wandb.watch(faf_module.model, log="all")
+    # Try freeze part of model
+    if False:
+        for name, param in faf_module.model.named_parameters():
+            if name.split('.')[1] != 'cornerPairIndReg':
+                param.requires_grad = False
     for epoch in range(start_epoch, num_epochs + 1):
         lr = faf_module.optimizer.param_groups[0]["lr"]
         print("Epoch {}, learning rate {}".format(epoch, lr))
