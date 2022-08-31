@@ -26,6 +26,7 @@ def main(args):
             args.resume, nepoch
         )
     )
+    """
     print("Average measure with IOU threshold=0.5: ")
     mean_ap_local_average_5, _ = eval_map(
         det_results_all_local,
@@ -37,8 +38,6 @@ def main(args):
     )
     print("mAP: {}".format(mean_ap_local_average_5))
     #ipdb.set_trace()
-    covar_nll_5 = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.5)
-    print(covar_nll_5)
     print("Average measure with IOU threshold=0.7: ")
     mean_ap_local_average_7, _ = eval_map(
         det_results_all_local,
@@ -49,8 +48,10 @@ def main(args):
         logger=None,
     )
     print("mAP: {}".format(mean_ap_local_average_7))
-    covar_nll_7 = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.7)
-    print(covar_nll_7)
+    """
+    print("NLL:")
+    covar_nll = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.0)
+    print(covar_nll)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

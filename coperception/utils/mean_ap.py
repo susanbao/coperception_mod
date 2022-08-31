@@ -603,7 +603,6 @@ def eval_nll(
     """
     assert len(det_results) == len(annotations)
     assert len(det_results[0][0][0]) == 21
-
     num_imgs = len(det_results)
     num_scales = len(scale_ranges) if scale_ranges is not None else 1
     num_classes = len(det_results[0])  # positive class num
