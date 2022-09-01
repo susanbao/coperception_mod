@@ -18,22 +18,22 @@ training_data := $(create_data_save_path)/train
 
 testing_script := test_codet.py
 # Path to the test/val data
-testing_data := $(create_data_save_path)/test
+testing_data := $(create_data_save_path)/val
 # [lowerbound / upperbound / v2v / disco / when2com / max / mean / sum / agent]
 com := upperbound
 batch_size := 1
 # [train / test / val]
 split := train
 # Where to store the logs check_loss_base check_loss_two_step_corner_pair_ind
-logpath := check/check_loss_two_step_corner_pair_ind
+logpath := check/check_loss_mbb_two_step_corner_pair_ind
 # Train for how many epochs
-nepoch := 100
+nepoch := 25
 # loss type: corner_loss faf_loss kl_loss_center kl_loss_center_add, kl_loss_corner, kl_loss_center_ind, kl_loss_center_offset_ind, kl_loss_corner_pair_ind 
 loss_type = kl_loss_corner_pair_ind
 # If given, the model will resume from its most recent (by modification time) check point
 auto_resume_path := $(logpath)
 # experiment name
-exp_name = two_step
+exp_name = mbb_two_step
 # compress_level
 compress_level := 0
 # 1: apply late fusion. 0: no late fusion
@@ -134,9 +134,13 @@ mbb_train:
 	--pose_noise $(pose_noise) \
 	--only_v2i $(only_v2i) \
 	--block_len $(block_len) \
-	--init_resume_path logs/$(com)/no_rsu/epoch_100.pth \
+	--init_resume_path check/check_loss_two_step_corner_pair_ind/$(com)/no_rsu/epoch_80.pth \
 	--test_store $(logpath)/$(com)/no_rsu \
-	--test_data $(testing_data)
+	--test_data $(testing_data) \
+	--use_wandb $(use_wandb) \
+	--loss_type $(loss_type) \
+	--exp_name $(exp_name) \
+	--test
     
 mbb_train_disco_no_rsu:
 	python train_mbb.py \
@@ -153,9 +157,13 @@ mbb_train_disco_no_rsu:
 	--only_v2i $(only_v2i) \
 	--rsu 0 \
 	--block_len $(block_len) \
-	--init_resume_path logs/disco/no_rsu/epoch_100.pth \
+	--init_resume_path check/check_loss_two_step_corner_pair_ind/disco/no_rsu/epoch_100.pth \
 	--test_store $(logpath)/disco/no_rsu \
-	--test_data $(testing_data)
+	--test_data $(testing_data) \
+	--use_wandb $(use_wandb) \
+	--loss_type $(loss_type) \
+	--exp_name $(exp_name) \
+	--test
     
 test:
 	python $(testing_script) \

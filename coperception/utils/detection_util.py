@@ -702,7 +702,8 @@ def cal_local_mAP(config, data, det_results, annotations, return_local = False):
             pred_corners = cls_pred_corners
             cls_score = cls_pred_scores
             if "pred_covar" in pred_selected[k]:
-                pred_corners_covar = pred_selected[k]["pred_covar"][:, p].cpu().numpy()
+                #pred_corners_covar = pred_selected[k]["pred_covar"][:, p].cpu().numpy()
+                pred_corners_covar = pred_selected[k]["pred_covar"][:, p].cpu().detach().numpy()
                 covar_exist = True
 
         ## iou calculation

@@ -167,7 +167,7 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, epoch, a
             seq_save = os.path.join(save_fig_path[k], seq_name)
             check_folder(seq_save)
             idx_save = str(idx) + ".png"
-            temp_ = deepcopy(temp)
+            #temp_ = deepcopy(temp)
             if args.visualization:
                 visualization(
                     config,
@@ -183,7 +183,7 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, epoch, a
             npy_frame_file = os.path.join(tracking_path[k], npy_frame_name)
             det_res = {"scene" : scene, "frame": frame, "det_results_frame": det_results_frame, "annotations_frame": annotations_frame}
             np.save(npy_frame_file, det_res)
-            
+            """
             det_file = os.path.join(tracking_path[k], f"det_{scene}.txt")
             if scene not in tracking_file[k]:
                 det_file = open(det_file, "w")
@@ -214,6 +214,7 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, epoch, a
                 det_file.flush()
 
             det_file.close()
+            """
 
             # restore data before late-fusion
             if apply_late_fusion == 1 and len(result[k]) != 0:
