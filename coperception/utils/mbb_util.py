@@ -17,6 +17,7 @@ from coperception.utils.mean_ap import eval_map
 
 import glob
 import os
+import wandb
 
 def check_folder(folder_path):
     if not os.path.exists(folder_path):
@@ -321,3 +322,5 @@ def test_model(fafmodule, validation_data_loader, flag, device, config, epoch, a
             mean_ap_all[0], mean_ap_all[1]
         )
     )
+    if args.wandb:
+        wandb.log({"AP@0.5":mean_ap_all[0], "AP@0.7": mean_ap_all[1]}, step=epoch)
