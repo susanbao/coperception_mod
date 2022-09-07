@@ -12,7 +12,7 @@ def main(args):
     end_epoch = args.max_epoch
     res_diff = []
     for epoch in range(start_epoch, end_epoch+1):
-        data_path = args.mbb_path + "/epoch_" + "{}.pth".format(epoch)
+        data_path = args.mbb_path + "/{}".format(epoch) +"/all_data.npy"
         print("Load data from {}".format(data_path))
         data = np.load(data_path, allow_pickle=True)
         det_results_all_local = data.item()['det_results_frame']
