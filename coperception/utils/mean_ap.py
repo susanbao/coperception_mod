@@ -558,6 +558,17 @@ def compute_residual_error(dets, gt):
     gt_loc = torch.reshape(gt_loc, (-1, 2))
     return (gt_loc - dets_loc).tolist()
 
+def get_predicted_covar(dets):
+    dets_covar = dets[:,9:]
+    dets_covar = np.reshape(dets_covar, (-1, 3))
+    u_matrix = np.zeros((dets_covar.shape[0], 2, 2))
+    u_matrix[:, 0, 0] = np.exp(dets_covar[:, 0])
+    u_matrix[:, 0, 1] = dets_covar[:, 1]
+    u_matrix[:, 1, 1] = np.exp(dets_covar[:, 2])
+    sigma_inverse = np.matmul(np.transpose(u_matrix, 1, 2), u_matrix)
+    covar_matrix = np.linalg.inv(sigma_inverse)
+    return covar_matrix.tolist()
+
 def compute_reg_entropy(dets):
     dets_loc = torch.from_numpy(dets[:,:8])
     dets_covar = torch.from_numpy(dets[:,9:])
@@ -678,7 +689,7 @@ def eval_nll(
     return eval_results
 
 
-def get_residual_error(
+def get_residual_error_and_cov(
     det_results,
     annotations,
     scale_ranges=None,
@@ -714,6 +725,7 @@ def get_residual_error(
         resError: y-\hat{y}
     """
     assert len(det_results) == len(annotations)
+    covar_flag = len(det_results[0][0][0]) == 21
     num_imgs = len(det_results)
     num_scales = len(scale_ranges) if scale_ranges is not None else 1
     num_classes = len(det_results[0])  # positive class num
@@ -725,10 +737,12 @@ def get_residual_error(
 
     pool = Pool(nproc)
     res_error = []
+    predicted_covar = []
     for i in range(num_classes):
         # get gt and det bboxes of this class
         cls_dets, cls_gts, cls_gts_ignore = get_cls_results(det_results, annotations, i)
         one_res_error = []
+        one_covar = []
         tpfp_func = match_tp_fp
         # compute tp and fp for each image with multiple processes
         tpfp = pool.starmap(
@@ -764,5 +778,11 @@ def get_residual_error(
                 tp_match = match[tp]
                 tp_gt = gt[tp_match]
                 one_res_error.extend(compute_residual_error(tp_dets, tp_gt))
+                if covar_flag:
+                    one_covar.extend(get_predicted_covar(tp_dets))
         res_error.append(one_res_error)
-    return res_error
+        predicted_covar.append(one_covar)
+    if covar_flag:
+        return res_error, predicted_covar
+    else:
+        return res_error, None
