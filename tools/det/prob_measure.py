@@ -15,10 +15,18 @@ from coperception.models.det import *
 from coperception.utils.detection_util import late_fusion
 from coperception.utils.data_util import apply_pose_noise
 import ipdb
+import wandb
+import socket
 
-def main(args):
+def check_folder(folder_path):
+    if not os.path.exists(folder_path):
+        os.mkdir(folder_path)
+    return folder_path
+
+def compute_one_nll(args):
     nepoch = args.nepoch
-    data = np.load(args.resume, allow_pickle=True)
+    data_path = args.resume + "/all_data.npy"
+    data = np.load(data_path, allow_pickle=True)
     det_results_all_local = data.item()['det_results_frame']
     annotations_all_local = data.item()['annotations_frame']
     if args.covar_path != "":
@@ -37,32 +45,53 @@ def main(args):
             args.resume, nepoch
         )
     )
-    """
-    print("Average measure with IOU threshold=0.5: ")
-    mean_ap_local_average_5, _ = eval_map(
-        det_results_all_local,
-        annotations_all_local,
-        scale_ranges=None,
-        iou_thr=0.5,
-        dataset=None,
-        logger=None,
-    )
-    print("mAP: {}".format(mean_ap_local_average_5))
-    #ipdb.set_trace()
-    print("Average measure with IOU threshold=0.7: ")
-    mean_ap_local_average_7, _ = eval_map(
-        det_results_all_local,
-        annotations_all_local,
-        scale_ranges=None,
-        iou_thr=0.7,
-        dataset=None,
-        logger=None,
-    )
-    print("mAP: {}".format(mean_ap_local_average_7))
-    """
     print("NLL:")
     covar_nll = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.0, covar_e = covar_e, covar_a=covar_a, w=w)
     print(covar_nll)
+
+def compute_null_with_different_weight(args):
+    nepoch = args.nepoch
+    data_path = args.resume + "/all_data.npy"
+    data = np.load(data_path, allow_pickle=True)
+    det_results_all_local = data.item()['det_results_frame']
+    annotations_all_local = data.item()['annotations_frame']
+    covar_data = np.load(args.covar_path, allow_pickle=True)
+    covar_e = covar_data.item()['covar_e']
+    covar_a = covar_data.item()['covar_a']
+    covar_e = torch.from_numpy(covar_e)
+    covar_a = torch.from_numpy(covar_a)
+    
+    #save with wandb
+    wandb_path = args.resume + "/wandb"
+    if not os.path.exists(wandb_path):
+        os.makedirs(wandb_path)
+    wandb.init(config=args,
+            project="mbb_weight",
+            entity="susanbao",
+            notes=socket.gethostname(),
+            name=args.resume,
+            dir=wandb_path,
+            job_type="testing",
+            reinit=True)
+    
+    w_list = np.arange(0.0, 1.05, 0.05)
+    nll_list = []
+    for w in w_list:
+        covar_nll = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.0, covar_e = covar_e, covar_a=covar_a, w=w)
+        wandb.log({"NLL": covar_nll['NLL']}, step=w)
+        nll_list.append(covar_nll['NLL'])
+    save_data = {"nll_list": nll_list, "w_list":w_list}
+    save_data_path = args.resume + "/nll_list.npy"
+    np.save(save_data_path, save_data)
+    print("Complete save computed NLLs in {}".format(save_data_path))
+
+def main(args):
+    if args.type == 0:
+        compute_one_nll(args)
+    elif args.type == 1:
+        compute_null_with_different_weight(args)
+    else:
+        print("Error: type is error!")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -79,6 +108,12 @@ if __name__ == "__main__":
         default="",
         type=str,
         help="The path of saving the computed covariance matrix from mbb",
+    )
+    parser.add_argument(
+        "--stype",
+        default=0, 
+        type=int,
+        help="0: compute nll once, 1: compute null for different weight and draw figure",
     )
 
     torch.multiprocessing.set_sharing_strategy("file_system")
