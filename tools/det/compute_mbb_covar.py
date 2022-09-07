@@ -19,10 +19,13 @@ def main(args):
         annotations_all_local = data.item()['annotations_frame']
         res_diff_one_epoch = get_residual_error(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.0)
         res_diff.extend(res_diff_one_epoch)
-    print(len(res_diff))
-    print(len(res_diff[0]))
-    print(len(res_diff[0][0]))
-    print(res_diff)
+        print("Number of corners of all bounding box: {}".format(len(res_diff[epoch])))
+    res_diff_np = np.array(res_diff[0])
+    for i in range(1, len(res_diff)):
+        res_diff_np = np.concatenate((res_diff_np, res_diff[i]))
+    print(res_diff_np.shape)
+    print("covariance matrix:")
+    print(np.cov(res_diff_np.T))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
