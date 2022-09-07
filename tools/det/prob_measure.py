@@ -76,14 +76,16 @@ def compute_null_with_different_weight(args):
     
     w_list = np.arange(0.0, 1.05, 0.05)
     nll_list = []
-    for w in w_list:
+    for index, w in enumerate(w_list):
         covar_nll = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.0, covar_e = covar_e, covar_a=covar_a, w=w)
-        wandb.log({"NLL": covar_nll['NLL']}, step=w)
-        nll_list.append(covar_nll['NLL'])
+        wandb.log({"NLL": covar_nll[0]['NLL'], "w": w}, step=index)
+        nll_list.append(covar_nll[0]['NLL'])
     save_data = {"nll_list": nll_list, "w_list":w_list}
     save_data_path = args.resume + "/nll_list.npy"
     np.save(save_data_path, save_data)
     print("Complete save computed NLLs in {}".format(save_data_path))
+    if args.use_wandb:
+        wandb.finish()
 
 def main(args):
     if args.type == 0:
@@ -110,7 +112,7 @@ if __name__ == "__main__":
         help="The path of saving the computed covariance matrix from mbb",
     )
     parser.add_argument(
-        "--stype",
+        "--type",
         default=0, 
         type=int,
         help="0: compute nll once, 1: compute null for different weight and draw figure",

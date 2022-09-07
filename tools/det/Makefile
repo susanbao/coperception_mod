@@ -222,12 +222,13 @@ mbb_analyse_all_scenes:
 
 prob_measure:
 	python prob_measure.py \
-	--resume $(testlogpath)/${com}/no_rsu/$(nepoch)/all_data.npy \
+	--resume $(testlogpath)/${com}/no_rsu/$(nepoch) \
 	--nepoch $(nepoch) \
-	--covar_path $(logpath)/${com}/no_rsu/mbb_covar.npy
+	--covar_path $(logpath)/${com}/no_rsu/mbb_covar.npy \
+	--type 1
     
 compute_mbb_covar:
 	python compute_mbb_covar.py \
 	--mbb_path $(logpath)/${com}/no_rsu \
 	--min_epoch 0 \
-	--max_epoch 3
+	--max_epoch $(nepoch)
