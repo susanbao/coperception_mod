@@ -21,8 +21,8 @@ def main(args):
     data = np.load(args.resume, allow_pickle=True)
     det_results_all_local = data.item()['det_results_frame']
     annotations_all_local = data.item()['annotations_frame']
-    covar_e = torch.from_numpy([[ 4.20428409, -0.09594844], [-0.09594844,  2.83234283]])
-    covar_a = torch.from_numpy([[1.14563041e-03,1.29301672e-05], [1.29301672e-05,1.01163209e-03]])
+    covar_e = torch.FloatTensor([[ 4.20428409, -0.09594844], [-0.09594844,  2.83234283]])
+    covar_a = torch.FloatTensor([[1.14563041e-03,1.29301672e-05], [1.29301672e-05,1.01163209e-03]])
     w = 0.5
     print(
         "Quantitative evaluation results of model from {}, at epoch {}".format(

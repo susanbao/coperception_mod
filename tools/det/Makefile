@@ -26,6 +26,7 @@ batch_size := 1
 split := train
 # Where to store the logs check_loss_base, check_loss_mbb, check_loss_two_step_corner_pair_ind, check_loss_mbb_two_step_corner_pair_ind 
 logpath := check/check_loss_mbb_two_step_corner_pair_ind
+testlogpath := check/test_loss_mbb_two_step_corner_pair_ind
 # Train for how many epochs
 nepoch := 25
 # loss type: corner_loss faf_loss kl_loss_center kl_loss_center_add, kl_loss_corner, kl_loss_center_ind, kl_loss_center_offset_ind, kl_loss_corner_pair_ind 
@@ -221,7 +222,7 @@ mbb_analyse_all_scenes:
 
 prob_measure:
 	python prob_measure.py \
-	--resume $(logpath)/${com}/no_rsu/5/all_data.npy \
+	--resume $(testlogpath)/${com}/no_rsu/$(nepoch)/all_data.npy \
 	--nepoch $(nepoch)
     
 compute_mbb_covar:
