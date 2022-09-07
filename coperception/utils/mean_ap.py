@@ -530,7 +530,7 @@ def match_tp_fp(
                     fp[k, i] = 1
     return tp, fp
 
-def compute_reg_nll(dets, gt):
+def compute_reg_nll(dets, gt, covar_e = None, covar_a = None, w=0.0):
     assert len(dets) == len(gt)
     dets_loc = torch.from_numpy(dets[:,:8])
     dets_covar = torch.from_numpy(dets[:,9:])
@@ -544,6 +544,8 @@ def compute_reg_nll(dets, gt):
     u_matrix[:, 1, 1] = torch.exp(dets_covar[:, 2])
     sigma_inverse = torch.matmul(torch.transpose(u_matrix, 1, 2), u_matrix)
     covar_matrix = torch.linalg.inv(sigma_inverse)
+    if covar_e != None and covar_a != None:
+        covar_matrix = w * covar_e + (1.0 - w) * (0.5 * covar_a + 0.5 * covar_matrix + 1e-2 * torch.eye(2))
     predicted_multivariate_normal_dists = torch.distributions.multivariate_normal.MultivariateNormal(dets_loc, covariance_matrix = covar_matrix + 1e-2 * torch.eye(2))
     negative_log_prob = - \
         predicted_multivariate_normal_dists.log_prob(gt_loc)
@@ -592,6 +594,9 @@ def eval_nll(
     iou_thr=0.5,
     logger=None,
     nproc=4,
+    covar_e = None,
+    covar_a = None,
+    w=0.0
 ):
     """Evaluate mAP of a dataset.
     Args:
@@ -675,7 +680,7 @@ def eval_nll(
                 tp_dets = dets[tp]
                 tp_match = match[tp]
                 tp_gt = gt[tp_match]
-                nll = compute_reg_nll(tp_dets, tp_gt)
+                nll = compute_reg_nll(tp_dets, tp_gt, covar_e, covar_a, w)
                 tp_nll.extend(nll)
             if len(dets[fp]) != 0:
                 fp_dets = dets[fp]
