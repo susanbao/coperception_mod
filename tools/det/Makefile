@@ -18,22 +18,22 @@ training_data := $(create_data_save_path)/train
 
 testing_script := test_codet.py
 # Path to the test/val data
-testing_data := $(create_data_save_path)/val
+testing_data := $(create_data_save_path)/test
 # [lowerbound / upperbound / v2v / disco / when2com / max / mean / sum / agent]
-com := upperbound
+com := disco
 batch_size := 1
 # [train / test / val]
 split := train
-# Where to store the logs check_loss_base check_loss_two_step_corner_pair_ind
-logpath := check/check_loss_mbb_two_step_corner_pair_ind
+# Where to store the logs check_loss_base, check_loss_mbb, check_loss_two_step_corner_pair_ind, check_loss_mbb_two_step_corner_pair_ind 
+logpath := check/test_loss_mbb
 # Train for how many epochs
 nepoch := 25
 # loss type: corner_loss faf_loss kl_loss_center kl_loss_center_add, kl_loss_corner, kl_loss_center_ind, kl_loss_center_offset_ind, kl_loss_corner_pair_ind 
-loss_type = kl_loss_corner_pair_ind
+loss_type = corner_loss
 # If given, the model will resume from its most recent (by modification time) check point
 auto_resume_path := $(logpath)
 # experiment name
-exp_name = mbb_two_step
+exp_name = test_mbb_base
 # compress_level
 compress_level := 0
 # 1: apply late fusion. 0: no late fusion
@@ -134,7 +134,7 @@ mbb_train:
 	--pose_noise $(pose_noise) \
 	--only_v2i $(only_v2i) \
 	--block_len $(block_len) \
-	--init_resume_path check/check_loss_two_step_corner_pair_ind/$(com)/no_rsu/epoch_80.pth \
+	--init_resume_path check/check_loss_base/$(com)/no_rsu/epoch_80.pth \
 	--test_store $(logpath)/$(com)/no_rsu \
 	--test_data $(testing_data) \
 	--use_wandb $(use_wandb) \
@@ -148,7 +148,7 @@ mbb_train_disco_no_rsu:
 	--com disco \
 	--log --batch $(batch_size) \
 	--kd_flag 1 \
-	--resume_teacher logs/upperbound/no_rsu/epoch_100.pth \
+	--resume_teacher check/check_loss_base/upperbound/no_rsu/epoch_100.pth \
 	--auto_resume_path $(auto_resume_path) \
 	--logpath $(logpath) \
 	--nepoch $(nepoch) \
@@ -157,13 +157,12 @@ mbb_train_disco_no_rsu:
 	--only_v2i $(only_v2i) \
 	--rsu 0 \
 	--block_len $(block_len) \
-	--init_resume_path check/check_loss_two_step_corner_pair_ind/disco/no_rsu/epoch_100.pth \
+	--init_resume_path check/check_loss_base/disco/no_rsu/epoch_80.pth \
 	--test_store $(logpath)/disco/no_rsu \
 	--test_data $(testing_data) \
 	--use_wandb $(use_wandb) \
 	--loss_type $(loss_type) \
-	--exp_name $(exp_name) \
-	--test
+	--exp_name $(exp_name)
     
 test:
 	python $(testing_script) \
@@ -206,8 +205,11 @@ mbb_test_no_rsu:
 	--warp_flag $(warp_flag) \
 	--rsu 0 \
 	--test_store $(logpath)/$(com)/no_rsu \
-	--init_resume_path logs/$(com)/no_rsu/epoch_100.pth \
-	--nepoch ${nepoch}
+	--init_resume_path check/check_loss_two_step_corner_pair_ind/$(com)/no_rsu/epoch_80.pth \
+	--nepoch ${nepoch} \
+	--use_wandb $(use_wandb) \
+	--loss_type $(loss_type) \
+	--exp_name $(exp_name)
     
 mbb_analyse_all_scenes:
 	python analyse_all_scenes_mbb.py \
@@ -219,5 +221,5 @@ mbb_analyse_all_scenes:
 
 prob_measure:
 	python prob_measure.py \
-	--resume $(logpath)/$(com)/no_rsu/all_data_$(nepoch).npy \
+	--resume $(logpath)/${com}/no_rsu/5/all_data.npy \
 	--nepoch $(nepoch)
