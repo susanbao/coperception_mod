@@ -223,7 +223,8 @@ mbb_analyse_all_scenes:
 prob_measure:
 	python prob_measure.py \
 	--resume $(testlogpath)/${com}/no_rsu/$(nepoch)/all_data.npy \
-	--nepoch $(nepoch)
+	--nepoch $(nepoch) \
+	--covar_path $(logpath)/${com}/no_rsu/mbb_covar.npy
     
 compute_mbb_covar:
 	python compute_mbb_covar.py \

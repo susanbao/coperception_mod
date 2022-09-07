@@ -35,10 +35,18 @@ def main(args):
             all_predicted_covariance_np = np.concatenate((all_predicted_covariance_np, all_predicted_covariance[i]))
     print(res_diff_np.shape)
     print("covariance matrix for residual error:")
-    print(np.cov(res_diff_np.T))
-    print(all_predicted_covariance_np.shape)
-    print("mean of predicted covariance matrix:")
-    print(np.mean(all_predicted_covariance_np, axis=0))
+    covar_e = np.cov(res_diff_np.T)
+    print(covar_e)
+    save_data = {"covar_e":covar_e}
+    if covar_flag:
+        print(all_predicted_covariance_np.shape)
+        print("mean of predicted covariance matrix:")
+        covar_a = np.mean(all_predicted_covariance_np, axis=0)
+        print(covar_a)
+        save_data['covar_a'] =  covar_a
+    save_data_path = args.mbb_path + "/mbb_covar.npy"
+    np.save(save_data_path, save_data)
+    print("Save computed covariance in {}".format(save_data_path))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

@@ -21,9 +21,17 @@ def main(args):
     data = np.load(args.resume, allow_pickle=True)
     det_results_all_local = data.item()['det_results_frame']
     annotations_all_local = data.item()['annotations_frame']
-    covar_e = torch.FloatTensor([[ 4.20428409, -0.09594844], [-0.09594844,  2.83234283]])
-    covar_a = torch.FloatTensor([[1.14563041e-03,1.29301672e-05], [1.29301672e-05,1.01163209e-03]])
-    w = 0.5
+    if args.covar_path != "":
+        covar_data = np.load(args.covar_path, allow_pickle=True)
+        covar_e = covar_data.item()['covar_e']
+        covar_a = covar_data.item()['covar_a']
+        covar_e = torch.from_numpy(covar_e)
+        covar_a = torch.from_numpy(covar_a)
+        w = 0.5
+    else:
+        covar_a = None
+        covar_e = None
+        w = 0.0
     print(
         "Quantitative evaluation results of model from {}, at epoch {}".format(
             args.resume, nepoch
@@ -64,7 +72,13 @@ if __name__ == "__main__":
         "--resume",
         default="",
         type=str,
-        help="The path to the saved model that is loaded to resume training",
+        help="The path of saving the testing results",
+    )
+    parser.add_argument(
+        "--covar_path",
+        default="",
+        type=str,
+        help="The path of saving the computed covariance matrix from mbb",
     )
 
     torch.multiprocessing.set_sharing_strategy("file_system")
