@@ -565,7 +565,7 @@ def get_predicted_covar(dets):
     u_matrix[:, 0, 0] = np.exp(dets_covar[:, 0])
     u_matrix[:, 0, 1] = dets_covar[:, 1]
     u_matrix[:, 1, 1] = np.exp(dets_covar[:, 2])
-    sigma_inverse = np.matmul(np.transpose(u_matrix, 1, 2), u_matrix)
+    sigma_inverse = np.matmul(u_matrix.transpose((0,2,1)), u_matrix)
     covar_matrix = np.linalg.inv(sigma_inverse)
     return covar_matrix.tolist()
 

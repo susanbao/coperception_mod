@@ -13,7 +13,7 @@ def main(args):
     res_diff = []
     all_predicted_covariance = []
     covar_flag = False
-    ipdb.set_trace()
+    #ipdb.set_trace()
     for epoch in range(start_epoch, end_epoch+1):
         data_path = args.mbb_path + "/{}".format(epoch) +"/all_data.npy"
         print("Load data from {}".format(data_path))

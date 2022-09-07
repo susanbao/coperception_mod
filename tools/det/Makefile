@@ -25,11 +25,11 @@ batch_size := 1
 # [train / test / val]
 split := train
 # Where to store the logs check_loss_base, check_loss_mbb, check_loss_two_step_corner_pair_ind, check_loss_mbb_two_step_corner_pair_ind 
-logpath := check/test_loss_mbb
+logpath := check/check_loss_mbb_two_step_corner_pair_ind
 # Train for how many epochs
 nepoch := 25
 # loss type: corner_loss faf_loss kl_loss_center kl_loss_center_add, kl_loss_corner, kl_loss_center_ind, kl_loss_center_offset_ind, kl_loss_corner_pair_ind 
-loss_type = corner_loss
+loss_type = kl_loss_corner_pair_ind
 # If given, the model will resume from its most recent (by modification time) check point
 auto_resume_path := $(logpath)
 # experiment name
@@ -223,3 +223,9 @@ prob_measure:
 	python prob_measure.py \
 	--resume $(logpath)/${com}/no_rsu/5/all_data.npy \
 	--nepoch $(nepoch)
+    
+compute_mbb_covar:
+	python compute_mbb_covar.py \
+	--mbb_path $(logpath)/${com}/no_rsu \
+	--min_epoch 0 \
+	--max_epoch 3
