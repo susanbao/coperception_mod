@@ -533,20 +533,25 @@ def match_tp_fp(
 def compute_reg_nll(dets, gt, covar_e = None, covar_a = None, w=0.0):
     assert len(dets) == len(gt)
     dets_loc = torch.from_numpy(dets[:,:8])
-    dets_covar = torch.from_numpy(dets[:,9:])
     dets_loc = torch.reshape(dets_loc, (-1, 2))
-    dets_covar = torch.reshape(dets_covar, (-1, 3))
     gt_loc = torch.from_numpy(gt)
     gt_loc = torch.reshape(gt_loc, (-1, 2))
-    u_matrix = torch.zeros((dets_covar.shape[0], 2, 2))
-    u_matrix[:, 0, 0] = torch.exp(dets_covar[:, 0])
-    u_matrix[:, 0, 1] = dets_covar[:, 1]
-    u_matrix[:, 1, 1] = torch.exp(dets_covar[:, 2])
-    sigma_inverse = torch.matmul(torch.transpose(u_matrix, 1, 2), u_matrix)
-    covar_matrix = torch.linalg.inv(sigma_inverse)
-    if covar_e != None and covar_a != None:
-        covar_matrix = w * covar_e + (1.0 - w) * (0.5 * covar_a + 0.5 * covar_matrix + 1e-2 * torch.eye(2))
-    predicted_multivariate_normal_dists = torch.distributions.multivariate_normal.MultivariateNormal(dets_loc, covariance_matrix = covar_matrix + 1e-2 * torch.eye(2))
+    if len(dets[0]) <= 9:
+        covar_matrix = covar_e
+    else:
+        dets_covar = torch.from_numpy(dets[:,9:])
+        dets_covar = torch.reshape(dets_covar, (-1, 3))
+        u_matrix = torch.zeros((dets_covar.shape[0], 2, 2))
+        u_matrix[:, 0, 0] = torch.exp(dets_covar[:, 0])
+        u_matrix[:, 0, 1] = dets_covar[:, 1]
+        u_matrix[:, 1, 1] = torch.exp(dets_covar[:, 2])
+        sigma_inverse = torch.matmul(torch.transpose(u_matrix, 1, 2), u_matrix)
+        covar_matrix = torch.linalg.inv(sigma_inverse)
+        if covar_e != None and covar_a != None:
+            covar_matrix = w * covar_e + (1.0 - w) * (0.5 * covar_a + 0.5 * covar_matrix + 1e-2 * torch.eye(2))
+        else:
+            covar_matrix += 1e-2 * torch.eye(2)
+    predicted_multivariate_normal_dists = torch.distributions.multivariate_normal.MultivariateNormal(dets_loc, covariance_matrix = covar_matrix)
     negative_log_prob = - \
         predicted_multivariate_normal_dists.log_prob(gt_loc)
     #negative_log_prob_mean = negative_log_prob.mean()
@@ -571,18 +576,21 @@ def get_predicted_covar(dets):
     covar_matrix = np.linalg.inv(sigma_inverse)
     return covar_matrix.tolist()
 
-def compute_reg_entropy(dets):
+def compute_reg_entropy(dets, covar_e = None):
     dets_loc = torch.from_numpy(dets[:,:8])
-    dets_covar = torch.from_numpy(dets[:,9:])
     dets_loc = torch.reshape(dets_loc, (-1, 2))
-    dets_covar = torch.reshape(dets_covar, (-1, 3))
-    u_matrix = torch.zeros((dets_covar.shape[0], 2, 2))
-    u_matrix[:, 0, 0] = torch.exp(dets_covar[:, 0])
-    u_matrix[:, 0, 1] = dets_covar[:, 1]
-    u_matrix[:, 1, 1] = torch.exp(dets_covar[:, 2])
-    sigma_inverse = torch.matmul(torch.transpose(u_matrix, 1, 2), u_matrix)
-    covar_matrix = torch.linalg.inv(sigma_inverse)
-    predicted_multivariate_normal_dists = torch.distributions.multivariate_normal.MultivariateNormal(dets_loc, covariance_matrix = covar_matrix + 1e-2 * torch.eye(2))
+    if len(dets[0]) <= 9:
+        covar_matrix = covar_e
+    else:
+        dets_covar = torch.from_numpy(dets[:,9:])
+        dets_covar = torch.reshape(dets_covar, (-1, 3))
+        u_matrix = torch.zeros((dets_covar.shape[0], 2, 2))
+        u_matrix[:, 0, 0] = torch.exp(dets_covar[:, 0])
+        u_matrix[:, 0, 1] = dets_covar[:, 1]
+        u_matrix[:, 1, 1] = torch.exp(dets_covar[:, 2])
+        sigma_inverse = torch.matmul(torch.transpose(u_matrix, 1, 2), u_matrix)
+        covar_matrix = torch.linalg.inv(sigma_inverse) + 1e-2 * torch.eye(2)
+    predicted_multivariate_normal_dists = torch.distributions.multivariate_normal.MultivariateNormal(dets_loc, covariance_matrix = covar_matrix)
     total_entropy = predicted_multivariate_normal_dists.entropy()
     #total_entropy_mean = total_entropy.mean()
     return total_entropy.tolist()

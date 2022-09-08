@@ -87,6 +87,24 @@ def compute_null_with_different_weight(args):
     if args.use_wandb:
         wandb.finish()
 
+def compute_nll_only_with_mbb(args):
+    covar_data = np.load(args.covar_path, allow_pickle=True)
+    covar_e = covar_data.item()['covar_e']
+    covar_e = torch.from_numpy(covar_e)
+    nepoch = args.nepoch
+    data_path = args.resume + "/all_data.npy"
+    data = np.load(data_path, allow_pickle=True)
+    det_results_all_local = data.item()['det_results_frame']
+    annotations_all_local = data.item()['annotations_frame']
+    print(
+        "Quantitative evaluation results of model from {}, at epoch {}".format(
+            args.resume, nepoch
+        )
+    )
+    print("NLL:")
+    covar_nll = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.0, covar_e = covar_e)
+    print(covar_nll)
+
 def main(args):
     if args.type == 0:
         compute_one_nll(args)
