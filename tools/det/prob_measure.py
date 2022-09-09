@@ -25,7 +25,7 @@ def check_folder(folder_path):
 
 def compute_one_nll(args):
     nepoch = args.nepoch
-    data_path = args.resume + "/all_data.npy"
+    data_path = args.resume
     data = np.load(data_path, allow_pickle=True)
     det_results_all_local = data.item()['det_results_frame']
     annotations_all_local = data.item()['annotations_frame']
@@ -35,6 +35,10 @@ def compute_one_nll(args):
         covar_a = covar_data.item()['covar_a']
         covar_e = torch.from_numpy(covar_e)
         covar_a = torch.from_numpy(covar_a)
+        print("covar_e:")
+        print(covar_e)
+        print("covar_a")
+        print(covar_a)
         w = 0.5
     else:
         covar_a = None
@@ -51,7 +55,7 @@ def compute_one_nll(args):
 
 def compute_null_with_different_weight(args):
     nepoch = args.nepoch
-    data_path = args.resume + "/all_data.npy"
+    data_path = args.resume
     data = np.load(data_path, allow_pickle=True)
     det_results_all_local = data.item()['det_results_frame']
     annotations_all_local = data.item()['annotations_frame']
@@ -60,39 +64,47 @@ def compute_null_with_different_weight(args):
     covar_a = covar_data.item()['covar_a']
     covar_e = torch.from_numpy(covar_e)
     covar_a = torch.from_numpy(covar_a)
+    print("covar_e:")
+    print(covar_e)
+    print("covar_a")
+    print(covar_a)
     
     #save with wandb
-    wandb_path = args.resume + "/wandb"
+    wandb_path = args.save_path + "/wandb"
     if not os.path.exists(wandb_path):
         os.makedirs(wandb_path)
     wandb.init(config=args,
-            project="mbb_weight",
+            project="nll_weight",
             entity="susanbao",
             notes=socket.gethostname(),
-            name=args.resume,
+            name=args.exp_name,
             dir=wandb_path,
             job_type="testing",
             reinit=True)
     
+    #w_list = np.arange(0.0, 30.0, 0.5)
     w_list = np.arange(0.0, 1.05, 0.05)
+    #w_list = np.arange(1.0, 200.0, 1.0)
+    #w_list = np.arange(0.2, 3.0, 0.2)
     nll_list = []
     for index, w in enumerate(w_list):
         covar_nll = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.0, covar_e = covar_e, covar_a=covar_a, w=w)
         wandb.log({"NLL": covar_nll[0]['NLL'], "w": w}, step=index)
         nll_list.append(covar_nll[0]['NLL'])
     save_data = {"nll_list": nll_list, "w_list":w_list}
-    save_data_path = args.resume + "/nll_list.npy"
+    save_data_path = args.save_path + "/nll_list.npy"
     np.save(save_data_path, save_data)
     print("Complete save computed NLLs in {}".format(save_data_path))
-    if args.use_wandb:
-        wandb.finish()
+    wandb.finish()
 
 def compute_nll_only_with_mbb(args):
     covar_data = np.load(args.covar_path, allow_pickle=True)
     covar_e = covar_data.item()['covar_e']
     covar_e = torch.from_numpy(covar_e)
+    print("covar_e:")
+    print(covar_e)
     nepoch = args.nepoch
-    data_path = args.resume + "/all_data.npy"
+    data_path = args.resume
     data = np.load(data_path, allow_pickle=True)
     det_results_all_local = data.item()['det_results_frame']
     annotations_all_local = data.item()['annotations_frame']
@@ -110,6 +122,8 @@ def main(args):
         compute_one_nll(args)
     elif args.type == 1:
         compute_null_with_different_weight(args)
+    elif args.type == 2:
+        compute_nll_only_with_mbb(args)
     else:
         print("Error: type is error!")
 
@@ -133,7 +147,19 @@ if __name__ == "__main__":
         "--type",
         default=0, 
         type=int,
-        help="0: compute nll once, 1: compute null for different weight and draw figure",
+        help="0: compute nll once, 1: compute null for different weight and draw figure, 2: only mbb covariance",
+    )
+    parser.add_argument(
+        "--save_path",
+        default="",
+        type=str,
+        help="The path to save the result",
+    )
+    parser.add_argument(
+        "--exp_name",
+        default="",
+        type=str,
+        help="exp name",
     )
 
     torch.multiprocessing.set_sharing_strategy("file_system")

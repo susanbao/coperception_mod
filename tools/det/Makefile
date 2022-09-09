@@ -184,7 +184,6 @@ test_no_rsu:
 	--data $(testing_data) \
 	--com $(com) \
 	--resume $(logpath)/$(com)/no_rsu/epoch_$(nepoch).pth \
-	--tracking \
 	--logpath $(logpath) \
 	--apply_late_fusion $(apply_late_fusion) \
 	--visualization $(visualization) \
@@ -220,15 +219,45 @@ mbb_analyse_all_scenes:
 	--analyse_all \
 	--rsu 0
 
+#testlogpath, logpath
 prob_measure:
 	python prob_measure.py \
-	--resume $(testlogpath)/${com}/no_rsu/$(nepoch) \
+	--resume $(testlogpath)/${com}/no_rsu/$(nepoch)/all_data.npy \
 	--nepoch $(nepoch) \
+	--type 1 \
+	--save_path $(testlogpath)/${com}/no_rsu/$(nepoch) \
 	--covar_path $(logpath)/${com}/no_rsu/mbb_covar.npy \
-	--type 1
+	--exp_name new_eq_2_$(testlogpath)/${com}
+    
+prob_measure_2:
+	python prob_measure.py \
+	--resume $(testlogpath)/${com}/no_rsu/all_data_80.npy \
+	--nepoch $(nepoch) \
+	--type 1 \
+	--save_path $(testlogpath)/${com}/no_rsu \
+	--covar_path $(logpath)/${com}/no_rsu/mbb_covar.npy \
+	--exp_name $(testlogpath)/${com}
+
+prob_measure_one:
+	python prob_measure.py \
+	--resume $(testlogpath)/${com}/no_rsu/all_data_80.npy \
+	--nepoch $(nepoch) \
+	--type 0
+
+prob_measure_mbb:
+	python prob_measure.py \
+	--resume $(testlogpath)/${com}/no_rsu/$(nepoch)/all_data.npy \
+	--nepoch $(nepoch) \
+	--type 2 \
+	--save_path $(testlogpath)/${com}/no_rsu/$(nepoch) \
+	--covar_path $(logpath)/${com}/no_rsu/mbb_covar.npy \
+	--exp_name $(testlogpath)/${com}_new_eq
     
 compute_mbb_covar:
 	python compute_mbb_covar.py \
 	--mbb_path $(logpath)/${com}/no_rsu \
 	--min_epoch 0 \
 	--max_epoch $(nepoch)
+
+#$(testlogpath)/${com}/no_rsu/$(nepoch)/all_data.npy \
+#	--covar_path $(logpath)/${com}/no_rsu/mbb_covar.npy \

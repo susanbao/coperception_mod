@@ -3,6 +3,7 @@ import numpy as np
 from mmcv.utils import print_log
 from terminaltables import AsciiTable
 from coperception.utils.postprocess import *
+import ipdb
 
 
 def average_precision(recalls, precisions, mode="area"):
@@ -548,9 +549,13 @@ def compute_reg_nll(dets, gt, covar_e = None, covar_a = None, w=0.0):
         sigma_inverse = torch.matmul(torch.transpose(u_matrix, 1, 2), u_matrix)
         covar_matrix = torch.linalg.inv(sigma_inverse)
         if covar_e != None and covar_a != None:
-            covar_matrix = w * covar_e + (1.0 - w) * (0.5 * covar_a + 0.5 * covar_matrix + 1e-2 * torch.eye(2))
+            #covar_matrix = covar_e + w * ( 0.5*covar_a + 0.5* covar_matrix + 1e-2*torch.eye(2))
+            #covar_matrix = covar_e + w * (0.5 * covar_a + 0.5 * covar_matrix) * 100.0
+            #covar_matrix = w * covar_e + (1-w)*(0.5 * covar_a + 0.5 * covar_matrix)*1000.0
+            covar_matrix = w * covar_e + (1-w)*(0.5 * covar_a + 0.5 * covar_matrix) * 100.0
         else:
-            covar_matrix += 1e-2 * torch.eye(2)
+            #covar_matrix = covar_matrix + 1e-2*torch.eye(2)
+            covar_matrix = covar_matrix * 100.0
     predicted_multivariate_normal_dists = torch.distributions.multivariate_normal.MultivariateNormal(dets_loc, covariance_matrix = covar_matrix)
     negative_log_prob = - \
         predicted_multivariate_normal_dists.log_prob(gt_loc)
@@ -634,7 +639,6 @@ def eval_nll(
         tuple: [[tp_nll, fp_entropy]]
     """
     assert len(det_results) == len(annotations)
-    assert len(det_results[0][0][0]) == 21
     num_imgs = len(det_results)
     num_scales = len(scale_ranges) if scale_ranges is not None else 1
     num_classes = len(det_results[0])  # positive class num
@@ -690,14 +694,14 @@ def eval_nll(
                 tp_gt = gt[tp_match]
                 nll = compute_reg_nll(tp_dets, tp_gt, covar_e, covar_a, w)
                 tp_nll.extend(nll)
-            if len(dets[fp]) != 0:
-                fp_dets = dets[fp]
-                entropy = compute_reg_entropy(fp_dets)
-                fp_entropy.extend(entropy)
+            #if len(dets[fp]) != 0:
+            #    fp_dets = dets[fp]
+            #    entropy = compute_reg_entropy(fp_dets)
+            #    fp_entropy.extend(entropy)
         eval_results.append({
             "num_gts": num_gts,
             "NLL": np.mean(tp_nll),
-            "FP_entropy": np.mean(fp_entropy)
+            #"FP_entropy": np.mean(fp_entropy)
         })
     return eval_results
 
