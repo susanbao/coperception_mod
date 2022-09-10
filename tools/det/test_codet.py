@@ -207,6 +207,12 @@ def main(args):
         check_folder(os.path.join(model_save_path, f"tracking{i}"))
         for i in agent_idx_range
     ]
+    result_all_path = os.path.join(model_save_path, str(start_epoch - 1))
+    check_folder(result_all_path)
+    result_path = [
+        check_folder(os.path.join(result_all_path, f"result{i}"))
+        for i in agent_idx_range
+    ]
 
     # for local and global mAP evaluation
     det_results_local = [[] for i in agent_idx_range]
@@ -324,8 +330,8 @@ def main(args):
                 "anchors_map": data_agents["anchors"].cpu().numpy()[0],
                 "gt_max_iou": data_agents["gt_max_iou"],
             }
-            det_results_local[k], annotations_local[k] = cal_local_mAP(
-                config, temp, det_results_local[k], annotations_local[k]
+            det_results_local[k], annotations_local[k], det_results_frame, annotations_frame = cal_local_mAP(
+                config, temp, det_results_local[k], annotations_local[k], True
             )
             """
             print("det_results_local[k]:")
@@ -352,6 +358,11 @@ def main(args):
                     apply_late_fusion,
                     os.path.join(seq_save, idx_save),
                 )
+            scene, frame = filename.split("/")[-2].split("_")
+            npy_frame_name = filename.split("/")[-2] + ".npy"
+            npy_frame_file = os.path.join(result_path[k], npy_frame_name)
+            det_res = {"scene" : scene, "frame": frame, "det_results_frame": det_results_frame, "annotations_frame": annotations_frame}
+            np.save(npy_frame_file, det_res)
 
             # # plot the cell-wise edge
             # if flag == "disco" and k < len(save_agent_weight_list):
@@ -458,6 +469,9 @@ def main(args):
 
         det_results_all_local += det_results_local[k]
         annotations_all_local += annotations_local[k]
+        npy_frame_file = os.path.join(result_path[k], "one_agent_data.npy")
+        det_res = {"agent" : k+1, "det_results_frame": det_results_local[k], "annotations_frame": annotations_local[k]}
+        np.save(npy_frame_file, det_res)
 
     mean_ap_local_average, _ = eval_map(
         det_results_all_local,
