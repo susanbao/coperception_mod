@@ -49,9 +49,11 @@ def compute_one_nll(args):
             args.resume, nepoch
         )
     )
-    print("NLL:")
-    covar_nll = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.0, covar_e = covar_e, covar_a=covar_a, w=w)
-    print(covar_nll)
+    iou_list = [0.1, 0.3, 0.5, 0.7, 0.9]
+    for i in iou_list:
+        print("NLL with {}:".format(i))
+        covar_nll = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=i, covar_e = covar_e, covar_a=covar_a, w=w)
+        print(covar_nll)
 
 def compute_null_with_different_weight(args):
     nepoch = args.nepoch
@@ -74,7 +76,7 @@ def compute_null_with_different_weight(args):
     if not os.path.exists(wandb_path):
         os.makedirs(wandb_path)
     wandb.init(config=args,
-            project="nll_weight",
+            project="nll_weight_new",
             entity="susanbao",
             notes=socket.gethostname(),
             name=args.exp_name,
@@ -84,14 +86,17 @@ def compute_null_with_different_weight(args):
     
     #w_list = np.arange(0.0, 30.0, 0.5)
     w_list = np.arange(0.0, 1.05, 0.05)
-    #w_list = np.arange(1.0, 200.0, 1.0)
+    #w_list = np.arange(0.0, 21.0, 1.0)
     #w_list = np.arange(0.2, 3.0, 0.2)
-    nll_list = []
+    nll_list_05 = []
+    nll_list_07 = []
     for index, w in enumerate(w_list):
-        covar_nll = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.0, covar_e = covar_e, covar_a=covar_a, w=w)
-        wandb.log({"NLL": covar_nll[0]['NLL'], "w": w}, step=index)
-        nll_list.append(covar_nll[0]['NLL'])
-    save_data = {"nll_list": nll_list, "w_list":w_list}
+        covar_nll_05 = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.5, covar_e = covar_e, covar_a=covar_a, w=w)
+        nll_list_05.append(covar_nll_05[0]['NLL'])
+        covar_nll_07 = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.7, covar_e = covar_e, covar_a=covar_a, w=w)
+        wandb.log({"NLL_0.5": covar_nll_05[0]['NLL'], "NLL_0.7": covar_nll_07[0]['NLL'], "w": w}, step=index)
+        nll_list_07.append(covar_nll_07[0]['NLL'])
+    save_data = {"nll_list_05": nll_list_05, "nll_list_07": nll_list_07, "w_list":w_list}
     save_data_path = args.save_path + "/nll_list.npy"
     np.save(save_data_path, save_data)
     print("Complete save computed NLLs in {}".format(save_data_path))
@@ -113,9 +118,11 @@ def compute_nll_only_with_mbb(args):
             args.resume, nepoch
         )
     )
-    print("NLL:")
-    covar_nll = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.0, covar_e = covar_e)
-    print(covar_nll)
+    iou_list = [0.1, 0.3, 0.5, 0.7, 0.9]
+    for i in iou_list:
+        print("NLL with {}:".format(i))
+        covar_nll = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=i, covar_e = covar_e)
+        print(covar_nll)
 
 def main(args):
     if args.type == 0:
@@ -161,7 +168,6 @@ if __name__ == "__main__":
         type=str,
         help="exp name",
     )
-
     torch.multiprocessing.set_sharing_strategy("file_system")
     args = parser.parse_args()
     print(args)

@@ -14,13 +14,14 @@ def main(args):
     all_predicted_covariance = []
     covar_flag = False
     #ipdb.set_trace()
+    iou_thr = 0.1
     for epoch in range(start_epoch, end_epoch+1):
         data_path = args.mbb_path + "/{}".format(epoch) +"/all_data.npy"
         print("Load data from {}".format(data_path))
         data = np.load(data_path, allow_pickle=True)
         det_results_all_local = data.item()['det_results_frame']
         annotations_all_local = data.item()['annotations_frame']
-        res_diff_one_epoch, predicted_covar = get_residual_error_and_cov(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=0.0)
+        res_diff_one_epoch, predicted_covar = get_residual_error_and_cov(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=iou_thr)
         res_diff.extend(res_diff_one_epoch)
         if predicted_covar != None:
             all_predicted_covariance.extend(predicted_covar)
@@ -44,7 +45,7 @@ def main(args):
         covar_a = np.mean(all_predicted_covariance_np, axis=0)
         print(covar_a)
         save_data['covar_a'] =  covar_a
-    save_data_path = args.mbb_path + "/mbb_covar.npy"
+    save_data_path = args.mbb_path + "/mbb_covar_01.npy"
     np.save(save_data_path, save_data)
     print("Save computed covariance in {}".format(save_data_path))
 

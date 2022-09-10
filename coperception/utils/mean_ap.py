@@ -5,6 +5,34 @@ from terminaltables import AsciiTable
 from coperception.utils.postprocess import *
 import ipdb
 
+def compute_reg_nll(dets, gt, covar_e = None, covar_a = None, w=0.0):
+    assert len(dets) == len(gt)
+    dets_loc = torch.from_numpy(dets[:,:8])
+    dets_loc = torch.reshape(dets_loc, (-1, 2))
+    gt_loc = torch.from_numpy(gt)
+    gt_loc = torch.reshape(gt_loc, (-1, 2))
+    if len(dets) == 0:
+        return None
+    if len(dets[0]) <= 9:
+        covar_matrix = covar_e
+    else:
+        dets_covar = torch.from_numpy(dets[:,9:])
+        dets_covar = torch.reshape(dets_covar, (-1, 3))
+        u_matrix = torch.zeros((dets_covar.shape[0], 2, 2))
+        u_matrix[:, 0, 0] = torch.exp(dets_covar[:, 0])
+        u_matrix[:, 0, 1] = dets_covar[:, 1]
+        u_matrix[:, 1, 1] = torch.exp(dets_covar[:, 2])
+        sigma_inverse = torch.matmul(torch.transpose(u_matrix, 1, 2), u_matrix)
+        covar_matrix = torch.linalg.inv(sigma_inverse)
+        if covar_e != None and covar_a != None:
+            covar_matrix = covar_e + (0.5 * covar_a + 0.5 * covar_matrix) * 100.0
+        else:
+            covar_matrix = covar_matrix * 100.0
+    predicted_multivariate_normal_dists = torch.distributions.multivariate_normal.MultivariateNormal(dets_loc, covariance_matrix = covar_matrix)
+    negative_log_prob = - \
+        predicted_multivariate_normal_dists.log_prob(gt_loc)
+    #negative_log_prob_mean = negative_log_prob.mean()
+    return negative_log_prob.tolist()
 
 def average_precision(recalls, precisions, mode="area"):
     """Calculate average precision (for single or multiple scales).
@@ -531,37 +559,6 @@ def match_tp_fp(
                     fp[k, i] = 1
     return tp, fp
 
-def compute_reg_nll(dets, gt, covar_e = None, covar_a = None, w=0.0):
-    assert len(dets) == len(gt)
-    dets_loc = torch.from_numpy(dets[:,:8])
-    dets_loc = torch.reshape(dets_loc, (-1, 2))
-    gt_loc = torch.from_numpy(gt)
-    gt_loc = torch.reshape(gt_loc, (-1, 2))
-    if len(dets[0]) <= 9:
-        covar_matrix = covar_e
-    else:
-        dets_covar = torch.from_numpy(dets[:,9:])
-        dets_covar = torch.reshape(dets_covar, (-1, 3))
-        u_matrix = torch.zeros((dets_covar.shape[0], 2, 2))
-        u_matrix[:, 0, 0] = torch.exp(dets_covar[:, 0])
-        u_matrix[:, 0, 1] = dets_covar[:, 1]
-        u_matrix[:, 1, 1] = torch.exp(dets_covar[:, 2])
-        sigma_inverse = torch.matmul(torch.transpose(u_matrix, 1, 2), u_matrix)
-        covar_matrix = torch.linalg.inv(sigma_inverse)
-        if covar_e != None and covar_a != None:
-            #covar_matrix = covar_e + w * ( 0.5*covar_a + 0.5* covar_matrix + 1e-2*torch.eye(2))
-            #covar_matrix = covar_e + w * (0.5 * covar_a + 0.5 * covar_matrix) * 100.0
-            #covar_matrix = w * covar_e + (1-w)*(0.5 * covar_a + 0.5 * covar_matrix)*1000.0
-            covar_matrix = w * covar_e + (1-w)*(0.5 * covar_a + 0.5 * covar_matrix) * 100.0
-        else:
-            #covar_matrix = covar_matrix + 1e-2*torch.eye(2)
-            covar_matrix = covar_matrix * 100.0
-    predicted_multivariate_normal_dists = torch.distributions.multivariate_normal.MultivariateNormal(dets_loc, covariance_matrix = covar_matrix)
-    negative_log_prob = - \
-        predicted_multivariate_normal_dists.log_prob(gt_loc)
-    #negative_log_prob_mean = negative_log_prob.mean()
-    return negative_log_prob.tolist()
-
 def compute_residual_error(dets, gt):
     assert len(dets) == len(gt)
     dets_loc = torch.from_numpy(dets[:,:8])
@@ -693,7 +690,8 @@ def eval_nll(
                 tp_match = match[tp]
                 tp_gt = gt[tp_match]
                 nll = compute_reg_nll(tp_dets, tp_gt, covar_e, covar_a, w)
-                tp_nll.extend(nll)
+                if nll != None:
+                    tp_nll.extend(nll)
             #if len(dets[fp]) != 0:
             #    fp_dets = dets[fp]
             #    entropy = compute_reg_entropy(fp_dets)

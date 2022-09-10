@@ -226,32 +226,37 @@ prob_measure:
 	--nepoch $(nepoch) \
 	--type 1 \
 	--save_path $(testlogpath)/${com}/no_rsu/$(nepoch) \
-	--covar_path $(logpath)/${com}/no_rsu/mbb_covar.npy \
-	--exp_name new_eq_2_$(testlogpath)/${com}
+	--covar_path $(logpath)/${com}/no_rsu/mbb_covar_00.npy \
+	--exp_name new_eq_00_$(testlogpath)/${com}
     
 prob_measure_2:
 	python prob_measure.py \
-	--resume $(testlogpath)/${com}/no_rsu/all_data_80.npy \
+	--resume check/train_loss_mbb_two_step_corner_pair_ind/${com}/no_rsu/all_data_23.npy \
 	--nepoch $(nepoch) \
 	--type 1 \
 	--save_path $(testlogpath)/${com}/no_rsu \
-	--covar_path $(logpath)/${com}/no_rsu/mbb_covar.npy \
-	--exp_name $(testlogpath)/${com}
+	--covar_path $(logpath)/${com}/no_rsu/mbb_covar_05.npy \
+	--exp_name train_new_eq_train_loss_mbb_two_step_corner_pair_ind/${com}
 
 prob_measure_one:
 	python prob_measure.py \
-	--resume $(testlogpath)/${com}/no_rsu/all_data_80.npy \
+	--resume check/check_loss_two_step_corner_pair_ind/${com}/no_rsu/all_data_80.npy \
 	--nepoch $(nepoch) \
+	--type 0
+    
+prob_measure_one_with_mbb:
+	python prob_measure.py \
+	--resume $(testlogpath)/${com}/no_rsu/$(nepoch)/all_data.npy \
+	--nepoch $(nepoch) \
+	--covar_path $(logpath)/${com}/no_rsu/mbb_covar_05.npy \
 	--type 0
 
 prob_measure_mbb:
 	python prob_measure.py \
-	--resume $(testlogpath)/${com}/no_rsu/$(nepoch)/all_data.npy \
+	--resume check/test_loss_mbb/${com}/no_rsu/$(nepoch)/all_data.npy \
 	--nepoch $(nepoch) \
 	--type 2 \
-	--save_path $(testlogpath)/${com}/no_rsu/$(nepoch) \
-	--covar_path $(logpath)/${com}/no_rsu/mbb_covar.npy \
-	--exp_name $(testlogpath)/${com}_new_eq
+	--covar_path $(logpath)/${com}/no_rsu/mbb_covar_05.npy \
     
 compute_mbb_covar:
 	python compute_mbb_covar.py \
