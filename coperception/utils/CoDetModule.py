@@ -340,6 +340,49 @@ class FaFModule(object):
         print("reg_loss_sum_all: {}".format(reg_loss_sum_all))
         """
         return reg_loss_sum_all
+    
+    def kl_loss_corner_all(self, anchors, reg_loss_mask, reg_targets, pred_result, pred_covar):
+        N = pred_result.shape[0]
+        anchors = anchors.unsqueeze(-2).expand(
+            anchors.shape[0],
+            anchors.shape[1],
+            anchors.shape[2],
+            anchors.shape[3],
+            reg_loss_mask.shape[-1],
+            anchors.shape[-1],
+        )
+        assigned_anchor = anchors[reg_loss_mask]
+        assigned_target = reg_targets[reg_loss_mask]
+        assigned_pred = pred_result[reg_loss_mask]
+        covariance_pred = pred_covar[reg_loss_mask]
+        
+        pred_decode = bev_box_decode_torch(assigned_pred, assigned_anchor)
+        target_decode = bev_box_decode_torch(assigned_target, assigned_anchor)
+        pred_corners = center_to_corner_box2d_torch(
+            pred_decode[..., :2], pred_decode[..., 2:4], pred_decode[..., 4:]
+        )
+        target_corners = center_to_corner_box2d_torch(
+            target_decode[..., :2], target_decode[..., 2:4], target_decode[..., 4:]
+        )
+        pred_diff = target_corners - pred_corners
+        pred_diff = pred_diff.reshape(pred_diff.shape[0], 8)
+        pred_diff = torch.unsqueeze(pred_diff, 1) #N*1*8
+        
+        covar_matrix_size = 36
+        covar_matrix = torch.zeros((covariance_pred.shape[0], covar_matrix_size, covar_matrix_size), device='cuda') # T*6*6
+        indices = torch.triu_indices(covar_matrix_size, covar_matrix_size, device='cuda')
+        first_indices = torch.unsqueeze(torch.arange(0, covariance_pred.shape[0], dtype = torch.long, device='cuda'), 1)
+        covar_matrix[first_indices, indices[0], indices[1]] = covariance_pred
+        diagional = torch.arange(0, covar_matrix_size, dtype = torch.long, device='cuda')
+        matrix_diagonal = covar_matrix[first_indices, diagional, diagional]
+        matrix_log_det_sum = -(torch.sum(matrix_diagonal) * 2 / N)
+        covar_matrix[first_indices, diagional, diagional] = torch.exp(covar_matrix[first_indices, diagional, diagional])
+        sigma_inverse = torch.matmul(torch.transpose(covar_matrix, 1, 2), covar_matrix)
+        reg_loss = torch.matmul(torch.matmul(pred_diff, sigma_inverse), torch.transpose(pred_diff, 1, 2))
+        reg_loss_sum = torch.sum(reg_loss) / N
+        reg_loss_sum_all = reg_loss_sum + matrix_log_det_sum
+        reg_loss_sum_all = reg_loss_sum_all/2
+        return reg_loss_sum_all
 
     def loss_calculator(
         self,
@@ -441,6 +484,8 @@ class FaFModule(object):
                 else:
                     loss_loc = self.kl_loss_corner_pair_independent(anchors, reg_loss_mask, reg_targets, loc_result, result["loc_covar"])
                 loss_num += 1
+            elif self.loss_type == "kl_loss_corner_all":
+                loss_loc = self.kl_loss_corner_all(anchors, reg_loss_mask, reg_targets, loc_result, result["loc"][:,:,:,:,:,6:42])
             else:
                 loss_loc = F.smooth_l1_loss(
                     loc_result[reg_loss_mask], reg_targets[reg_loss_mask]

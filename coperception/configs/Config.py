@@ -82,6 +82,8 @@ class Config(object):
         self.loss_loc_weight = 0.1
         self.loc_det_weight = 0.1
         self.regMeanCovToge = False # always be False
+        if self.loss_type == "kl_loss_corner_all":
+            self.regMeanCovToge = True
 
         # The specifications for BEV maps
         self.voxel_size = (0.25, 0.25, 0.4)
