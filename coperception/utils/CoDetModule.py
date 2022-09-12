@@ -368,7 +368,7 @@ class FaFModule(object):
         pred_diff = pred_diff.reshape(pred_diff.shape[0], 8)
         pred_diff = torch.unsqueeze(pred_diff, 1) #N*1*8
         
-        covar_matrix_size = 36
+        covar_matrix_size = 8
         covar_matrix = torch.zeros((covariance_pred.shape[0], covar_matrix_size, covar_matrix_size), device='cuda') # T*6*6
         indices = torch.triu_indices(covar_matrix_size, covar_matrix_size, device='cuda')
         first_indices = torch.unsqueeze(torch.arange(0, covariance_pred.shape[0], dtype = torch.long, device='cuda'), 1)
