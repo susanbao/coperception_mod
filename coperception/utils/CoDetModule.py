@@ -486,6 +486,7 @@ class FaFModule(object):
                 loss_num += 1
             elif self.loss_type == "kl_loss_corner_all":
                 loss_loc = self.kl_loss_corner_all(anchors, reg_loss_mask, reg_targets, loc_result, result["loc"][:,:,:,:,:,6:42])
+                loss_num += 1
             else:
                 loss_loc = F.smooth_l1_loss(
                     loc_result[reg_loss_mask], reg_targets[reg_loss_mask]

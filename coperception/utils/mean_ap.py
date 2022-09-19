@@ -244,7 +244,7 @@ def eval_map(
         tuple: (mAP, [dict, dict, ...])
     """
     assert len(det_results) == len(annotations)
-    assert (len(det_results[0][0][0]) == 21) or (len(det_results[0][0][0]) == 9)
+    #assert (len(det_results[0][0][0]) == 21) or (len(det_results[0][0][0]) == 9)
 
     num_imgs = len(det_results)
     num_scales = len(scale_ranges) if scale_ranges is not None else 1

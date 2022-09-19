@@ -135,13 +135,12 @@ mbb_train:
 	--pose_noise $(pose_noise) \
 	--only_v2i $(only_v2i) \
 	--block_len $(block_len) \
-	--init_resume_path check/check_loss_base/$(com)/no_rsu/epoch_80.pth \
+	--init_resume_path check/check_loss_two_step_corner/$(com)/no_rsu/epoch_80.pth \
 	--test_store $(logpath)/$(com)/no_rsu \
 	--test_data $(testing_data) \
 	--use_wandb $(use_wandb) \
 	--loss_type $(loss_type) \
-	--exp_name $(exp_name) \
-	--test
+	--exp_name $(exp_name)
     
 mbb_train_disco_no_rsu:
 	python train_mbb.py \
@@ -197,7 +196,6 @@ mbb_test_no_rsu:
 	--data $(testing_data) \
 	--com $(com) \
 	--resume $(logpath)/$(com)/no_rsu \
-	--tracking \
 	--logpath $(logpath)/${com}/no_rsu \
 	--apply_late_fusion $(apply_late_fusion) \
 	--visualization $(visualization) \
@@ -205,7 +203,7 @@ mbb_test_no_rsu:
 	--warp_flag $(warp_flag) \
 	--rsu 0 \
 	--test_store $(logpath)/$(com)/no_rsu \
-	--init_resume_path check/check_loss_two_step_corner_pair_ind/$(com)/no_rsu/epoch_80.pth \
+	--init_resume_path check/check_loss_base/$(com)/no_rsu/epoch_80.pth \
 	--nepoch ${nepoch} \
 	--use_wandb $(use_wandb) \
 	--loss_type $(loss_type) \
@@ -226,8 +224,8 @@ prob_measure:
 	--nepoch $(nepoch) \
 	--type 1 \
 	--save_path $(testlogpath)/${com}/no_rsu/$(nepoch) \
-	--covar_path $(logpath)/${com}/no_rsu/mbb_covar_00.npy \
-	--exp_name new_eq_00_$(testlogpath)/${com}
+	--covar_path $(logpath)/${com}/no_rsu/mbb_covar_05.npy \
+	--exp_name a_p_$(testlogpath)/${com}
     
 prob_measure_2:
 	python prob_measure.py \
