@@ -8,3 +8,4 @@ check_*
 check
 err_logs
 v2x-sim*
+.DS_Store
