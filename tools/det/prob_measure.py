@@ -10,7 +10,7 @@ from coperception.datasets import V2XSimDet
 from coperception.configs import Config, ConfigGlobal
 from coperception.utils.CoDetModule import *
 from coperception.utils.loss import *
-from coperception.utils.mean_ap import eval_map, eval_nll
+from coperception.utils.mean_ap import eval_map, eval_nll, eval_calibrate
 from coperception.models.det import *
 from coperception.utils.detection_util import late_fusion
 from coperception.utils.data_util import apply_pose_noise
@@ -124,6 +124,42 @@ def compute_nll_only_with_mbb(args):
         covar_nll = eval_nll(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=i, covar_e = covar_e)
         print(covar_nll)
 
+def compute_one_cal(args):
+    nepoch = args.nepoch
+    data_path = args.resume
+    data = np.load(data_path, allow_pickle=True)
+    det_results_all_local = data.item()['det_results_frame']
+    annotations_all_local = data.item()['annotations_frame']
+    if args.covar_path != "":
+        covar_data = np.load(args.covar_path, allow_pickle=True)
+        covar_e = covar_data.item()['covar_e']
+        covar_a = covar_data.item()['covar_a']
+        covar_e = torch.from_numpy(covar_e)
+        covar_a = torch.from_numpy(covar_a)
+        print("covar_e:")
+        print(covar_e)
+        print("covar_a")
+        print(covar_a)
+        w = 0.5
+    else:
+        covar_a = None
+        covar_e = None
+        w = 0.0
+    print(
+        "Quantitative evaluation results of model from {}, at epoch {}".format(
+            args.resume, nepoch
+        )
+    )
+    iou_list = [0.1, 0.3, 0.5, 0.7, 0.9]
+    ipdb.set_trace()
+    for i in iou_list:
+        print("NLL with {}:".format(i))
+        covar_ece = eval_calibrate(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=i, covar_e = covar_e, covar_a=covar_a, w=w)
+        print(covar_ece['ECE'])
+        print(covar_ece['exp_cal'])
+        print(covar_ece['pre_cal'])
+
+
 def main(args):
     if args.type == 0:
         compute_one_nll(args)
@@ -131,6 +167,8 @@ def main(args):
         compute_null_with_different_weight(args)
     elif args.type == 2:
         compute_nll_only_with_mbb(args)
+    elif args.type == 3:
+        compute_one_cal(args)
     else:
         print("Error: type is error!")
 

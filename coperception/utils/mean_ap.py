@@ -4,6 +4,7 @@ from mmcv.utils import print_log
 from terminaltables import AsciiTable
 from coperception.utils.postprocess import *
 import ipdb
+from scipy.stats import multivariate_normal
 
 def compute_reg_nll(dets, gt, covar_e = None, covar_a = None, w=0.0):
     assert len(dets) == len(gt)
@@ -33,6 +34,33 @@ def compute_reg_nll(dets, gt, covar_e = None, covar_a = None, w=0.0):
         predicted_multivariate_normal_dists.log_prob(gt_loc)
     #negative_log_prob_mean = negative_log_prob.mean()
     return negative_log_prob.tolist()
+
+def compute_reg_calibrated(dets, gt, covar_e = None, covar_a = None, w=0.0):
+    dets_loc = torch.from_numpy(dets[:,:8])
+    dets_loc = torch.reshape(dets_loc, (-1, 2))
+    gt_loc = torch.from_numpy(gt)
+    gt_loc = torch.reshape(gt_loc, (-1, 2))
+    if len(dets) == 0:
+        return None
+    if len(dets[0]) <= 9:
+        covar_matrix = covar_e
+    else:
+        dets_covar = torch.from_numpy(dets[:,9:])
+        dets_covar = torch.reshape(dets_covar, (-1, 3))
+        u_matrix = torch.zeros((dets_covar.shape[0], 2, 2))
+        u_matrix[:, 0, 0] = torch.exp(dets_covar[:, 0])
+        u_matrix[:, 0, 1] = dets_covar[:, 1]
+        u_matrix[:, 1, 1] = torch.exp(dets_covar[:, 2])
+        sigma_inverse = torch.matmul(torch.transpose(u_matrix, 1, 2), u_matrix)
+        covar_matrix = torch.linalg.inv(sigma_inverse)
+        if covar_e != None and covar_a != None:
+            covar_matrix = covar_e + (0.5 * covar_a + 0.5 * covar_matrix) * 100.0
+        else:
+            covar_matrix = covar_matrix * 100.0
+    predicted_multivariate_normal_dists = multivariate_normal(mean = dets_loc, cov = covar_matrix)
+    calibrated  =  predicted_multivariate_normal_dists.cdf(gt_loc)
+    #negative_log_prob_mean = negative_log_prob.mean()
+    return calibrated
 
 def average_precision(recalls, precisions, mode="area"):
     """Calculate average precision (for single or multiple scales).
@@ -700,6 +728,94 @@ def eval_nll(
             "num_gts": num_gts,
             "NLL": np.mean(tp_nll),
             #"FP_entropy": np.mean(fp_entropy)
+        })
+    return eval_results
+
+def eval_calibrate(
+    det_results,
+    annotations,
+    scale_ranges=None,
+    iou_thr=0.5,
+    logger=None,
+    nproc=4,
+    covar_e = None,
+    covar_a = None,
+    w=0.0
+):
+    assert len(det_results) == len(annotations)
+    num_imgs = len(det_results)
+    num_scales = len(scale_ranges) if scale_ranges is not None else 1
+    num_classes = len(det_results[0])  # positive class num
+    area_ranges = (
+        [(rg[0] ** 2, rg[1] ** 2) for rg in scale_ranges]
+        if scale_ranges is not None
+        else None
+    )
+
+    pool = Pool(nproc)
+    eval_results = []
+    for i in range(num_classes):
+        # get gt and det bboxes of this class
+        cls_dets, cls_gts, cls_gts_ignore = get_cls_results(det_results, annotations, i)
+        tp_cal = []
+        tpfp_func = match_tp_fp
+        # compute tp and fp for each image with multiple processes
+        tpfp = pool.starmap(
+            tpfp_func,
+            zip(
+                cls_dets,
+                cls_gts,
+                cls_gts_ignore,
+                [iou_thr for _ in range(num_imgs)],
+                [area_ranges for _ in range(num_imgs)],
+            ),
+        )
+        tp_all, fp_all = list(zip(*tpfp))
+        # calculate gt number of each scale
+        # ignored gts or gts beyond the specific scale are not counted
+        num_gts = np.zeros(num_scales, dtype=int)
+        for j, bbox in enumerate(cls_gts):
+            if area_ranges is None:
+                num_gts[0] += bbox.shape[0]
+            else:
+                gt_areas = (bbox[:, 2] - bbox[:, 0]) * (bbox[:, 3] - bbox[:, 1])
+                for k, (min_area, max_area) in enumerate(area_ranges):
+                    num_gts[k] += np.sum((gt_areas >= min_area) & (gt_areas < max_area))
+        # sort all det bboxes by score, also sort tp and fp
+        for dets, gt, match, fp in zip(cls_dets, cls_gts, tp_all, fp_all):
+            tp = np.squeeze((1 - fp).astype(bool))
+            fp = np.squeeze(fp.astype(bool))
+            match = np.squeeze(match)
+            if tp.shape is ():
+                tp = np.array([tp])
+                match = np.array([match])
+            if fp.shape is ():
+                fp = np.array([fp])
+            if len(tp) != 0:
+                tp_dets = dets[tp]
+                tp_match = match[tp]
+                tp_gt = gt[tp_match]
+                cal = compute_reg_calibrated(tp_dets, tp_gt, covar_e, covar_a, w)
+                if cal != None:
+                    tp_cal.extend(cal)
+            #if len(dets[fp]) != 0:
+            #    fp_dets = dets[fp]
+            #    entropy = compute_reg_entropy(fp_dets)
+            #    fp_entropy.extend(entropy)
+        histogram_bin_step_size = 1 / 15.0
+        reg_calibration_error = []
+        expected = np.arange( 0.0, 1.0 - histogram_bin_step_size, histogram_bin_step_size)
+        predicted = []
+        for i in expected:
+            elements_in_bin = (tp_cal < (i+histogram_bin_step_size))
+            num_elems_in_bin_i = sum(elements_in_bin) * 1.0
+            predicted.append(num_elems_in_bin_i / len(tp_cal))
+            reg_calibration_error.append( (num_elems_in_bin_i / len(tp_cal) - (i + histogram_bin_step_size)) ** 2)
+        eval_results.append({
+            "num_gts": num_gts,
+            "ECE": np.mean(reg_calibration_error),
+            "exp_cal": expected,
+            "pre_cal": predicted
         })
     return eval_results
 
