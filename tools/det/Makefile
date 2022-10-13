@@ -28,9 +28,9 @@ split := train
 logpath := check/check_loss_mbb_two_step_corner_pair_ind
 testlogpath := check/test_loss_mbb_two_step_corner_pair_ind
 # Train for how many epochs
-nepoch := 25
+nepoch := 100
 # loss type: corner_loss faf_loss kl_loss_center kl_loss_center_add, kl_loss_corner, kl_loss_center_ind, kl_loss_center_offset_ind, kl_loss_corner_pair_ind 
-loss_type = kl_loss_corner_pair_ind
+loss_type = corner_loss
 # If given, the model will resume from its most recent (by modification time) check point
 auto_resume_path := $(logpath)
 # experiment name
@@ -108,7 +108,7 @@ train_disco_no_rsu:
 	--com disco \
 	--log --batch $(batch_size) \
 	--kd_flag 1 \
-	--resume_teacher check/check_loss_base/upperbound/no_rsu/epoch_90.pth \
+	--resume_teacher check/check_loss_base/upperbound/no_rsu/epoch_$(nepoch).pth \
 	--auto_resume_path $(auto_resume_path) \
 	--logpath $(logpath) \
 	--nepoch $(nepoch) \
@@ -261,6 +261,13 @@ compute_mbb_covar:
 	--mbb_path $(logpath)/${com}/no_rsu \
 	--min_epoch 0 \
 	--max_epoch $(nepoch)
+    
+prob_measure_ece_with_mbb:
+	python prob_measure.py \
+	--resume $(testlogpath)/${com}/no_rsu/$(nepoch)/all_data.npy \
+	--nepoch $(nepoch) \
+	--covar_path $(logpath)/${com}/no_rsu/mbb_covar_05.npy \
+	--type 3
 
 #$(testlogpath)/${com}/no_rsu/$(nepoch)/all_data.npy \
 #	--covar_path $(logpath)/${com}/no_rsu/mbb_covar.npy \

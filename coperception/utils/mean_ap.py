@@ -57,9 +57,10 @@ def compute_reg_calibrated(dets, gt, covar_e = None, covar_a = None, w=0.0):
             covar_matrix = covar_e + (0.5 * covar_a + 0.5 * covar_matrix) * 100.0
         else:
             covar_matrix = covar_matrix * 100.0
-    predicted_multivariate_normal_dists = multivariate_normal(mean = dets_loc, cov = covar_matrix)
-    calibrated  =  predicted_multivariate_normal_dists.cdf(gt_loc)
-    #negative_log_prob_mean = negative_log_prob.mean()
+    calibrated = []
+    for i in range(len(dets_loc)):
+        predicted_multivariate_normal_dists = multivariate_normal(mean = dets_loc[i], cov = covar_matrix[i])
+        calibrated.append(predicted_multivariate_normal_dists.cdf(gt_loc[i]))
     return calibrated
 
 def average_precision(recalls, precisions, mode="area"):
@@ -811,6 +812,7 @@ def eval_calibrate(
             num_elems_in_bin_i = sum(elements_in_bin) * 1.0
             predicted.append(num_elems_in_bin_i / len(tp_cal))
             reg_calibration_error.append( (num_elems_in_bin_i / len(tp_cal) - (i + histogram_bin_step_size)) ** 2)
+            i = i + histogram_bin_step_size
         eval_results.append({
             "num_gts": num_gts,
             "ECE": np.mean(reg_calibration_error),

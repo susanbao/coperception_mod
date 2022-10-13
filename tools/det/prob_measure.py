@@ -150,14 +150,14 @@ def compute_one_cal(args):
             args.resume, nepoch
         )
     )
-    iou_list = [0.1, 0.3, 0.5, 0.7, 0.9]
-    ipdb.set_trace()
+    #iou_list = [0.1, 0.3, 0.5, 0.7, 0.9]
+    iou_list = [0.5, 0.7]
+    #ipdb.set_trace()
     for i in iou_list:
-        print("NLL with {}:".format(i))
+        print("ECE with {}:".format(i))
         covar_ece = eval_calibrate(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=i, covar_e = covar_e, covar_a=covar_a, w=w)
-        print(covar_ece['ECE'])
-        print(covar_ece['exp_cal'])
-        print(covar_ece['pre_cal'])
+        #print(covar_ece)
+        print(covar_ece[0]['ECE'])
 
 
 def main(args):
