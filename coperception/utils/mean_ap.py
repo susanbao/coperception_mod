@@ -44,6 +44,11 @@ def compute_reg_calibrated(dets, gt, covar_e = None, covar_a = None, w=0.0):
         return None
     if len(dets[0]) <= 9:
         covar_matrix = covar_e
+        calibrated = []
+        for i in range(len(dets_loc)):
+            predicted_multivariate_normal_dists = multivariate_normal(mean = dets_loc[i], cov = covar_matrix)
+            calibrated.append(predicted_multivariate_normal_dists.cdf(gt_loc[i]))
+        return calibrated
     else:
         dets_covar = torch.from_numpy(dets[:,9:])
         dets_covar = torch.reshape(dets_covar, (-1, 3))
@@ -805,14 +810,13 @@ def eval_calibrate(
             #    fp_entropy.extend(entropy)
         histogram_bin_step_size = 1 / 15.0
         reg_calibration_error = []
-        expected = np.arange( 0.0, 1.0 - histogram_bin_step_size, histogram_bin_step_size)
+        expected = np.arange( histogram_bin_step_size, 1.0 + histogram_bin_step_size, histogram_bin_step_size)
         predicted = []
         for i in expected:
-            elements_in_bin = (tp_cal < (i+histogram_bin_step_size))
+            elements_in_bin = (tp_cal <= i)
             num_elems_in_bin_i = sum(elements_in_bin) * 1.0
             predicted.append(num_elems_in_bin_i / len(tp_cal))
-            reg_calibration_error.append( (num_elems_in_bin_i / len(tp_cal) - (i + histogram_bin_step_size)) ** 2)
-            i = i + histogram_bin_step_size
+            reg_calibration_error.append( (num_elems_in_bin_i / len(tp_cal) - i ) ** 2)
         eval_results.append({
             "num_gts": num_gts,
             "ECE": np.mean(reg_calibration_error),

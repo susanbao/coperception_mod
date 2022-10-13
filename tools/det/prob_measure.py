@@ -156,9 +156,31 @@ def compute_one_cal(args):
     for i in iou_list:
         print("ECE with {}:".format(i))
         covar_ece = eval_calibrate(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=i, covar_e = covar_e, covar_a=covar_a, w=w)
-        #print(covar_ece)
-        print(covar_ece[0]['ECE'])
+        print(covar_ece)
+        #print(covar_ece[0]['ECE'])
 
+def compute_ece_only_with_mbb(args):
+    covar_data = np.load(args.covar_path, allow_pickle=True)
+    covar_e = covar_data.item()['covar_e']
+    covar_e = torch.from_numpy(covar_e)
+    print("covar_e:")
+    print(covar_e)
+    nepoch = args.nepoch
+    data_path = args.resume
+    data = np.load(data_path, allow_pickle=True)
+    det_results_all_local = data.item()['det_results_frame']
+    annotations_all_local = data.item()['annotations_frame']
+    print(
+        "Quantitative evaluation results of model from {}, at epoch {}".format(
+            args.resume, nepoch
+        )
+    )
+    #iou_list = [0.1, 0.3, 0.5, 0.7, 0.9]
+    iou_list = [0.5, 0.7]
+    for i in iou_list:
+        print("NLL with {}:".format(i))
+        covar_ece = eval_calibrate(det_results_all_local, annotations_all_local, scale_ranges=None, iou_thr=i, covar_e = covar_e)
+        print(covar_ece)
 
 def main(args):
     if args.type == 0:
@@ -169,6 +191,8 @@ def main(args):
         compute_nll_only_with_mbb(args)
     elif args.type == 3:
         compute_one_cal(args)
+    elif args.type == 5:
+        compute_ece_only_with_mbb(args)
     else:
         print("Error: type is error!")
 

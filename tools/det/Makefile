@@ -269,5 +269,18 @@ prob_measure_ece_with_mbb:
 	--covar_path $(logpath)/${com}/no_rsu/mbb_covar_05.npy \
 	--type 3
 
+prob_measure_ece_mbb:
+	python prob_measure.py \
+	--resume check/test_loss_mbb/${com}/no_rsu/$(nepoch)/all_data.npy \
+	--nepoch $(nepoch) \
+	--type 5 \
+	--covar_path $(logpath)/${com}/no_rsu/mbb_covar_05.npy
+
+prob_measure_ece_one:
+	python prob_measure.py \
+	--resume check/check_loss_two_step_corner_pair_ind/${com}/no_rsu/all_data_80.npy \
+	--nepoch $(nepoch) \
+	--type 3
+
 #$(testlogpath)/${com}/no_rsu/$(nepoch)/all_data.npy \
 #	--covar_path $(logpath)/${com}/no_rsu/mbb_covar.npy \
