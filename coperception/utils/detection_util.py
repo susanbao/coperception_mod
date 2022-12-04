@@ -1080,6 +1080,25 @@ def get_det_corners(config, data, savename=None):
 
     return det_corners
 
+def get_det_covar(config, data, savename=None):
+    voxel_size = config.voxel_size
+    area_extents = config.area_extents
+    pred_len = 1
+
+    pred_selected = data["result"]
+
+    det_covar = []
+    for p in range(pred_len):
+        for k in range(len(pred_selected)):
+
+            cls_pred_covar = pred_selected[k]["pred_covar"][:, p]
+            if config.motion_state:
+                pass
+            print(cls_pred_covar)
+            det_covar.extend(cls_pred_covar)
+
+    return det_covar
+
 
 def late_fusion(ego_agent, num_agent, result, trans_matrices, box_color_map):
     box_colors = np.array(

@@ -135,10 +135,14 @@ class KalmanBoxTracker(object):
         )
 
         self.kf.R[2:, 2:] *= 10.0
+        if len(bbox) > 5:
+            self.kf.R[0,0] *= bbox[8]
+            self.kf.R[1,1] *= bbox[9]
         self.kf.P[
             4:, 4:
         ] *= 1000.0  # give high uncertainty to the unobservable initial velocities
         self.kf.P *= 10.0
+        # Use predicted variance to initialize the variance matrix of x and y
         self.kf.Q[-1, -1] *= 0.01
         self.kf.Q[4:, 4:] *= 0.01
 
@@ -159,7 +163,12 @@ class KalmanBoxTracker(object):
         self.history = []
         self.hits += 1
         self.hit_streak += 1
-        self.kf.update(convert_bbox_to_z(bbox))
+        if len(bbox) > 5:
+            self.kf.R[0,0] = bbox[8]
+            self.kf.R[1,1] = bbox[9]
+            self.kf.update(convert_bbox_to_z(bbox), self.kf.R)
+        else:
+            self.kf.update(convert_bbox_to_z(bbox))
 
     def predict(self):
         """
@@ -344,6 +353,7 @@ def parse_args():
         "--det_logs_path", default='', type=str, help="Det logs path (to get the tracking input)"
     )
     parser.add_argument("--split", type=str, help="[test/val]")
+    parser.add_argument("--output_cov", action="store_true", help = "Enable to use variance of x,y as input of Filter for SOTR")
     args = parser.parse_args()
     return args
 
@@ -378,7 +388,10 @@ if __name__ == "__main__":
                 print("Processing %s." % (os.path.join(root, seq)))
                 for frame in range(int(seq_dets[:, 0].max())):
                     frame += 1  # detection and frame numbers begin at 1
-                    dets = seq_dets[seq_dets[:, 0] == frame, 2:7]
+                    if args.output_cov:
+                        dets = seq_dets[seq_dets[:, 0] == frame, 2:]
+                    else:
+                        dets = seq_dets[seq_dets[:, 0] == frame, 2:7]
                     dets[:, 2:4] += dets[:, 0:2]  # convert to [x1,y1,w,h] to [x1,y1,x2,y2]
                     total_frames += 1
 

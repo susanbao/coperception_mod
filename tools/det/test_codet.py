@@ -386,26 +386,51 @@ def main(args):
                 else:
                     det_file = open(det_file, "a")
                 det_corners = get_det_corners(config, temp_)
+                if args.output_cov:
+                    det_covars = get_det_covar(config, temp_)
                 for ic, c in enumerate(det_corners):
-                    det_file.write(
-                        ",".join(
-                            [
-                                str(
-                                    int(frame) + 1
-                                ),  # frame idx is 1-based for tracking
-                                "-1",
-                                "{:.2f}".format(c[0]),
-                                "{:.2f}".format(c[1]),
-                                "{:.2f}".format(c[2]),
-                                "{:.2f}".format(c[3]),
-                                str(result_temp[0][0][0]["score"][ic]),
-                                "-1",
-                                "-1",
-                                "-1",
-                            ]
+                    if args.output_cov:
+                        det_file.write(
+                            ",".join(
+                                [
+                                    str(
+                                        int(frame) + 1
+                                    ),  # frame idx is 1-based for tracking
+                                    "-1",
+                                    "{:.2f}".format(c[0]),
+                                    "{:.2f}".format(c[1]),
+                                    "{:.2f}".format(c[2]),
+                                    "{:.2f}".format(c[3]),
+                                    str(result_temp[0][0][0]["score"][ic]),
+                                    "-1",
+                                    "-1",
+                                    "-1",
+                                    "{:.2f}".format(100*det_covars[ic][0]),
+                                    "{:.2f}".format(100*det_covars[ic][1]),
+                                ]
+                            )
+                            + "\n"
                         )
-                        + "\n"
-                    )
+                    else:
+                        det_file.write(
+                            ",".join(
+                                [
+                                    str(
+                                        int(frame) + 1
+                                    ),  # frame idx is 1-based for tracking
+                                    "-1",
+                                    "{:.2f}".format(c[0]),
+                                    "{:.2f}".format(c[1]),
+                                    "{:.2f}".format(c[2]),
+                                    "{:.2f}".format(c[3]),
+                                    str(result_temp[0][0][0]["score"][ic]),
+                                    "-1",
+                                    "-1",
+                                    "-1",
+                                ]
+                            )
+                            + "\n"
+                        )
                     det_file.flush()
 
                 det_file.close()
@@ -583,6 +608,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--inference", type=str)
     parser.add_argument("--tracking", action="store_true")
+    parser.add_argument("--output_cov", action="store_true", help = "Enable to use variance of x,y as input of Filter for SOTR")
     parser.add_argument("--box_com", action="store_true")
     parser.add_argument("--rsu", default=0, type=int, help="0: no RSU, 1: RSU")
     # scene_batch => batch size in each scene
