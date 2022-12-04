@@ -1094,7 +1094,7 @@ def get_det_covar(config, data, savename=None):
             cls_pred_covar = pred_selected[k]["pred_covar"][:, p]
             if config.motion_state:
                 pass
-            print(cls_pred_covar)
+            #print(cls_pred_covar)
             det_covar.extend(cls_pred_covar)
 
     return det_covar

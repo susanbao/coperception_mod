@@ -405,8 +405,8 @@ def main(args):
                                     "-1",
                                     "-1",
                                     "-1",
-                                    "{:.2f}".format(100*det_covars[ic][0]),
-                                    "{:.2f}".format(100*det_covars[ic][1]),
+                                    "{:.2f}".format(det_covars[ic][0]),
+                                    "{:.2f}".format(det_covars[ic][1]),
                                 ]
                             )
                             + "\n"
