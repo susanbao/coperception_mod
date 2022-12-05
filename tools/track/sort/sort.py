@@ -20,6 +20,8 @@ from __future__ import print_function
 import os
 import shutil
 import numpy as np
+import math
+import ipdb
 
 # import matplotlib
 # matplotlib.use('TkAgg')
@@ -136,8 +138,8 @@ class KalmanBoxTracker(object):
 
         self.kf.R[2:, 2:] *= 10.0
         if len(bbox) > 5:
-            self.kf.R[0,0] *= bbox[8]
-            self.kf.R[1,1] *= bbox[9]
+            self.kf.R[0,0] = 100.0 * math.exp(bbox[8])
+            self.kf.R[1,1] = 100.0 * math.exp(bbox[9])
         self.kf.P[
             4:, 4:
         ] *= 1000.0  # give high uncertainty to the unobservable initial velocities
@@ -164,8 +166,8 @@ class KalmanBoxTracker(object):
         self.hits += 1
         self.hit_streak += 1
         if len(bbox) > 5:
-            self.kf.R[0,0] = bbox[8]
-            self.kf.R[1,1] = bbox[9]
+            self.kf.R[0,0] = 100.0 * math.exp(bbox[8])
+            self.kf.R[1,1] = 100.0 * math.exp(bbox[9])
             self.kf.update(convert_bbox_to_z(bbox), self.kf.R)
         else:
             self.kf.update(convert_bbox_to_z(bbox))
@@ -307,6 +309,8 @@ def order_det_res(root):
     files = os.listdir(root)
     for file in files:
         F = os.path.join(root, file)
+        if F[-4:] != ".txt":
+            continue
         with open(F, "r") as f:
             lines = f.readlines()
         lines.sort(key=lambda x: int(x.split(",")[0]))
@@ -364,6 +368,7 @@ if __name__ == "__main__":
     scene_idxes_file = open(args.scene_idxes_file, "r")
     scene_idxes = [int(line.strip()) for line in scene_idxes_file]
     print(f'scenes to run: {scene_idxes}')
+    #ipdb.set_trace()
 
     for current_agent in range(args.from_agent, args.to_agent):
         total_time = 0.0
@@ -374,6 +379,8 @@ if __name__ == "__main__":
         save_path = f"./{args.mode}/agent{current_agent}"
         os.makedirs(save_path, exist_ok=True)
         for seq in det_results:
+            if seq[-4:] != ".txt":
+                continue
             mot_tracker = Sort(
                 max_age=args.max_age,
                 min_hits=args.min_hits,

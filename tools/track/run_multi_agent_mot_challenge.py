@@ -16,6 +16,7 @@ def parse_args():
         "--to_agent", default=6, type=int, help="until which agent (index + 1)"
     )
     parser.add_argument("--split", type=str, help="[test/val]")
+    parser.add_argument("--name", default="", type=str, help="special name for the output file")
     args = parser.parse_args()
     return args
 
@@ -73,4 +74,4 @@ if __name__ == "__main__":
     all_rows.append(['mean'] + list(mean)[1:])
     df = pd.DataFrame(all_rows, columns=['agent', 'MOTA', 'MOTP', 'HOTA', 'DetA', 'AssA', 'DetRe', 'DetPr', 'AssRe', 'AssPr', 'LocA'])
     os.makedirs('logs', exist_ok=True)
-    df.to_csv(f'logs/logs_{mode}_{rsu}.csv', sep=',', index=False)
+    df.to_csv(f'logs/logs_{mode}_{rsu}_{args.name}.csv', sep=',', index=False)
