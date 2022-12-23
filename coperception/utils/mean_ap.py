@@ -737,6 +737,93 @@ def eval_nll(
         })
     return eval_results
 
+def match_pairs(
+    det_results,
+    annotations,
+    scale_ranges=None,
+    iou_thr=0.5
+):
+    """Evaluate mAP of a dataset.
+    Args:
+        det_results (list[list]): [[cls1_det, cls2_det, ...], ...].
+            The outer list indicates images, and the inner list indicates
+            per-class detected bboxes.
+        annotations (list[dict]): Ground truth annotations where each item of
+            the list indicates an image. Keys of annotations are:
+            - `bboxes`: numpy array of shape (n, 4)
+            - `labels`: numpy array of shape (n, )
+            - `bboxes_ignore` (optional): numpy array of shape (k, 4)
+            - `labels_ignore` (optional): numpy array of shape (k, )
+        scale_ranges (list[tuple] | None): Range of scales to be evaluated,
+            in the format [(min1, max1), (min2, max2), ...]. A range of
+            (32, 64) means the area range between (32**2, 64**2).
+            Default: None.
+        iou_thr (float): IoU threshold to be considered as matched.
+            Default: 0.5.
+    Returns:
+        list: tp_results [[predicted, ground truth]]
+        list: fp_results [predicted]
+    """
+    assert len(det_results) == len(annotations)
+    num_imgs = len(det_results)
+    num_scales = len(scale_ranges) if scale_ranges is not None else 1
+    num_classes = len(det_results[0])  # positive class num
+    area_ranges = (
+        [(rg[0] ** 2, rg[1] ** 2) for rg in scale_ranges]
+        if scale_ranges is not None
+        else None
+    )
+
+    pool = Pool(nproc)
+    tp_results = []
+    fp_results = []
+    for i in range(num_classes):
+        # get gt and det bboxes of this class
+        cls_dets, cls_gts, cls_gts_ignore = get_cls_results(det_results, annotations, i)
+        tpfp_func = match_tp_fp
+        # compute tp and fp for each image with multiple processes
+        tpfp = pool.starmap(
+            tpfp_func,
+            zip(
+                cls_dets,
+                cls_gts,
+                cls_gts_ignore,
+                [iou_thr for _ in range(num_imgs)],
+                [area_ranges for _ in range(num_imgs)],
+            ),
+        )
+        tp_all, fp_all = list(zip(*tpfp))
+        # calculate gt number of each scale
+        # ignored gts or gts beyond the specific scale are not counted
+        num_gts = np.zeros(num_scales, dtype=int)
+        for j, bbox in enumerate(cls_gts):
+            if area_ranges is None:
+                num_gts[0] += bbox.shape[0]
+            else:
+                gt_areas = (bbox[:, 2] - bbox[:, 0]) * (bbox[:, 3] - bbox[:, 1])
+                for k, (min_area, max_area) in enumerate(area_ranges):
+                    num_gts[k] += np.sum((gt_areas >= min_area) & (gt_areas < max_area))
+        # sort all det bboxes by score, also sort tp and fp
+        for dets, gt, match, fp in zip(cls_dets, cls_gts, tp_all, fp_all):
+            tp = np.squeeze((1 - fp).astype(bool))
+            fp = np.squeeze(fp.astype(bool))
+            match = np.squeeze(match)
+            if tp.shape is ():
+                tp = np.array([tp])
+                match = np.array([match])
+            if fp.shape is ():
+                fp = np.array([fp])
+            if len(tp) != 0:
+                tp_dets = dets[tp]
+                tp_match = match[tp]
+                tp_gt = gt[tp_match]
+                assert len(tp_dets) == len(tp_gt)
+                tp_results.append([tp_dets, tp_gt])
+            if len(dets[fp]) != 0: 
+                fp_dets = dets[fp]
+                fp_results.append(fp_dets)   
+    return tp_results, fp_results
+
 def eval_calibrate(
     det_results,
     annotations,
