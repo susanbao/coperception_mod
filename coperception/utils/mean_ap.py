@@ -774,7 +774,7 @@ def match_pairs(
         else None
     )
 
-    pool = Pool(nproc)
+    pool = Pool(4)
     tp_results = []
     fp_results = []
     for i in range(num_classes):
