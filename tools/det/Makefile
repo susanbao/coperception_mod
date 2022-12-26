@@ -19,6 +19,7 @@ training_data := $(create_data_save_path)/train
 testing_script := test_codet.py
 # Path to the test/val data
 testing_data := $(create_data_save_path)/test
+val_data :=$(create_data_save_path)/val
 # [lowerbound / upperbound / v2v / disco / when2com / max / mean / sum / agent]
 com := disco
 batch_size := 1
@@ -190,6 +191,34 @@ test_no_rsu:
 	--warp_flag $(warp_flag) \
 	--rsu 0 \
 	--loss_type $(loss_type)
+    
+test_no_rsu_val:
+	python $(testing_script) \
+	--data $(val_data) \
+	--com $(com) \
+	--resume $(logpath)/$(com)/no_rsu/epoch_$(nepoch).pth \
+	--logpath $(logpath) \
+	--apply_late_fusion $(apply_late_fusion) \
+	--visualization $(visualization) \
+	--inference $(inference) \
+	--warp_flag $(warp_flag) \
+	--rsu 0 \
+	--loss_type $(loss_type)
+
+test_no_rsu_cov:
+	python $(testing_script) \
+	--data $(testing_data) \
+	--com $(com) \
+	--resume $(logpath)/$(com)/no_rsu/epoch_$(nepoch).pth \
+	--logpath $(logpath) \
+	--apply_late_fusion $(apply_late_fusion) \
+	--visualization $(visualization) \
+	--inference $(inference) \
+	--warp_flag $(warp_flag) \
+	--tracking \
+	--output_cov \
+	--rsu 0 \
+	--loss_type $(loss_type)
 
 mbb_test_no_rsu:
 	python test_mbb.py \
@@ -281,6 +310,12 @@ prob_measure_ece_one:
 	--resume check/check_loss_two_step_corner_pair_ind/${com}/no_rsu/all_data_80.npy \
 	--nepoch $(nepoch) \
 	--type 3
+
+match_store:
+	python match_store.py \
+	--resume $(logpath)/${com}/no_rsu/all_data_$(nepoch).npy \
+	--save_path $(logpath)/${com}/no_rsu \
+	--iou 5
 
 #$(testlogpath)/${com}/no_rsu/$(nepoch)/all_data.npy \
 #	--covar_path $(logpath)/${com}/no_rsu/mbb_covar.npy \
