@@ -1,0 +1,41 @@
+python test_codet.py \
+--data /data/v2x-sim-nyu/V2X-Sim-det/test \
+--com upperbound \
+--resume check/check_loss_two_step_center_ind_cov/upperbound/no_rsu/epoch_100.pth \
+--logpath check/check_loss_two_step_center_ind_cov \
+--apply_late_fusion 0 \
+--visualization 0 \
+--inference activated \
+--warp_flag 0 \
+--tracking \
+--output_cov \
+--rsu 0 \
+--loss_type kl_loss_center_ind
+Namespace(apply_late_fusion=0, box_com=False, com='upperbound', compress_level=0, data='/data/v2x-sim-nyu/V2X-Sim-det/test', gnn_iter_times=3, inference='activated', kd_flag=0, kd_weight=100000, layer=3, log=False, logpath='check/check_loss_two_step_center_ind_cov', loss_type='kl_loss_center_ind', lr=0.001, nepoch=100, num_agent=6, nworker=1, only_v2i=0, output_cov=True, pose_noise=0, resume='check/check_loss_two_step_center_ind_cov/upperbound/no_rsu/epoch_100.pth', resume_teacher='', rsu=0, tracking=True, use_wandb=0, visualization=0, warp_flag=0)
+device number 1
+flag upperbound
+The number of val sequences: 1000
+The number of val sequences: 1000
+Validation dataset size: 1000
+Traceback (most recent call last):
+  File "test_codet.py", line 653, in <module>
+    main(args)
+  File "/home/sas20048/anaconda/envs/coperception/lib/python3.7/site-packages/torch/autograd/grad_mode.py", line 27, in decorate_context
+    return func(*args, **kwargs)
+  File "test_codet.py", line 165, in main
+    model = nn.DataParallel(model)
+  File "/home/sas20048/anaconda/envs/coperception/lib/python3.7/site-packages/torch/nn/parallel/data_parallel.py", line 145, in __init__
+    self.module.to(self.src_device_obj)
+  File "/home/sas20048/anaconda/envs/coperception/lib/python3.7/site-packages/torch/nn/modules/module.py", line 907, in to
+    return self._apply(convert)
+  File "/home/sas20048/anaconda/envs/coperception/lib/python3.7/site-packages/torch/nn/modules/module.py", line 578, in _apply
+    module._apply(fn)
+  File "/home/sas20048/anaconda/envs/coperception/lib/python3.7/site-packages/torch/nn/modules/module.py", line 578, in _apply
+    module._apply(fn)
+  File "/home/sas20048/anaconda/envs/coperception/lib/python3.7/site-packages/torch/nn/modules/module.py", line 601, in _apply
+    param_applied = fn(param)
+  File "/home/sas20048/anaconda/envs/coperception/lib/python3.7/site-packages/torch/nn/modules/module.py", line 905, in convert
+    return t.to(device, dtype if t.is_floating_point() or t.is_complex() else None, non_blocking)
+KeyboardInterrupt
+Makefile:209: recipe for target 'test_no_rsu_cov' failed
+make: *** [test_no_rsu_cov] Error 1

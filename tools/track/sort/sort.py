@@ -35,7 +35,10 @@ from filterpy.kalman import KalmanFilter
 
 np.random.seed(0)
 
-expand_scalar = 100.0
+expand_scalar_x = (31.340185602346363 / 3) ** 2
+expand_scalar_y = (24.276376908593676 / 3) ** 2
+# expand_scalar_x = 100.0
+# expand_scalar_y = 100.0
 
 def linear_assignment(cost_matrix):
     try:
@@ -139,8 +142,8 @@ class KalmanBoxTracker(object):
 
         self.kf.R[2:, 2:] *= 10.0
         if len(bbox) > 5:
-            self.kf.R[0,0] = expand_scalar * math.exp(bbox[8])
-            self.kf.R[1,1] = expand_scalar * math.exp(bbox[9])
+            self.kf.R[0,0] = expand_scalar_x * math.exp(bbox[8])
+            self.kf.R[1,1] = expand_scalar_y * math.exp(bbox[9])
         self.kf.P[
             4:, 4:
         ] *= 1000.0  # give high uncertainty to the unobservable initial velocities
@@ -167,8 +170,8 @@ class KalmanBoxTracker(object):
         self.hits += 1
         self.hit_streak += 1
         if len(bbox) > 5:
-            self.kf.R[0,0] = expand_scalar * math.exp(bbox[8])
-            self.kf.R[1,1] = expand_scalar * math.exp(bbox[9])
+            self.kf.R[0,0] = expand_scalar_x * math.exp(bbox[8])
+            self.kf.R[1,1] = expand_scalar_y * math.exp(bbox[9])
             self.kf.update(convert_bbox_to_z(bbox), self.kf.R)
         else:
             self.kf.update(convert_bbox_to_z(bbox))
