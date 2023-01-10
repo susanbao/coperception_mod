@@ -35,10 +35,10 @@ from filterpy.kalman import KalmanFilter
 
 np.random.seed(0)
 
-expand_scalar_x = (31.340185602346363 / 3) ** 2
-expand_scalar_y = (24.276376908593676 / 3) ** 2
-# expand_scalar_x = 100.0
-# expand_scalar_y = 100.0
+# expand_scalar_x = (31.340185602346363 / 3) ** 2
+# expand_scalar_y = (24.276376908593676 / 3) ** 2
+expand_scalar_x = 100.0
+expand_scalar_y = 100.0
 
 def linear_assignment(cost_matrix):
     try:
