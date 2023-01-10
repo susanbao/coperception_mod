@@ -35,10 +35,9 @@ from filterpy.kalman import KalmanFilter
 
 np.random.seed(0)
 
-# expand_scalar_x = (31.340185602346363 / 3) ** 2
-# expand_scalar_y = (24.276376908593676 / 3) ** 2
-expand_scalar_x = 100.0
-expand_scalar_y = 100.0
+# expand_scalar = [100.0, 100, 100, 100]
+expand_scalar = np.array([33.60120205831025, 22.88242090727398, 44.92134567665782, 187.53907271555377, 83.97342833677149, 57.77635661409111]) / 3
+expand_scalar = np.multiply(expand_scalar, expand_scalar)
 
 def linear_assignment(cost_matrix):
     try:
@@ -142,8 +141,10 @@ class KalmanBoxTracker(object):
 
         self.kf.R[2:, 2:] *= 10.0
         if len(bbox) > 5:
-            self.kf.R[0,0] = expand_scalar_x * math.exp(bbox[8])
-            self.kf.R[1,1] = expand_scalar_y * math.exp(bbox[9])
+            self.kf.R[0,0] = expand_scalar[0] * math.exp(bbox[8])
+            self.kf.R[1,1] = expand_scalar[1] * math.exp(bbox[9])
+            self.kf.R[2,2] = expand_scalar[2] * math.exp(bbox[10])
+            self.kf.R[3,3] = expand_scalar[3] * math.exp(bbox[11])
         self.kf.P[
             4:, 4:
         ] *= 1000.0  # give high uncertainty to the unobservable initial velocities
@@ -170,8 +171,10 @@ class KalmanBoxTracker(object):
         self.hits += 1
         self.hit_streak += 1
         if len(bbox) > 5:
-            self.kf.R[0,0] = expand_scalar_x * math.exp(bbox[8])
-            self.kf.R[1,1] = expand_scalar_y * math.exp(bbox[9])
+            self.kf.R[0,0] = expand_scalar[0] * math.exp(bbox[8])
+            self.kf.R[1,1] = expand_scalar[1] * math.exp(bbox[9])
+            self.kf.R[2,2] = expand_scalar[2] * math.exp(bbox[10])
+            self.kf.R[3,3] = expand_scalar[3] * math.exp(bbox[11])
             self.kf.update(convert_bbox_to_z(bbox), self.kf.R)
         else:
             self.kf.update(convert_bbox_to_z(bbox))
@@ -391,7 +394,7 @@ if __name__ == "__main__":
                 iou_threshold=args.iou_threshold,
             )  # create instance of the SORT tracker
             seq_dets = np.loadtxt(os.path.join(root, seq), delimiter=",")
-
+            ipdb.set_trace()
             with open(os.path.join(save_path, seq.replace("det_", "")), "w") as out_file:
                 if len(seq_dets) == 0:
                     continue
