@@ -22,6 +22,7 @@ import shutil
 import numpy as np
 import math
 import ipdb
+import torch
 
 # import matplotlib
 # matplotlib.use('TkAgg')
@@ -196,6 +197,12 @@ class KalmanBoxTracker(object):
         Returns the current bounding box estimate.
         """
         return convert_x_to_bbox(self.kf.x)
+    
+    def get_center_state(self):
+        """
+        Returns the current bounding box estimate of center format with x,y,s,r.
+        """
+        return self.kf.x
 
 
 def associate_detections_to_trackers(detections, trackers, iou_threshold=0.3):
@@ -246,6 +253,43 @@ def associate_detections_to_trackers(detections, trackers, iou_threshold=0.3):
 
     return matches, np.array(unmatched_detections), np.array(unmatched_trackers)
 
+def nll_batch(c_test, c_gt):
+    nll = []
+    return nll
+
+def associate_detections_to_trackers_by_NLL(matched, unmatch_dets, unmatched_trks, detections, trackers, nll_threshold=0.3):
+    if len(trackers) == 0:
+        return matched, unmatch_dets, unmatched_trks
+    
+    detections = detections[unmatch_dets]
+    trackers = trackers[unmatched_trks]
+    
+    detections = convert_bbox_to_z(detections)
+    nll_matrix = nll_batch(detections, trackers)
+
+    matched_indices = linear_assignment(nll_matrix)
+
+    unmatched_detections = []
+    for d, det in enumerate(detections):
+        if d not in matched_indices[:, 0]:
+            unmatched_detections.append(unmatch_dets[d])
+    unmatched_trackers = []
+    for t, trk in enumerate(trackers):
+        if t not in matched_indices[:, 1]:
+            unmatched_trackers.append(unmatched_trks[t])
+    matches = list(matched)
+    for m in matched_indices:
+        if nll_matrix[m[0],m[1]] > nll_threshold:
+            unmatched_detections.append(unmatch_dets[m[0]])
+            unmatched_trackers.append(unmatched_trks[m[1]])
+        else:
+            matches.append([unmatch_dets[m[0]], unmatched_trks[m[1]]])
+    if len(matches) == 0:
+        matches = np.empty((0,2), dtype = int)
+    else:
+        matches = np.concatenate(matches, axis=0)
+    return matches, np.array(unmatched_detections), np.array(unmatched_trackers)
+
 
 class Sort(object):
     def __init__(self, max_age=1, min_hits=3, iou_threshold=0.3):
@@ -280,9 +324,17 @@ class Sort(object):
         trks = np.ma.compress_rows(np.ma.masked_invalid(trks))
         for t in reversed(to_del):
             self.trackers.pop(t)
+        trks_center = np.zeros((len(self.trackers), 5))
+        for t, trk in enumerate(trks_center):
+            pos = self.trackers[t].get_center_state()[0]
+            trk[:] = [pos[0], pos[1], pos[2], pos[3], 0]
         matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers(
             dets, trks, self.iou_threshold
         )
+
+        matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers(
+            matched, unmatched_dets, unmatched_trks, dets, trks_center, 10
+        ) 
 
         # update matched trackers with assigned detections
         for m in matched:
