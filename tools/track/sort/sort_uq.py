@@ -258,8 +258,10 @@ def nll_batch(c_test, c_gt):
     return nll
 
 def associate_detections_to_trackers_by_NLL(matched, unmatch_dets, unmatched_trks, detections, trackers, nll_threshold=0.3):
-    if len(trackers) == 0:
+    if len(trackers) == 0 or len(unmatched_dets) == 0 or len(unmatrched_trks) == 0:
         return matched, unmatch_dets, unmatched_trks
+    
+    ipdb.set_trace()
     
     detections = detections[unmatch_dets]
     trackers = trackers[unmatched_trks]
@@ -326,7 +328,8 @@ class Sort(object):
             self.trackers.pop(t)
         trks_center = np.zeros((len(self.trackers), 5))
         for t, trk in enumerate(trks_center):
-            pos = self.trackers[t].get_center_state()[0]
+            print(self.trackers[t].get_center_state())
+            pos = self.trackers[t].get_center_state()
             trk[:] = [pos[0], pos[1], pos[2], pos[3], 0]
         matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers(
             dets, trks, self.iou_threshold
@@ -425,7 +428,6 @@ if __name__ == "__main__":
     scene_idxes_file = open(args.scene_idxes_file, "r")
     scene_idxes = [int(line.strip()) for line in scene_idxes_file]
     print(f'scenes to run: {scene_idxes}')
-    #ipdb.set_trace()
 
     for current_agent in range(args.from_agent, args.to_agent):
         total_time = 0.0
