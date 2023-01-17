@@ -332,7 +332,7 @@ class Sort(object):
             dets, trks, self.iou_threshold
         )
 
-        matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers(
+        matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers_by_NLL(
             matched, unmatched_dets, unmatched_trks, dets, trks_center, 10
         ) 
 
