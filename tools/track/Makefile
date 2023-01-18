@@ -26,6 +26,7 @@ boot_start := 0
 # end of bootstrap for testing, include the boot_end 25
 boot_end := 25
 output_name := name
+nll_threshold = 10
 
 .PHONY: sort
 
@@ -48,4 +49,4 @@ mbb_eval:
 	python mbb_run_multi_agent_mot_challenge.py --mode $(mode) --rsu $(rsu) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --split $(split) --bootstrap_start $(boot_start) --bootstrap_end ${boot_end}
     
 sort_uq:
-	cd sort && python sort_uq.py --mode $(mode)/$(rsu) --split $(split) --output_cov --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path)
+	cd sort && python sort_uq.py --mode $(mode)/$(rsu) --split $(split) --output_cov --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --nll_threshold $(nll_threshold)

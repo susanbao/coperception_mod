@@ -36,7 +36,12 @@ from filterpy.kalman import KalmanFilter
 
 np.random.seed(0)
 
-expand_scalar = [100.0, 100, 100, 100]
+expand_scalar = [100,100,100,100]
+cp_thred = [10,10,10,10]
+
+matched_num = 0
+unmatched_det = 0
+unmatched_trk = 0
 
 def linear_assignment(cost_matrix):
     try:
@@ -254,20 +259,52 @@ def associate_detections_to_trackers(detections, trackers, iou_threshold=0.3):
     return matches, np.array(unmatched_detections), np.array(unmatched_trackers)
 
 def nll_batch(c_test, c_gt):
-    nll = []
+    nll = np.zeros((c_test.shape[0], c_gt.shape[0]))
+    mean = torch.from_numpy(c_test[:,:4])
+    cov = torch.from_numpy(c_test[:,8:])
+    std = torch.sqrt(torch.exp(cov))
+    std = torch.multiply(std, torch.FloatTensor(cp_thred)) # cp_thred, expand_scalar
+    predicted_normal_dists = torch.distributions.normal.Normal(mean, std)
+    target = torch.from_numpy(c_gt);
+    for j in range(c_gt.shape[0]):
+        temp = target[j, :4]
+        temp = temp.expand(mean.shape[0], 4)
+        negative_log_prob = - predicted_normal_dists.log_prob(temp)
+        negative_log_prob = torch.clamp(negative_log_prob, min = 0)
+        nll[:,j] = torch.sum(negative_log_prob, axis = 1) / 4
     return nll
 
-def associate_detections_to_trackers_by_NLL(matched, unmatch_dets, unmatched_trks, detections, trackers, nll_threshold=0.3):
-    if len(trackers) == 0 or len(unmatched_dets) == 0 or len(unmatrched_trks) == 0:
+def convert_bbox_to_z_group(detections):
+    res = detections
+    for i in range(len(detections)):
+        res[i, :4] = convert_bbox_to_z(detections[i, :4]).reshape((4,))
+    return res
+
+def cp_batch(c_test, c_gt):
+    cp = np.zeros((c_test.shape[0], c_gt.shape[0]))
+    mean = c_test[:,:4]
+    cov = c_test[:,8:]
+    std = np.sqrt(np.exp(cov)) * np.array(cp_thred)
+    for j in range(c_gt.shape[0]):
+        pred = c_gt[j, :4]
+        pred = np.tile(pred, mean.shape[0]).reshape((mean.shape[0], 4))
+        score = np.abs(pred-mean) / std
+        score[score > 2] = 1000
+        cp[:,j] = np.prod(score, axis=1)
+    return cp
+
+def associate_detections_to_trackers_by_NLL(matched, unmatch_dets, unmatched_trks, detections, trackers, nll_threshold=10):
+    if len(trackers) == 0 or len(unmatch_dets) == 0 or len(unmatched_trks) == 0:
         return matched, unmatch_dets, unmatched_trks
-    
-    ipdb.set_trace()
     
     detections = detections[unmatch_dets]
     trackers = trackers[unmatched_trks]
     
-    detections = convert_bbox_to_z(detections)
+    detections = convert_bbox_to_z_group(detections)
     nll_matrix = nll_batch(detections, trackers)
+    # try use comformal prediction result as score
+    # nll_matrix = cp_batch(detections, trackers)
+    # nll_threshold = 1.0
 
     matched_indices = linear_assignment(nll_matrix)
 
@@ -279,22 +316,20 @@ def associate_detections_to_trackers_by_NLL(matched, unmatch_dets, unmatched_trk
     for t, trk in enumerate(trackers):
         if t not in matched_indices[:, 1]:
             unmatched_trackers.append(unmatched_trks[t])
-    matches = list(matched)
+    matches = matched
     for m in matched_indices:
         if nll_matrix[m[0],m[1]] > nll_threshold:
             unmatched_detections.append(unmatch_dets[m[0]])
             unmatched_trackers.append(unmatched_trks[m[1]])
         else:
-            matches.append([unmatch_dets[m[0]], unmatched_trks[m[1]]])
+            matches = np.append(matches, [[unmatch_dets[m[0]], unmatched_trks[m[1]]]], axis=0)
     if len(matches) == 0:
         matches = np.empty((0,2), dtype = int)
-    else:
-        matches = np.concatenate(matches, axis=0)
     return matches, np.array(unmatched_detections), np.array(unmatched_trackers)
 
 
 class Sort(object):
-    def __init__(self, max_age=1, min_hits=3, iou_threshold=0.3):
+    def __init__(self, max_age=1, min_hits=3, iou_threshold=0.3, nll_threshold=10):
         """
         Sets key parameters for SORT
         """
@@ -303,6 +338,7 @@ class Sort(object):
         self.iou_threshold = iou_threshold
         self.trackers = []
         self.frame_count = 0
+        self.nll_threshold = nll_threshold
 
     def update(self, dets=np.empty((0, 5))):
         """
@@ -313,6 +349,7 @@ class Sort(object):
 
         NOTE: The number of objects returned may differ from the number of detections provided.
         """
+        global matched_num, unmatched_det, unmatched_trk
         self.frame_count += 1
         # get predicted locations from existing trackers.
         trks = np.zeros((len(self.trackers), 5))
@@ -328,7 +365,6 @@ class Sort(object):
             self.trackers.pop(t)
         trks_center = np.zeros((len(self.trackers), 5))
         for t, trk in enumerate(trks_center):
-            print(self.trackers[t].get_center_state())
             pos = self.trackers[t].get_center_state()
             trk[:] = [pos[0], pos[1], pos[2], pos[3], 0]
         matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers(
@@ -336,9 +372,11 @@ class Sort(object):
         )
 
         matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers_by_NLL(
-            matched, unmatched_dets, unmatched_trks, dets, trks_center, 10
+            matched, unmatched_dets, unmatched_trks, dets, trks_center, self.nll_threshold
         ) 
-
+        matched_num += len(matched)
+        unmatched_det += len(unmatched_dets)
+        unmatched_trk += len(unmatched_trks)
         # update matched trackers with assigned detections
         for m in matched:
             self.trackers[m[1]].update(dets[m[0], :])
@@ -406,6 +444,9 @@ def parse_args():
     parser.add_argument(
         "--iou_threshold", help="Minimum IOU for match.", type=float, default=0.3
     )
+    parser.add_argument(
+        "--nll_threshold", help="Maximum for match.", type=float, default=10
+    )
     parser.add_argument("--scene_idxes_file", type=str, help="File containing idxes of scenes to run tracking")
     parser.add_argument(
         "--from_agent", default=0, type=int, help="start from which agent"
@@ -428,6 +469,7 @@ if __name__ == "__main__":
     scene_idxes_file = open(args.scene_idxes_file, "r")
     scene_idxes = [int(line.strip()) for line in scene_idxes_file]
     print(f'scenes to run: {scene_idxes}')
+    #ipdb.set_trace()
 
     for current_agent in range(args.from_agent, args.to_agent):
         total_time = 0.0
@@ -444,6 +486,7 @@ if __name__ == "__main__":
                 max_age=args.max_age,
                 min_hits=args.min_hits,
                 iou_threshold=args.iou_threshold,
+                nll_threshold=args.nll_threshold
             )  # create instance of the SORT tracker
             seq_dets = np.loadtxt(os.path.join(root, seq), delimiter=",")
 
@@ -486,3 +529,4 @@ if __name__ == "__main__":
             % (total_time, total_frames, total_frames / total_time)
         )
         print("Saved results to ", eval_dir)
+        print("matched count: {}, unmatched detection: {}, unmatched prediction: {}".format(matched_num, unmatched_det, unmatched_trk))
