@@ -36,8 +36,8 @@ from filterpy.kalman import KalmanFilter
 
 np.random.seed(0)
 
-expand_scalar = [100,100,100,100]
-cp_thred = [10,10,10,10]
+expand_scalar = [339.5195216553872, 111.26186541465519, 298.26359427936194, 15076.497769642287]
+cp_thred = [18.42605551,  10.54807401,  17.27030962, 122.78639082]
 
 matched_num = 0
 unmatched_det = 0
