@@ -5,8 +5,8 @@ import json
 import time
 
 command_list =[
-    "CUDA_VISIBLE_DEVICES=0 nohup make sort_uq det_check_path=check/check_loss_two_step_center_sr_ind mode=upperbound nll_threshold=",
-    "CUDA_VISIBLE_DEVICES=0 nohup make eval mode=upperbound output_name=center_sr_ind_nll_",
+    "CUDA_VISIBLE_DEVICES=0 nohup make sort_uq det_check_path=check/check_loss_two_step_center_sr_ind mode=upperbound max_age=3 nll_threshold=",
+    "CUDA_VISIBLE_DEVICES=0 nohup make eval mode=upperbound output_name=center_sr_ind_age_",
 ]
 
 cout_command = " > nll.out 2> nll.err&"

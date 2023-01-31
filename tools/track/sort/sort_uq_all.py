@@ -37,7 +37,7 @@ from filterpy.kalman import KalmanFilter
 np.random.seed(0)
 
 expand_scalar = [125.44897552926587, 58.17835406418326, 224.21414415575381, 3907.8781994455294]
-cp_thred =[11.200400686103416, 7.627473635757993, 14.973781892219273, 62.51302423851792]
+cp_thred = [11.20040069,  7.62747364, 14.97378189, 62.51302424]
 
 matched_num = 0
 unmatched_det = 0
@@ -293,38 +293,49 @@ def cp_batch(c_test, c_gt):
         cp[:,j] = np.prod(score, axis=1)
     return cp
 
-def associate_detections_to_trackers_by_NLL(matched, unmatch_dets, unmatched_trks, detections, trackers, nll_threshold=10):
-    if len(trackers) == 0 or len(unmatch_dets) == 0 or len(unmatched_trks) == 0:
-        return matched, unmatch_dets, unmatched_trks
+def associate_detections_to_trackers_by_NLL(detections, trackers, nll_threshold=2000):
     
-    detections = detections[unmatch_dets]
-    trackers = trackers[unmatched_trks]
+    if len(trackers) == 0:
+        return (
+            np.empty((0, 2), dtype=int),
+            np.arange(len(detections)),
+            np.empty((0, 5), dtype=int),
+        )
     
     detections = convert_bbox_to_z_group(detections)
     nll_matrix = nll_batch(detections, trackers)
-    # try use comformal prediction result as score
-    # nll_matrix = cp_batch(detections, trackers)
-    # nll_threshold = 1.0
 
-    matched_indices = linear_assignment(nll_matrix)
+    if min(nll_matrix.shape) > 0:
+        a = (nll_matrix < nll_threshold).astype(np.int32)
+        if a.sum(1).max() == 1 and a.sum(0).max() == 1:
+            matched_indices = np.stack(np.where(a), axis=1)
+        else:
+            matched_indices = linear_assignment(nll_matrix)
+    else:
+        matched_indices = np.empty(shape=(0, 2))
 
     unmatched_detections = []
     for d, det in enumerate(detections):
         if d not in matched_indices[:, 0]:
-            unmatched_detections.append(unmatch_dets[d])
+            unmatched_detections.append(d)
     unmatched_trackers = []
     for t, trk in enumerate(trackers):
         if t not in matched_indices[:, 1]:
-            unmatched_trackers.append(unmatched_trks[t])
-    matches = matched
+            unmatched_trackers.append(t)
+
+    # filter out matched with high nll
+    matches = []
     for m in matched_indices:
-        if nll_matrix[m[0],m[1]] > nll_threshold:
-            unmatched_detections.append(unmatch_dets[m[0]])
-            unmatched_trackers.append(unmatched_trks[m[1]])
+        if nll_matrix[m[0], m[1]] > nll_threshold:
+            unmatched_detections.append(m[0])
+            unmatched_trackers.append(m[1])
         else:
-            matches = np.append(matches, [[unmatch_dets[m[0]], unmatched_trks[m[1]]]], axis=0)
+            matches.append(m.reshape(1, 2))
     if len(matches) == 0:
-        matches = np.empty((0,2), dtype = int)
+        matches = np.empty((0, 2), dtype=int)
+    else:
+        matches = np.concatenate(matches, axis=0)
+
     return matches, np.array(unmatched_detections), np.array(unmatched_trackers)
 
 
@@ -356,23 +367,16 @@ class Sort(object):
         to_del = []
         ret = []
         for t, trk in enumerate(trks):
-            pos = self.trackers[t].predict()[0]
+            pos = self.trackers[t].get_center_state()
             trk[:] = [pos[0], pos[1], pos[2], pos[3], 0]
             if np.any(np.isnan(pos)):
                 to_del.append(t)
         trks = np.ma.compress_rows(np.ma.masked_invalid(trks))
         for t in reversed(to_del):
             self.trackers.pop(t)
-        trks_center = np.zeros((len(self.trackers), 5))
-        for t, trk in enumerate(trks_center):
-            pos = self.trackers[t].get_center_state()
-            trk[:] = [pos[0], pos[1], pos[2], pos[3], 0]
-        matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers(
-            dets, trks, self.iou_threshold
-        )
 
         matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers_by_NLL(
-            matched, unmatched_dets, unmatched_trks, dets, trks_center, self.nll_threshold
+            dets, trks, self.nll_threshold
         ) 
         matched_num += len(matched)
         unmatched_det += len(unmatched_dets)

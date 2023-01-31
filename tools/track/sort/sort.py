@@ -394,7 +394,6 @@ if __name__ == "__main__":
                 iou_threshold=args.iou_threshold,
             )  # create instance of the SORT tracker
             seq_dets = np.loadtxt(os.path.join(root, seq), delimiter=",")
-            ipdb.set_trace()
             with open(os.path.join(save_path, seq.replace("det_", "")), "w") as out_file:
                 if len(seq_dets) == 0:
                     continue
