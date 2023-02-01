@@ -331,9 +331,15 @@ def associate_detections_to_trackers_by_NLL(matched, unmatch_dets, unmatched_trk
         matches = np.empty((0,2), dtype = int)
     return matches, np.array(unmatched_detections), np.array(unmatched_trackers)
 
+def compute_variance_sum(bbox):
+    var = expand_scalar[0] * math.exp(bbox[8])
+    var += expand_scalar[1] * math.exp(bbox[9])
+    var += expand_scalar[2] * math.exp(bbox[10])
+    var += expand_scalar[3] * math.exp(bbox[11])
+    return var
 
 class Sort(object):
-    def __init__(self, max_age=1, min_hits=3, iou_threshold=0.3, nll_threshold=10):
+    def __init__(self, max_age=1, min_hits=3, iou_threshold=0.3, nll_threshold=10, var_threshold=10):
         """
         Sets key parameters for SORT
         """
@@ -343,6 +349,7 @@ class Sort(object):
         self.trackers = []
         self.frame_count = 0
         self.nll_threshold = nll_threshold
+        self.var_threshold = var_threshold
 
     def update(self, dets=np.empty((0, 5))):
         """
@@ -387,8 +394,11 @@ class Sort(object):
 
         # create and initialise new trackers for unmatched detections
         for i in unmatched_dets:
+            # if compute_variance_sum(dets[i, :]) > self.var_threshold:
+            #     continue
             trk = KalmanBoxTracker(dets[i, :])
             self.trackers.append(trk)
+            #print(compute_variance_sum(dets[i, :]))
         i = len(self.trackers)
         for trk in reversed(self.trackers):
             d = trk.get_state()[0]
@@ -451,6 +461,9 @@ def parse_args():
     parser.add_argument(
         "--nll_threshold", help="Maximum for match.", type=float, default=10
     )
+    parser.add_argument(
+        "--var_threshold", help="Maximum variance for build a new track.", type=float, default=10
+    )
     parser.add_argument("--scene_idxes_file", type=str, help="File containing idxes of scenes to run tracking")
     parser.add_argument(
         "--from_agent", default=0, type=int, help="start from which agent"
@@ -474,7 +487,6 @@ if __name__ == "__main__":
     scene_idxes = [int(line.strip()) for line in scene_idxes_file]
     print(f'scenes to run: {scene_idxes}')
     #ipdb.set_trace()
-    #global expand_scalar, cp_thred
     mode_type = args.mode.split("/")[0]
     expand_scalar = var_cp_dict[mode_type]
     cp_thred = std_cp_dict[mode_type]
@@ -494,7 +506,8 @@ if __name__ == "__main__":
                 max_age=args.max_age,
                 min_hits=args.min_hits,
                 iou_threshold=args.iou_threshold,
-                nll_threshold=args.nll_threshold
+                nll_threshold=args.nll_threshold,
+                var_threshold=args.var_threshold
             )  # create instance of the SORT tracker
             seq_dets = np.loadtxt(os.path.join(root, seq), delimiter=",")
 

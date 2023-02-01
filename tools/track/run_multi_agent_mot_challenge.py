@@ -74,4 +74,4 @@ if __name__ == "__main__":
     all_rows.append(['mean'] + list(mean)[1:])
     df = pd.DataFrame(all_rows, columns=['agent', 'MOTA', 'MOTP', 'HOTA', 'DetA', 'AssA', 'DetRe', 'DetPr', 'AssRe', 'AssPr', 'LocA'])
     os.makedirs('logs', exist_ok=True)
-    df.to_csv(f'logs/age/logs_{mode}_{rsu}_{args.name}.csv', sep=',', index=False)
+    df.to_csv(f'logs/var_threshold/logs_{mode}_{rsu}_{args.name}.csv', sep=',', index=False)
