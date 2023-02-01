@@ -36,8 +36,12 @@ from filterpy.kalman import KalmanFilter
 
 np.random.seed(0)
 
-expand_scalar = [125.44897552926587, 58.17835406418326, 224.21414415575381, 3907.8781994455294]
-cp_thred =[11.200400686103416, 7.627473635757993, 14.973781892219273, 62.51302423851792]
+var_cp_dict = {"upperbound": [125.44897552926587, 58.17835406418326, 224.21414415575381, 3907.8781994455294], "disco": [267.6059187072261, 65.37177933480551, 214.8165049926819, 4107.835669322297], "lowerbound": [339.5195216553872, 111.26186541465519, 298.26359427936194, 15076.497769642287]}
+
+std_cp_dict = {"upperbound":[11.200400686103416, 7.627473635757993, 14.973781892219273, 62.51302423851792], "disco": [16.358664942690957, 8.08528164845267, 14.656619835169428, 64.09239946610126], "lowerbound": [18.42605551,  10.54807401,  17.27030962, 122.78639082]}
+
+expand_scalar = None
+cp_thred = None
 
 matched_num = 0
 unmatched_det = 0
@@ -470,6 +474,10 @@ if __name__ == "__main__":
     scene_idxes = [int(line.strip()) for line in scene_idxes_file]
     print(f'scenes to run: {scene_idxes}')
     #ipdb.set_trace()
+    #global expand_scalar, cp_thred
+    mode_type = args.mode.split("/")[0]
+    expand_scalar = var_cp_dict[mode_type]
+    cp_thred = std_cp_dict[mode_type]
 
     for current_agent in range(args.from_agent, args.to_agent):
         total_time = 0.0
