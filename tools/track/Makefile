@@ -54,3 +54,6 @@ sort_uq:
 
 sort_uq_output:
 	cd sort && python sort_uq_out.py --mode $(mode)/$(rsu) --split $(split) --output_cov --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --nll_threshold $(nll_threshold) --max_age $(max_age)
+    
+sort_output:
+	cd sort && python sort_out.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --max_age $(max_age)
