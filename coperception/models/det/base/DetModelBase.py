@@ -276,7 +276,7 @@ class DetModelBase(nn.Module):
             covRegHead = self.covariance
         elif self.loss_type == "kl_loss_center":
             covRegHead = self.centerReg
-        elif self.loss_type == "kl_loss_center_ind" or self.loss_type == "kl_loss_center_offset_ind" or self.loss_type == "kl_loss_center_sr_ind" or self.loss_type == "kl_loss_center_hr_ind":
+        elif self.loss_type == "kl_loss_center_ind" or self.loss_type == "kl_loss_center_offset_ind" or self.loss_type == "kl_loss_center_sr_ind" or self.loss_type == "kl_loss_center_rh_ind":
             covRegHead = self.centerIndReg
         elif self.loss_type == "kl_loss_corner":
             covRegHead = self.cornerIndReg
