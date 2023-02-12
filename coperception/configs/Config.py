@@ -74,7 +74,7 @@ class Config(object):
         self.covar_length = 21 # number of variables in the covariance matrix, decomposition matrix for covariance matrix, for multivariate Gaussian of (x,y,w,h,sin,cos), it should be 21
         if self.loss_type == "kl_loss_corner":
             self.covar_length = 8
-        elif self.loss_type == "kl_loss_center_ind" or self.loss_type == "kl_loss_center_offset_ind" or self.loss_type == "kl_loss_center_sr_ind":
+        elif self.loss_type == "kl_loss_center_ind" or self.loss_type == "kl_loss_center_offset_ind" or self.loss_type == "kl_loss_center_sr_ind" or self.loss_type == "kl_loss_center_hr_ind":
             self.covar_length = 6
         elif self.loss_type == "kl_loss_corner_pair_ind":
             self.covar_length = 12
