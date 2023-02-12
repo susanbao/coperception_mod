@@ -549,14 +549,14 @@ def center_to_xysr_box2d_torch(centers):
     box_decoding = torch.cat([x, y, s, r, sin, cos], dim=-1)
     return box_decoding
 
-def center_to_xyhr_box2d_torch(centers):
-    """convert kitti locations, (x,y,w,h,sin,cos) to (x,y,h,r,sin,cos)
+def center_to_xyrh_box2d_torch(centers):
+    """convert kitti locations, (x,y,w,h,sin,cos) to (x,y,r,h,sin,cos)
 
     r = w / h
     """
     x, y, w, h, sin, cos = torch.split(centers, 1, dim=-1)
     r = torch.divide(w, h)
-    box_decoding = torch.cat([x, y, h, r, sin, cos], dim=-1)
+    box_decoding = torch.cat([x, y, r, h, sin, cos], dim=-1)
     return box_decoding
 
 def center_to_corner_box2d_torch(centers, dims, angles=None, origin=0.5):

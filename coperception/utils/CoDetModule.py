@@ -292,7 +292,7 @@ class FaFModule(object):
         
         return loss_loc_sum
 
-    def kl_loss_center_sr_independent(self, anchors, reg_loss_mask, reg_targets, pred_result, pred_covar):
+    def kl_loss_center_rh_independent(self, anchors, reg_loss_mask, reg_targets, pred_result, pred_covar):
         N = pred_result.shape[0]
         anchors = anchors.unsqueeze(-2).expand(
             anchors.shape[0],
@@ -309,8 +309,8 @@ class FaFModule(object):
 
         pred_decode = bev_box_decode_torch(assigned_pred, assigned_anchor)
         target_decode = bev_box_decode_torch(assigned_target, assigned_anchor)
-        pred_decode = center_to_xyhr_box2d_torch(pred_decode)
-        target_decode = center_to_xyhr_box2d_torch(target_decode)
+        pred_decode = center_to_xyrh_box2d_torch(pred_decode)
+        target_decode = center_to_xyrh_box2d_torch(target_decode)
         
         l1_loss = nn.functional.smooth_l1_loss(pred_decode, target_decode, reduction='none')
         loss_loc = l1_loss * torch.exp(-covariance_pred) + covariance_pred/2
@@ -543,8 +543,8 @@ class FaFModule(object):
             elif self.loss_type == "kl_loss_center_sr_ind":
                 loss_loc = self.kl_loss_center_sr_independent(anchors, reg_loss_mask, reg_targets, loc_result, result["loc_covar"])
                 loss_num += 1
-            elif self.loss_type == "kl_loss_center_hr_ind":
-                loss_loc = self.kl_loss_center_hr_independent(anchors, reg_loss_mask, reg_targets, loc_result, result["loc_covar"])
+            elif self.loss_type == "kl_loss_center_rh_ind":
+                loss_loc = self.kl_loss_center_rh_independent(anchors, reg_loss_mask, reg_targets, loc_result, result["loc_covar"])
                 loss_num += 1
             else:
                 loss_loc = F.smooth_l1_loss(
