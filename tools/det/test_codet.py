@@ -25,6 +25,7 @@ def check_folder(folder_path):
 
 @torch.no_grad()
 def main(args):
+    #ipdb.set_trace()
     config = Config("train", binary=True, only_det=True, loss_type = args.loss_type)
     config_global = ConfigGlobal("train", binary=True, only_det=True, loss_type = args.loss_type)
 
@@ -462,7 +463,6 @@ def main(args):
     # local mAP evaluation
     det_results_all_local = []
     annotations_all_local = []
-    #ipdb.set_trace()
     for k in range(eval_start_idx, num_agent):
         if type(det_results_local[k]) != list or len(det_results_local[k]) == 0:
             continue
