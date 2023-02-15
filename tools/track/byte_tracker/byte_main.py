@@ -55,6 +55,7 @@ def parse_args():
     parser.add_argument("--mode")  # TODO: what is mode
     parser.add_argument("--track_thresh", type=float, default=0.6, help="detection confidence threshold")
     parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
+    parser.add_argument("--mot20", dest="mot20", default=False, action="store_true", help="test mot20.")
     # parser.add_argument('--save_path', type=str)
     parser.add_argument(
         "--display",
@@ -63,21 +64,21 @@ def parse_args():
         action="store_true",
     )
     # parser.add_argument("--seq_path", help="Path to detections.", type=str, default='data')
-    parser.add_argument(
-        "--max_age",
-        help="Maximum number of frames to keep alive a track without associated detections.",
-        type=int,
-        default=1,
-    )
-    parser.add_argument(
-        "--min_hits",
-        help="Minimum number of associated detections before track is initialised.",
-        type=int,
-        default=3,
-    )
-    parser.add_argument(
-        "--iou_threshold", help="Minimum IOU for match.", type=float, default=0.3
-    )
+    # parser.add_argument(
+    #     "--max_age",
+    #     help="Maximum number of frames to keep alive a track without associated detections.",
+    #     type=int,
+    #     default=1,
+    # )
+    # parser.add_argument(
+    #     "--min_hits",
+    #     help="Minimum number of associated detections before track is initialised.",
+    #     type=int,
+    #     default=3,
+    # )
+    # parser.add_argument(
+    #     "--iou_threshold", help="Minimum IOU for match.", type=float, default=0.3
+    # )
     parser.add_argument("--scene_idxes_file", type=str, help="File containing idxes of scenes to run tracking")
     parser.add_argument(
         "--from_agent", default=0, type=int, help="start from which agent"
@@ -113,10 +114,8 @@ if __name__ == "__main__":
         for seq in det_results:
             if seq[-4:] != ".txt":
                 continue
-            mot_tracker = Sort(
-                max_age=args.max_age,
-                min_hits=args.min_hits,
-                iou_threshold=args.iou_threshold,
+            mot_tracker = BYTETracker(
+                args
             )  # create instance of the SORT tracker
             seq_dets = np.loadtxt(os.path.join(root, seq), delimiter=",")
             with open(os.path.join(save_path, seq.replace("det_", "")), "w") as out_file:
