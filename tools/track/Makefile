@@ -57,3 +57,7 @@ sort_uq_output:
     
 sort_output:
 	cd sort && python sort_out.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --max_age $(max_age)
+    
+
+byte_track:
+	cd byte_tracker && python byte_main.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path)

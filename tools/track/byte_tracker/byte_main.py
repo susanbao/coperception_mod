@@ -22,7 +22,7 @@ import shutil
 import numpy as np
 import math
 import ipdb
-from .byte_tracker import BYTETracker
+from byte_tracker import BYTETracker
 
 # import matplotlib
 # matplotlib.use('TkAgg')
@@ -56,6 +56,7 @@ def parse_args():
     parser.add_argument("--track_thresh", type=float, default=0.6, help="detection confidence threshold")
     parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
     parser.add_argument("--mot20", dest="mot20", default=False, action="store_true", help="test mot20.")
+    parser.add_argument("--match_thresh", type=float, default=0.9, help="matching threshold for tracking")
     # parser.add_argument('--save_path', type=str)
     parser.add_argument(
         "--display",
