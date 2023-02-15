@@ -156,7 +156,7 @@ class BYTETracker(object):
         self.max_time_lost = self.buffer_size
         self.kalman_filter = KalmanFilter()
 
-    def update(self, output_results, img_info, img_size):
+    def update(self, output_results):
         self.frame_id += 1
         activated_starcks = []
         refind_stracks = []
@@ -170,9 +170,6 @@ class BYTETracker(object):
             output_results = output_results.cpu().numpy()
             scores = output_results[:, 4] * output_results[:, 5]
             bboxes = output_results[:, :4]  # x1y1x2y2
-        img_h, img_w = img_info[0], img_info[1]
-        scale = min(img_size[0] / float(img_h), img_size[1] / float(img_w))
-        bboxes /= scale
 
         remain_inds = scores > self.args.track_thresh
         inds_low = scores > 0.1
@@ -205,8 +202,8 @@ class BYTETracker(object):
         # Predict the current location with KF
         STrack.multi_predict(strack_pool)
         dists = matching.iou_distance(strack_pool, detections)
-        if not self.args.mot20:
-            dists = matching.fuse_score(dists, detections)
+        #if not self.args.mot20:
+        dists = matching.fuse_score(dists, detections)
         matches, u_track, u_detection = matching.linear_assignment(dists, thresh=self.args.match_thresh)
 
         for itracked, idet in matches:
