@@ -90,7 +90,7 @@ def parse_args():
         "--det_logs_path", default='', type=str, help="Det logs path (to get the tracking input)"
     )
     parser.add_argument("--split", type=str, help="[test/val]")
-    parser.add_argument("--output_cov", action="store_true", help = "Enable to use variance of x,y as input of Filter for SOTR")
+    parser.add_argument("--output_cov", default=False, action="store_true", help = "Enable to use variance of x,y as input of Filter for SOTR")
     args = parser.parse_args()
     return args
 
