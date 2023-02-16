@@ -138,10 +138,12 @@ if __name__ == "__main__":
                     cycle_time = time.time() - start_time
                     total_time += cycle_time
 
-                    for d in trackers:
+                    for track in trackers:
+                        tlwh = track.tlwh
+                        track_id = track.track_id
                         print(
                             "%d,%d,%.2f,%.2f,%.2f,%.2f,1,-1,-1,-1"
-                            % (frame, d[4], d[0], d[1], d[2] - d[0], d[3] - d[1]),
+                            % (frame, track_id, tlwh[0], tlwh[1], tlwh[2], tlwh[3]),
                             file=out_file,
                         )
 
