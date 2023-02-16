@@ -9,13 +9,25 @@ import torch.nn.functional as F
 from kalman_filter import KalmanFilter
 import matching
 from basetrack import BaseTrack, TrackState
+from kalman_filter_uq import KalmanFilterUQ
+
+var_cp_dict = {"upperbound": [156.3751341925818, 65.24260517866209, 2785.7870238883734, 26.43169171689354], "disco": [214.13191750615232, 77.15047953920649, 2503.1216487206066, 24.387592952924123], "lowerbound": [268.0828005828979, 93.20827260609053, 18277.14814591181, 40.319136673153885]}
+
+std_cp_dict = {"upperbound":[12.505004365956127, 8.077289469782675, 52.780555357900255, 5.14117610249771], "disco": [14.633246991223524, 8.783534569819059, 50.031206748594485, 4.938379587772099], "lowerbound": [16.373234273743776, 9.654443153599825, 135.19300331715326, 6.34973516559186]}
+
+output_cov = False
 
 class STrack(BaseTrack):
     shared_kalman = KalmanFilter()
+    shared_kalman_uq = KalmanFilterUQ()
     def __init__(self, tlwh, score):
 
         # wait activate
-        self._tlwh = np.asarray(tlwh, dtype=np.float)
+        self._tlwh = np.asarray(tlwh[:4], dtype=np.float)
+        if output_cov:
+            self._stdrh = np.asarray(tlwh[4:], dtype = np.float)
+        else:
+            self._stdrh = None
         self.kalman_filter = None
         self.mean, self.covariance = None, None
         self.is_activated = False
@@ -27,7 +39,7 @@ class STrack(BaseTrack):
         mean_state = self.mean.copy()
         if self.state != TrackState.Tracked:
             mean_state[7] = 0
-        self.mean, self.covariance = self.kalman_filter.predict(mean_state, self.covariance)
+        self.mean, self.covariance = self.kalman_filter.predict(mean_state, self.covariance, self._stdrh)
 
     @staticmethod
     def multi_predict(stracks):
@@ -37,7 +49,11 @@ class STrack(BaseTrack):
             for i, st in enumerate(stracks):
                 if st.state != TrackState.Tracked:
                     multi_mean[i][7] = 0
-            multi_mean, multi_covariance = STrack.shared_kalman.multi_predict(multi_mean, multi_covariance)
+            if output_cov:
+                multi_std = np.asarray([st._stdrh for st in stracks])
+                multi_mean, multi_covariance = STrack.shared_kalman_uq.multi_predict(multi_mean, multi_covariance, multi_std) 
+            else:
+                multi_mean, multi_covariance = STrack.shared_kalman.multi_predict(multi_mean, multi_covariance)
             for i, (mean, cov) in enumerate(zip(multi_mean, multi_covariance)):
                 stracks[i].mean = mean
                 stracks[i].covariance = cov
@@ -46,7 +62,7 @@ class STrack(BaseTrack):
         """Start a new tracklet"""
         self.kalman_filter = kalman_filter
         self.track_id = self.next_id()
-        self.mean, self.covariance = self.kalman_filter.initiate(self.tlwh_to_xyah(self._tlwh))
+        self.mean, self.covariance = self.kalman_filter.initiate(self.tlwh_to_xyah(self._tlwh), self._stdrh)
 
         self.tracklet_len = 0
         self.state = TrackState.Tracked
@@ -58,7 +74,7 @@ class STrack(BaseTrack):
 
     def re_activate(self, new_track, frame_id, new_id=False):
         self.mean, self.covariance = self.kalman_filter.update(
-            self.mean, self.covariance, self.tlwh_to_xyah(new_track.tlwh)
+            self.mean, self.covariance, self.tlwh_to_xyah(new_track.tlwh), new_track._stdrh
         )
         self.tracklet_len = 0
         self.state = TrackState.Tracked
@@ -81,7 +97,7 @@ class STrack(BaseTrack):
 
         new_tlwh = new_track.tlwh
         self.mean, self.covariance = self.kalman_filter.update(
-            self.mean, self.covariance, self.tlwh_to_xyah(new_tlwh))
+            self.mean, self.covariance, self.tlwh_to_xyah(new_tlwh), new_track._stdrh)
         self.state = TrackState.Tracked
         self.is_activated = True
 
@@ -109,6 +125,11 @@ class STrack(BaseTrack):
         ret = self.tlwh.copy()
         ret[2:] += ret[:2]
         return ret
+
+    @property
+    # @jit(nopython=True)
+    def stdrh(self):
+        return self._stdrh
 
     @staticmethod
     # @jit(nopython=True)
@@ -154,7 +175,18 @@ class BYTETracker(object):
         self.det_thresh = args.track_thresh + 0.1
         self.buffer_size = int(frame_rate / 30.0 * args.track_buffer)
         self.max_time_lost = self.buffer_size
-        self.kalman_filter = KalmanFilter()
+        self.kalman_filter = KalmanFilterUQ() if args.output_cov else KalmanFilter()
+        self.mode = args.mode
+        global output_cov
+        output_cov = args.output_cov
+
+    def compute_variance(self, log_var):
+        out = np.exp(log_var) * np.array(var_cp_dict[self.mode])
+        return out
+    
+    def computer_std(self, log_var):
+        out = np.sqrt(np.exp(log_var)) * np.array(std_cp_dict[self.mode])
+        return out
 
     def update(self, output_results):
         self.frame_id += 1
@@ -163,13 +195,10 @@ class BYTETracker(object):
         lost_stracks = []
         removed_stracks = []
 
-        if output_results.shape[1] == 5:
-            scores = output_results[:, 4]
-            bboxes = output_results[:, :4]
-        else:
-            output_results = output_results.cpu().numpy()
-            scores = output_results[:, 4] * output_results[:, 5]
-            bboxes = output_results[:, :4]  # x1y1x2y2
+        scores = output_results[:, 4]
+        bboxes = output_results[:, :4]
+        if output_cov:
+            bboxes = np.concatenate((bboxes, self.compute_std(output_results[:, 8:12])), axis=1)
 
         remain_inds = scores > self.args.track_thresh
         inds_low = scores > 0.1

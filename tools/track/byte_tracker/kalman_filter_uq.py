@@ -1,26 +1,10 @@
 # vim: expandtab:ts=4:sw=4
 import numpy as np
 import scipy.linalg
+import math
 
 
-"""
-Table for the 0.95 quantile of the chi-square distribution with N degrees of
-freedom (contains values for N=1, ..., 9). Taken from MATLAB/Octave's chi2inv
-function and used as Mahalanobis gating threshold.
-"""
-chi2inv95 = {
-    1: 3.8415,
-    2: 5.9915,
-    3: 7.8147,
-    4: 9.4877,
-    5: 11.070,
-    6: 12.592,
-    7: 14.067,
-    8: 15.507,
-    9: 16.919}
-
-
-class KalmanFilter(object):
+class KalmanFilterUQ(object):
     """
     A simple Kalman filter for tracking bounding boxes in image space.
 
@@ -52,7 +36,7 @@ class KalmanFilter(object):
         self._std_weight_position = 1. / 20
         self._std_weight_velocity = 1. / 160
 
-    def initiate(self, measurement, measure_std=None):
+    def initiate(self, measurement, measure_std):
         """Create track from unassociated measurement.
 
         Parameters
@@ -74,18 +58,19 @@ class KalmanFilter(object):
         mean = np.r_[mean_pos, mean_vel]
 
         std = [
-            2 * self._std_weight_position * measurement[3],
-            2 * self._std_weight_position * measurement[3],
-            1e-2,
-            2 * self._std_weight_position * measurement[3],
-            10 * self._std_weight_velocity * measurement[3],
-            10 * self._std_weight_velocity * measurement[3],
-            1e-5,
-            10 * self._std_weight_velocity * measurement[3]]
+            measure_std[0],
+            measure_std[1],
+            measure_std[2],
+            measure_std[3],
+            math.square(10 * self._std_weight_velocity * measurement[3]),
+            math.sqrt(10 * self._std_weight_velocity * measurement[3]),
+            1e-10,
+            math.sqrt10 * self._std_weight_velocity * measurement[3]]
+        
         covariance = np.diag(np.square(std))
         return mean, covariance
 
-    def predict(self, mean, covariance, measure_std=None):
+    def predict(self, mean, covariance, measure_std):
         """Run Kalman filter prediction step.
 
         Parameters
@@ -104,11 +89,7 @@ class KalmanFilter(object):
             state. Unobserved velocities are initialized to 0 mean.
 
         """
-        std_pos = [
-            self._std_weight_position * mean[3],
-            self._std_weight_position * mean[3],
-            1e-2,
-            self._std_weight_position * mean[3]]
+        std_pos = measure_std
         std_vel = [
             self._std_weight_velocity * mean[3],
             self._std_weight_velocity * mean[3],
@@ -123,7 +104,7 @@ class KalmanFilter(object):
 
         return mean, covariance
 
-    def project(self, mean, covariance):
+    def project(self, mean, covariance, std):
         """Project state distribution to measurement space.
 
         Parameters
@@ -140,11 +121,11 @@ class KalmanFilter(object):
             estimate.
 
         """
-        std = [
-            self._std_weight_position * mean[3],
-            self._std_weight_position * mean[3],
-            1e-1,
-            self._std_weight_position * mean[3]]
+        # std = [
+        #     self._std_weight_position * mean[3],
+        #     self._std_weight_position * mean[3],
+        #     1e-1,
+        #     self._std_weight_position * mean[3]]
         innovation_cov = np.diag(np.square(std))
 
         mean = np.dot(self._update_mat, mean)
@@ -152,7 +133,7 @@ class KalmanFilter(object):
             self._update_mat, covariance, self._update_mat.T))
         return mean, covariance + innovation_cov
 
-    def multi_predict(self, mean, covariance):
+    def multi_predict(self, mean, covariance, std_pos):
         """Run Kalman filter prediction step (Vectorized version).
         Parameters
         ----------
@@ -168,11 +149,6 @@ class KalmanFilter(object):
             Returns the mean vector and covariance matrix of the predicted
             state. Unobserved velocities are initialized to 0 mean.
         """
-        std_pos = [
-            self._std_weight_position * mean[:, 3],
-            self._std_weight_position * mean[:, 3],
-            1e-2 * np.ones_like(mean[:, 3]),
-            self._std_weight_position * mean[:, 3]]
         std_vel = [
             self._std_weight_velocity * mean[:, 3],
             self._std_weight_velocity * mean[:, 3],
@@ -191,7 +167,7 @@ class KalmanFilter(object):
 
         return mean, covariance
 
-    def update(self, mean, covariance, measurement, measure_std=None):
+    def update(self, mean, covariance, measurement, measure_std):
         """Run Kalman filter correction step.
 
         Parameters
@@ -211,7 +187,7 @@ class KalmanFilter(object):
             Returns the measurement-corrected state distribution.
 
         """
-        projected_mean, projected_cov = self.project(mean, covariance)
+        projected_mean, projected_cov = self.project(mean, covariance, measure_std)
 
         chol_factor, lower = scipy.linalg.cho_factor(
             projected_cov, lower=True, check_finite=False)
@@ -225,7 +201,7 @@ class KalmanFilter(object):
             kalman_gain, projected_cov, kalman_gain.T))
         return new_mean, new_covariance
 
-    def gating_distance(self, mean, covariance, measurements,
+    def gating_distance(self, mean, covariance, measurements, std,
                         only_position=False, metric='maha'):
         """Compute gating distance between state distribution and measurements.
         A suitable distance threshold can be obtained from `chi2inv95`. If
@@ -251,7 +227,7 @@ class KalmanFilter(object):
             squared Mahalanobis distance between (mean, covariance) and
             `measurements[i]`.
         """
-        mean, covariance = self.project(mean, covariance)
+        mean, covariance = self.project(mean, covariance, std)
         if only_position:
             mean, covariance = mean[:2], covariance[:2, :2]
             measurements = measurements[:, :2]
