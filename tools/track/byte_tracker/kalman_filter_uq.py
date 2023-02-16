@@ -62,10 +62,10 @@ class KalmanFilterUQ(object):
             measure_std[1],
             measure_std[2],
             measure_std[3],
-            math.square(10 * self._std_weight_velocity * measurement[3]),
-            math.sqrt(10 * self._std_weight_velocity * measurement[3]),
-            1e-10,
-            math.sqrt10 * self._std_weight_velocity * measurement[3]]
+            10 * self._std_weight_velocity * measurement[3],
+            10 * self._std_weight_velocity * measurement[3],
+            1e-5,
+            10 * self._std_weight_velocity * measurement[3]]
         
         covariance = np.diag(np.square(std))
         return mean, covariance
@@ -154,7 +154,7 @@ class KalmanFilterUQ(object):
             self._std_weight_velocity * mean[:, 3],
             1e-5 * np.ones_like(mean[:, 3]),
             self._std_weight_velocity * mean[:, 3]]
-        sqr = np.square(np.r_[std_pos, std_vel]).T
+        sqr = np.square(np.r_[std_pos.T, std_vel]).T
 
         motion_cov = []
         for i in range(len(mean)):

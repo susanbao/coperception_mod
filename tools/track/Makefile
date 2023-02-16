@@ -61,3 +61,6 @@ sort_output:
 
 byte_track:
 	cd byte_tracker && python byte_main.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path)
+    
+byte_track_cfk:
+	cd byte_tracker && python byte_main.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --output_cov

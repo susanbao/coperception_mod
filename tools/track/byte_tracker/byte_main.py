@@ -102,7 +102,7 @@ if __name__ == "__main__":
     scene_idxes_file = open(args.scene_idxes_file, "r")
     scene_idxes = [int(line.strip()) for line in scene_idxes_file]
     print(f'scenes to run: {scene_idxes}')
-    #ipdb.set_trace()
+    ipdb.set_trace()
 
     for current_agent in range(args.from_agent, args.to_agent):
         total_time = 0.0

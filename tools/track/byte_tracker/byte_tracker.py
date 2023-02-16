@@ -138,7 +138,7 @@ class STrack(BaseTrack):
         height)`, where the aspect ratio is `width / height`.
         """
         ret = np.asarray(tlwh).copy()
-        ret[:2] += ret[2:] / 2
+        ret[:2] += ret[2:4] / 2
         ret[2] /= ret[3]
         return ret
 
@@ -149,14 +149,14 @@ class STrack(BaseTrack):
     # @jit(nopython=True)
     def tlbr_to_tlwh(tlbr):
         ret = np.asarray(tlbr).copy()
-        ret[2:] -= ret[:2]
+        ret[2:4] -= ret[:2]
         return ret
 
     @staticmethod
     # @jit(nopython=True)
     def tlwh_to_tlbr(tlwh):
         ret = np.asarray(tlwh).copy()
-        ret[2:] += ret[:2]
+        ret[2:4] += ret[:2]
         return ret
 
     def __repr__(self):
@@ -176,7 +176,7 @@ class BYTETracker(object):
         self.buffer_size = int(frame_rate / 30.0 * args.track_buffer)
         self.max_time_lost = self.buffer_size
         self.kalman_filter = KalmanFilterUQ() if args.output_cov else KalmanFilter()
-        self.mode = args.mode
+        self.mode = args.mode.split("/")[0]
         global output_cov
         output_cov = args.output_cov
 
@@ -184,7 +184,7 @@ class BYTETracker(object):
         out = np.exp(log_var) * np.array(var_cp_dict[self.mode])
         return out
     
-    def computer_std(self, log_var):
+    def compute_std(self, log_var):
         out = np.sqrt(np.exp(log_var)) * np.array(std_cp_dict[self.mode])
         return out
 
