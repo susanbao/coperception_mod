@@ -182,6 +182,12 @@ class BYTETracker(object):
         output_cov = args.output_cov
         nll_ass = args.nll_ass
         self.nll_threshold = args.nll_threshold
+        self.matched_num = 0
+        self.unmatched_det = 0
+        self.unmatched_trk = 0
+    
+    def return_match_result(self):
+        return self.matched_num, self.unmatched_det, self.unmatched_trk
 
     def compute_variance(self, log_var):
         out = np.exp(log_var) * np.array(var_cp_dict[self.mode])
@@ -329,7 +335,10 @@ class BYTETracker(object):
             track = unconfirmed[it]
             track.mark_removed()
             removed_stracks.append(track)
-
+        
+        self.matched_num += len(activated_starcks) + len(refind_stracks)
+        self.unmatched_det += (output_results.shape[0] - (len(activated_starcks) + len(refind_stracks)))
+        
         """ Step 4: Init new stracks"""
         for inew in u_detection:
             track = detections[inew]
@@ -342,6 +351,8 @@ class BYTETracker(object):
             if self.frame_id - track.end_frame > self.max_time_lost:
                 track.mark_removed()
                 removed_stracks.append(track)
+        
+        self.unmatched_trk += len(lost_stracks) + len(removed_stracks)
 
         # print('Ramained match {} s'.format(t4-t3))
 
