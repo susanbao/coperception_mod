@@ -64,3 +64,9 @@ byte_track:
     
 byte_track_cfk:
 	cd byte_tracker && python byte_main.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --output_cov
+    
+byte_track_nlla:
+	cd byte_tracker && python byte_main.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --nll_ass --nll_threshold $(nll_threshold)
+    
+byter_track_cfk_nlla:
+	cd byte_tracker && python byte_main.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --nll_ass --nll_threshold $(nll_threshold) --output_cov

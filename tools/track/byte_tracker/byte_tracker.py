@@ -200,7 +200,7 @@ class BYTETracker(object):
 
         scores = output_results[:, 4]
         bboxes = output_results[:, :4]
-        if output_cov:
+        if output_cov or nll_ass:
             bboxes = np.concatenate((bboxes, self.compute_std(output_results[:, 8:12])), axis=1)
 
         remain_inds = scores > self.args.track_thresh
@@ -271,34 +271,44 @@ class BYTETracker(object):
 
         '''Step 4: association with NLL'''
         if nll_ass:
-            r_tracked_stracks = [r_tracked_stracks[i] for i in u_track]
+            r_tracked_stracks_temp = [r_tracked_stracks[i] for i in u_track if strack_pool[i].state == TrackState.Tracked]
             ind_third = scores <= 0.1
             dets_third = bboxes[ind_third]
             scores_third = scores[ind_third]
             detections_third = [STrack(STrack.tlbr_to_tlwh(tlbr), s) for
                             (tlbr, s) in zip(dets_third, scores_third)]
+            start_det = len(detections_third)
             for i in u_detection:
                 detections_third.append(detections[i])
+            end_det = len(detections_third)
             for i in u_detection_second:
                 detections_third.append(detections_second[i])
-            r_tracked_stracks = [r_tracked_stracks[i] for i in u_track if strack_pool[i].state == TrackState.Tracked]
-            nll_distance = matching.nll_distance(r_tracked_stracks, detections_third)
-            matches, u_track, u_detection_third = matching.linear_assignment(nll_distance, thresh=np.inf)
-            for itracked, idet in matches:
-                if nll_distance[itracked, idet] > self.nll_threshold:
-                    u_track.append(itracked)
-                    u_detection_third.append(idet)
-                    continue
-                track = r_tracked_stracks[itracked]
-                det = detections_third[idet]
-                if track.state == TrackState.Tracked:
-                    track.update(det, self.frame_id)
-                    activated_starcks.append(track)
-                else:
-                    track.re_activate(det, self.frame_id, new_id = False)
-                    refind_stracks.append(track)
-            u_detection = u_detection_third
-            detections = detections_third
+            if len(r_tracked_stracks_temp) != 0 and len(detections_third) != 0:
+                r_tracked_stracks = r_tracked_stracks_temp
+                nll_distance = matching.nll_distance(r_tracked_stracks, detections_third)
+                matches, u_track, u_detection_third = matching.linear_assignment(nll_distance, thresh=np.inf)
+                removed_u_track = []
+                for itracked, idet in matches:
+                    if nll_distance[itracked, idet] > self.nll_threshold:
+                        u_track = np.append(u_track, itracked)
+                        u_detection_third = np.append(u_detection_third, idet)
+                        continue
+                    if start_det <= idet < end_det:
+                        removed_u_track.append(idet-start_det)
+                    track = r_tracked_stracks[itracked]
+                    det = detections_third[idet]
+                    if track.state == TrackState.Tracked:
+                        track.update(det, self.frame_id)
+                        activated_starcks.append(track)
+                    else:
+                        track.re_activate(det, self.frame_id, new_id = False)
+                        refind_stracks.append(track)
+                u_detection_temp = []
+                for i in range(len(u_detection)):
+                    if i not in removed_u_track:
+                        u_detection_temp.append(u_detection[i])
+                u_detection = u_detection_temp
+                
         
         for it in u_track:
             track = r_tracked_stracks[it]

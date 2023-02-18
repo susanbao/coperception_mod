@@ -106,7 +106,7 @@ if __name__ == "__main__":
     scene_idxes_file = open(args.scene_idxes_file, "r")
     scene_idxes = [int(line.strip()) for line in scene_idxes_file]
     print(f'scenes to run: {scene_idxes}')
-    #ipdb.set_trace()
+    # ipdb.set_trace()
 
     for current_agent in range(args.from_agent, args.to_agent):
         total_time = 0.0
@@ -130,7 +130,7 @@ if __name__ == "__main__":
                 print("Processing %s." % (os.path.join(root, seq)))
                 for frame in range(int(seq_dets[:, 0].max())):
                     frame += 1  # detection and frame numbers begin at 1
-                    if args.output_cov:
+                    if args.output_cov or args.nll_ass:
                         dets = seq_dets[seq_dets[:, 0] == frame, 2:]
                     else:
                         dets = seq_dets[seq_dets[:, 0] == frame, 2:7]
