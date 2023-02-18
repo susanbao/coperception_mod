@@ -7,6 +7,7 @@ from scipy.spatial.distance import cdist
 from cython_bbox import bbox_overlaps as bbox_ious
 import kalman_filter
 import time
+import torch
 
 def merge_matches(m1, m2, shape):
     O,P,Q = shape
@@ -89,6 +90,25 @@ def iou_distance(atracks, btracks):
     cost_matrix = 1 - _ious
 
     return cost_matrix
+
+def nll_distance(c_tracks, c_dets):
+    """
+    Compute the nll between c_track and c_dets
+    """
+    nll = np.zeros((len(c_tracks), len(c_dets)))
+    mean = torch.from_numpy(np.array([det.to_xyah() for det in c_dets]))
+    std = torch.from_numpy(np.array([det._stdrh for det in c_dets]))
+    predicted_normal_dists = torch.distributions.normal.Normal(mean, std)
+    target = torch.from_numpy(np.array([track.to_xyah() for track in c_tracks]))
+    for j in range(len(c_tracks)):
+        temp = target[j, :4]
+        temp = temp.expand(mean.shape[0], 4)
+        negative_log_prob = -predicted_normal_dists.log_prob(temp)
+        negative_log_prob = torch.clamp(negative_log_prob, min=0)
+        nll[j,:] = torch.sum(negative_log_prob, axis=1) / 4
+    return nll
+    
+    
 
 def v_iou_distance(atracks, btracks):
     """

@@ -57,6 +57,9 @@ def parse_args():
     parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
     parser.add_argument("--mot20", dest="mot20", default=False, action="store_true", help="test mot20.")
     parser.add_argument("--match_thresh", type=float, default=0.9, help="matching threshold for tracking")
+    parser.add_argument(
+        "--nll_threshold", help="Maximum for match.", type=float, default=10
+    )
     # parser.add_argument('--save_path', type=str)
     parser.add_argument(
         "--display",
@@ -91,7 +94,8 @@ def parse_args():
         "--det_logs_path", default='', type=str, help="Det logs path (to get the tracking input)"
     )
     parser.add_argument("--split", type=str, help="[test/val]")
-    parser.add_argument("--output_cov", default=False, action="store_true", help = "Enable to use variance of x,y as input of Filter for SOTR")
+    parser.add_argument("--output_cov", default=False, action="store_true", help = "Enable to use variance of x,y as input of Filter for kalman filter")
+    parser.add_argument("--nll_ass", default=False, action="store_true", help = "Enable to use variance of x,y as input of Filter for association")
     args = parser.parse_args()
     return args
 

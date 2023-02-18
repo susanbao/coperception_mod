@@ -16,6 +16,7 @@ var_cp_dict = {"upperbound": [156.3751341925818, 65.24260517866209, 2785.7870238
 std_cp_dict = {"upperbound":[12.505004365956127, 8.077289469782675, 52.780555357900255, 5.14117610249771], "disco": [14.633246991223524, 8.783534569819059, 50.031206748594485, 4.938379587772099], "lowerbound": [16.373234273743776, 9.654443153599825, 135.19300331715326, 6.34973516559186]}
 
 output_cov = False
+nll_ass = False
 
 class STrack(BaseTrack):
     shared_kalman = KalmanFilter()
@@ -24,7 +25,7 @@ class STrack(BaseTrack):
 
         # wait activate
         self._tlwh = np.asarray(tlwh[:4], dtype=np.float)
-        if output_cov:
+        if output_cov or nll_ass:
             self._stdrh = np.asarray(tlwh[4:], dtype = np.float)
         else:
             self._stdrh = None
@@ -177,8 +178,10 @@ class BYTETracker(object):
         self.max_time_lost = self.buffer_size
         self.kalman_filter = KalmanFilterUQ() if args.output_cov else KalmanFilter()
         self.mode = args.mode.split("/")[0]
-        global output_cov
+        global output_cov, nll_ass
         output_cov = args.output_cov
+        nll_ass = args.nll_ass
+        self.nll_threshold = args.nll_threshold
 
     def compute_variance(self, log_var):
         out = np.exp(log_var) * np.array(var_cp_dict[self.mode])
@@ -266,6 +269,37 @@ class BYTETracker(object):
                 track.re_activate(det, self.frame_id, new_id=False)
                 refind_stracks.append(track)
 
+        '''Step 4: association with NLL'''
+        if nll_ass:
+            r_tracked_stracks = [r_tracked_stracks[i] for i in u_track]
+            ind_third = scores <= 0.1
+            dets_third = bboxes[ind_third]
+            scores_third = scores[ind_third]
+            detections_third = [STrack(STrack.tlbr_to_tlwh(tlbr), s) for
+                            (tlbr, s) in zip(dets_third, scores_third)]
+            for i in u_detection:
+                detections_third.append(detections[i])
+            for i in u_detection_second:
+                detections_third.append(detections_second[i])
+            r_tracked_stracks = [r_tracked_stracks[i] for i in u_track if strack_pool[i].state == TrackState.Tracked]
+            nll_distance = matching.nll_distance(r_tracked_stracks, detections_third)
+            matches, u_track, u_detection_third = matching.linear_assignment(nll_distance, thresh=np.inf)
+            for itracked, idet in matches:
+                if nll_distance[itracked, idet] > self.nll_threshold:
+                    u_track.append(itracked)
+                    u_detection_third.append(idet)
+                    continue
+                track = r_tracked_stracks[itracked]
+                det = detections_third[idet]
+                if track.state == TrackState.Tracked:
+                    track.update(det, self.frame_id)
+                    activated_starcks.append(track)
+                else:
+                    track.re_activate(det, self.frame_id, new_id = False)
+                    refind_stracks.append(track)
+            u_detection = u_detection_third
+            detections = detections_third
+        
         for it in u_track:
             track = r_tracked_stracks[it]
             if not track.state == TrackState.Lost:
