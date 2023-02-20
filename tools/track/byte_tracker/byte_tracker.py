@@ -293,13 +293,13 @@ class BYTETracker(object):
             if len(r_tracked_stracks_temp) != 0 and len(detections_third) != 0:
                 r_tracked_stracks = r_tracked_stracks_temp
                 nll_distance = matching.nll_distance(r_tracked_stracks, detections_third)
-                matches, u_track, u_detection_third = matching.linear_assignment(nll_distance, thresh=np.inf)
+                matches, u_track, u_detection_third = matching.linear_assignment(nll_distance, thresh=self.nll_threshold)
                 removed_u_track = []
                 for itracked, idet in matches:
-                    if nll_distance[itracked, idet] > self.nll_threshold:
-                        u_track = np.append(u_track, itracked)
-                        u_detection_third = np.append(u_detection_third, idet)
-                        continue
+                    # if nll_distance[itracked, idet] > self.nll_threshold:
+                    #     u_track = np.append(u_track, itracked)
+                    #     u_detection_third = np.append(u_detection_third, idet)
+                    #     continue
                     if start_det <= idet < end_det:
                         removed_u_track.append(idet-start_det)
                     self.improved_matched_by_nll += 1
@@ -330,13 +330,42 @@ class BYTETracker(object):
         if not self.args.mot20:
             dists = matching.fuse_score(dists, detections)
         matches, u_unconfirmed, u_detection = matching.linear_assignment(dists, thresh=0.7)
-        for itracked, idet in matches:
-            unconfirmed[itracked].update(detections[idet], self.frame_id)
-            activated_starcks.append(unconfirmed[itracked])
+        if len(unconfirmed) and len(detections):
+            for itracked, idet in matches:
+                unconfirmed[itracked].update(detections[idet], self.frame_id)
+                activated_starcks.append(unconfirmed[itracked])
+            
+        '''Step 4: association with NLL'''
+        if nll_ass and len(unconfirmed):
+            unconfirmed_temp = [unconfirmed[i] for i in u_unconfirmed]
+            detections_third = []
+            start_det = len(detections_third)
+            for i in u_detection:
+                detections_third.append(detections[i])
+            end_det = len(detections_third)
+            for i in u_detection_second:
+                detections_third.append(detections_second[i])
+            if len(unconfirmed) != 0 and len(detections_third) != 0:
+                unconfirmed = unconfirmed_temp
+                nll_distance = matching.nll_distance(unconfirmed, detections_third)
+                matches, u_unconfirmed, u_detection_third = matching.linear_assignment(nll_distance, thresh=self.nll_threshold)
+                removed_u_track = []
+                for itracked, idet in matches:
+                    if start_det <= idet < end_det:
+                        removed_u_track.append(idet-start_det)
+                    self.improved_matched_by_nll += 1
+                    unconfirmed[itracked].update(detections_third[idet], self.frame_id)
+                    activated_starcks.append(unconfirmed[itracked])
+                u_detection_temp = []
+                for i in range(len(u_detection)):
+                    if i not in removed_u_track:
+                        u_detection_temp.append(u_detection[i])
+                u_detection = u_detection_temp
+                
         for it in u_unconfirmed:
             track = unconfirmed[it]
             track.mark_removed()
-            removed_stracks.append(track)
+            removed_stracks.append(track)        
         
         self.matched_num += len(activated_starcks) + len(refind_stracks)
         self.unmatched_det += (output_results.shape[0] - (len(activated_starcks) + len(refind_stracks)))

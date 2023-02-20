@@ -53,7 +53,7 @@ def parse_args():
     """Parse input arguments."""
     parser = argparse.ArgumentParser(description="SORT demo")
     parser.add_argument("--mode")  # TODO: what is mode
-    parser.add_argument("--track_thresh", type=float, default=0.6, help="detection confidence threshold")
+    parser.add_argument("--track_thresh", type=float, default=0.8, help="detection confidence threshold")
     parser.add_argument("--track_buffer", type=int, default=30, help="the frames for keep lost tracks")
     parser.add_argument("--mot20", dest="mot20", default=False, action="store_true", help="test mot20.")
     parser.add_argument("--match_thresh", type=float, default=0.9, help="matching threshold for tracking")

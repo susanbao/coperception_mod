@@ -1,4 +1,4 @@
-python run_multi_agent_mot_challenge.py --mode upperbound --rsu no_rsu --from_agent 1 --to_agent 6 --scene_idxes_file ~/code/coperception_mod/tools/utils/test_scenes.txt --split test --name center_rh_ind_nll_cfk_100000
+python run_multi_agent_mot_challenge.py --mode disco --rsu no_rsu --from_agent 1 --to_agent 6 --scene_idxes_file ~/code/coperception_mod/tools/utils/test_scenes.txt --split test --name center_rh_ind_nll_cfk_2000
 
 Eval Config:
 USE_PARALLEL         : False                         
@@ -21,7 +21,7 @@ PRINT_CONFIG         : True
 GT_FOLDER            : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/gt/mot_challenge/
 TRACKERS_FOLDER      : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/trackers/mot_challenge/
 OUTPUT_FOLDER        : None                          
-TRACKERS_TO_EVAL     : ['sort-upperbound/no_rsu']    
+TRACKERS_TO_EVAL     : ['sort-disco/no_rsu']         
 CLASSES_TO_EVAL      : ['pedestrian']                
 BENCHMARK            : V2X                           
 SPLIT_TO_EVAL        : test1                         
@@ -56,94 +56,94 @@ PRINT_CONFIG         : True
 Evaluating 1 tracker(s) on 10 sequence(s) for 1 class(es) on MotChallenge2DBox dataset using the following metrics: CLEAR, Count
 
 
-Evaluating sort-upperbound/no_rsu
+Evaluating sort-disco/no_rsu
 
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 19)         0.0156 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
-    CLEAR.eval_sequence()                                                  0.0042 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 19)              0.0150 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0122 sec
+    CLEAR.eval_sequence()                                                  0.0041 sec
     Count.eval_sequence()                                                  0.0000 sec
-1 eval_sequence(19, sort-upperbound/no_rsu)                              0.0322 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 27)         0.0149 sec
+1 eval_sequence(19, sort-disco/no_rsu)                                   0.0314 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 27)              0.0136 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
+    CLEAR.eval_sequence()                                                  0.0040 sec
+    Count.eval_sequence()                                                  0.0000 sec
+2 eval_sequence(27, sort-disco/no_rsu)                                   0.0297 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 28)              0.0136 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
+    CLEAR.eval_sequence()                                                  0.0041 sec
+    Count.eval_sequence()                                                  0.0000 sec
+3 eval_sequence(28, sort-disco/no_rsu)                                   0.0299 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 29)              0.0143 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
+    CLEAR.eval_sequence()                                                  0.0041 sec
+    Count.eval_sequence()                                                  0.0000 sec
+4 eval_sequence(29, sort-disco/no_rsu)                                   0.0306 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 5)               0.0119 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
     CLEAR.eval_sequence()                                                  0.0041 sec
     Count.eval_sequence()                                                  0.0000 sec
-2 eval_sequence(27, sort-upperbound/no_rsu)                              0.0310 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 28)         0.0140 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0129 sec
-    CLEAR.eval_sequence()                                                  0.0046 sec
+5 eval_sequence(5, sort-disco/no_rsu)                                    0.0280 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 8)               0.0126 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
+    CLEAR.eval_sequence()                                                  0.0041 sec
     Count.eval_sequence()                                                  0.0000 sec
-3 eval_sequence(28, sort-upperbound/no_rsu)                              0.0315 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 29)         0.0144 sec
+6 eval_sequence(8, sort-disco/no_rsu)                                    0.0288 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 91)              0.0107 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
+    CLEAR.eval_sequence()                                                  0.0040 sec
+    Count.eval_sequence()                                                  0.0000 sec
+7 eval_sequence(91, sort-disco/no_rsu)                                   0.0267 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 92)              0.0108 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
+    CLEAR.eval_sequence()                                                  0.0040 sec
+    Count.eval_sequence()                                                  0.0000 sec
+8 eval_sequence(92, sort-disco/no_rsu)                                   0.0268 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 96)              0.0138 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
+    CLEAR.eval_sequence()                                                  0.0041 sec
+    Count.eval_sequence()                                                  0.0000 sec
+9 eval_sequence(96, sort-disco/no_rsu)                                   0.0301 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 97)              0.0157 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0122 sec
     CLEAR.eval_sequence()                                                  0.0042 sec
     Count.eval_sequence()                                                  0.0000 sec
-4 eval_sequence(29, sort-upperbound/no_rsu)                              0.0307 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 5)          0.0116 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
-    CLEAR.eval_sequence()                                                  0.0041 sec
-    Count.eval_sequence()                                                  0.0000 sec
-5 eval_sequence(5, sort-upperbound/no_rsu)                               0.0276 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 8)          0.0129 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
-    CLEAR.eval_sequence()                                                  0.0042 sec
-    Count.eval_sequence()                                                  0.0000 sec
-6 eval_sequence(8, sort-upperbound/no_rsu)                               0.0290 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 91)         0.0108 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0117 sec
-    CLEAR.eval_sequence()                                                  0.0041 sec
-    Count.eval_sequence()                                                  0.0000 sec
-7 eval_sequence(91, sort-upperbound/no_rsu)                              0.0267 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 92)         0.0107 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
-    CLEAR.eval_sequence()                                                  0.0041 sec
-    Count.eval_sequence()                                                  0.0000 sec
-8 eval_sequence(92, sort-upperbound/no_rsu)                              0.0267 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 96)         0.0146 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
-    CLEAR.eval_sequence()                                                  0.0043 sec
-    Count.eval_sequence()                                                  0.0000 sec
-9 eval_sequence(96, sort-upperbound/no_rsu)                              0.0312 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 97)         0.0158 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
-    CLEAR.eval_sequence()                                                  0.0043 sec
-    Count.eval_sequence()                                                  0.0000 sec
-10 eval_sequence(97, sort-upperbound/no_rsu)                              0.0323 sec
+10 eval_sequence(97, sort-disco/no_rsu)                                   0.0323 sec
 
-All sequences for sort-upperbound/no_rsu finished in 0.30 seconds
+All sequences for sort-disco/no_rsu finished in 0.29 seconds
 
-CLEAR: sort-upperbound/no_rsu-pedestrianMOTA      MOTP      MODA      CLR_Re    CLR_Pr    MTR       PTR       MLR       sMOTA     CLR_TP    CLR_FN    CLR_FP    IDSW      MT        PT        ML        Frag      
-19                                 53.715    83.646    55.98     59.377    94.589    36.842    36.842    26.316    44.005    839       574       48        32        7         7         5         44        
-27                                 27.424    87.611    27.795    28.042    99.127    14.286    23.81     61.905    23.95     454       1165      4         6         3         5         13        30        
-28                                 41.574    85.313    44.429    47.214    94.429    14.286    47.619    38.095    34.64     678       758       40        41        3         10        8         36        
-29                                 50.53     88.679    54.558    58.375    93.864    22.222    66.667    11.111    43.922    826       589       54        57        4         12        2         64        
-5                                  67.042    85.086    68.504    75.141    91.884    63.636    27.273    9.0909    55.835    668       221       59        13        7         3         1         35        
-8                                  64.695    86.86     68.817    71.416    96.489    35.294    64.706    0         55.312    797       319       29        46        6         11        0         53        
-91                                 38.251    85.898    42.842    44.481    96.445    10        75        15        31.979    407       508       15        42        2         15        3         49        
-92                                 34.313    81.509    39.953    48.061    85.565    10        70        20        25.426    409       442       69        48        2         14        4         54        
-96                                 71.739    85.48     74.058    75.072    98.667    41.176    58.824    0         60.838    1036      344       14        32        7         10        0         61        
-97                                 22.4      85.096    27.714    40.743    75.77     0         65.714    34.286    16.327    713       1037      228       93        0         23        12        100       
-COMBINED                           45.815    85.636    49.022    53.403    92.419    20.603    55.276    24.121    38.144    6827      5957      560       410       41        110       48        526       
+CLEAR: sort-disco/no_rsu-pedestrianMOTA      MOTP      MODA      CLR_Re    CLR_Pr    MTR       PTR       MLR       sMOTA     CLR_TP    CLR_FN    CLR_FP    IDSW      MT        PT        ML        Frag      
+19                                 47.205    89.733    49.257    49.328    99.857    31.579    31.579    36.842    42.14     697       716       1         29        6         6         7         22        
+27                                 24.707    88.71     25.077    25.263    99.272    9.5238    23.81     66.667    21.855    409       1210      3         6         2         5         14        16        
+28                                 43.384    88.719    45.474    46.17     98.514    19.048    28.571    52.381    38.176    663       773       10        30        4         6         11        24        
+29                                 58.728    85.445    61.06     61.979    98.539    44.444    38.889    16.667    49.707    877       538       13        33        8         7         3         40        
+5                                  57.593    85.192    60.517    76.378    82.805    63.636    36.364    0         46.283    679       210       141       26        7         4         0         40        
+8                                  62.634    84.491    66.219    67.384    98.301    41.176    52.941    5.8824    52.184    752       364       13        40        7         9         1         34        
+91                                 41.202    87.714    43.934    44.262    99.265    15        70        15        35.764    405       510       3         25        3         14        3         35        
+92                                 38.895    82.266    45.828    51.704    89.796    25        65        10        29.726    440       411       50        59        5         13        2         44        
+96                                 58.986    82.06     60.217    60.87     98.94     29.412    64.706    5.8824    48.066    840       540       9         17        5         11        1         28        
+97                                 35.314    82.596    41.257    47.257    88.734    22.857    54.286    22.857    27.09     827       923       105       104       8         19        8         99        
+COMBINED                           45.932    85.434    48.819    51.541    94.983    27.638    47.236    25.126    38.425    6589      6195      348       369       55        94        50        382       
 
-Count: sort-upperbound/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
-19                                 887       1413      17        19        
-27                                 458       1619      7         21        
-28                                 718       1436      21        21        
-29                                 880       1415      22        18        
-5                                  727       889       9         11        
-8                                  826       1116      19        17        
-91                                 422       915       15        20        
-92                                 478       851       14        20        
-96                                 1050      1380      15        17        
-97                                 941       1750      25        35        
-COMBINED                           7387      12784     164       199       
+Count: sort-disco/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
+19                                 698       1413      10        19        
+27                                 412       1619      6         21        
+28                                 673       1436      11        21        
+29                                 890       1415      15        18        
+5                                  820       889       22        11        
+8                                  765       1116      15        17        
+91                                 408       915       10        20        
+92                                 490       851       26        20        
+96                                 849       1380      11        17        
+97                                 932       1750      28        35        
+COMBINED                           6937      12784     154       199       
 
 Timing analysis:
-MotChallenge2DBox.get_raw_seq_data                                     0.1353 sec
-MotChallenge2DBox.get_preprocessed_seq_data                            0.1200 sec
-CLEAR.eval_sequence                                                    0.0421 sec
+MotChallenge2DBox.get_raw_seq_data                                     0.1321 sec
+MotChallenge2DBox.get_preprocessed_seq_data                            0.1199 sec
+CLEAR.eval_sequence                                                    0.0407 sec
 Count.eval_sequence                                                    0.0000 sec
-eval_sequence                                                          0.2990 sec
-Evaluator.evaluate                                                     0.3000 sec
+eval_sequence                                                          0.2943 sec
+Evaluator.evaluate                                                     0.2953 sec
 
 Eval Config:
 USE_PARALLEL         : False                         
@@ -166,7 +166,7 @@ PRINT_CONFIG         : True
 GT_FOLDER            : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/gt/mot_challenge/
 TRACKERS_FOLDER      : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/trackers/mot_challenge/
 OUTPUT_FOLDER        : None                          
-TRACKERS_TO_EVAL     : ['sort-upperbound/no_rsu']    
+TRACKERS_TO_EVAL     : ['sort-disco/no_rsu']         
 CLASSES_TO_EVAL      : ['pedestrian']                
 BENCHMARK            : V2X                           
 SPLIT_TO_EVAL        : test2                         
@@ -201,94 +201,94 @@ PRINT_CONFIG         : True
 Evaluating 1 tracker(s) on 10 sequence(s) for 1 class(es) on MotChallenge2DBox dataset using the following metrics: CLEAR, Count
 
 
-Evaluating sort-upperbound/no_rsu
+Evaluating sort-disco/no_rsu
 
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 19)         0.0171 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0124 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 19)              0.0189 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0126 sec
+    CLEAR.eval_sequence()                                                  0.0043 sec
+    Count.eval_sequence()                                                  0.0000 sec
+1 eval_sequence(19, sort-disco/no_rsu)                                   0.0360 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 27)              0.0147 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0123 sec
+    CLEAR.eval_sequence()                                                  0.0043 sec
+    Count.eval_sequence()                                                  0.0000 sec
+2 eval_sequence(27, sort-disco/no_rsu)                                   0.0315 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 28)              0.0148 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0123 sec
+    CLEAR.eval_sequence()                                                  0.0043 sec
+    Count.eval_sequence()                                                  0.0000 sec
+3 eval_sequence(28, sort-disco/no_rsu)                                   0.0316 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 29)              0.0125 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0122 sec
+    CLEAR.eval_sequence()                                                  0.0042 sec
+    Count.eval_sequence()                                                  0.0000 sec
+4 eval_sequence(29, sort-disco/no_rsu)                                   0.0290 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 5)               0.0119 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
+    CLEAR.eval_sequence()                                                  0.0041 sec
+    Count.eval_sequence()                                                  0.0000 sec
+5 eval_sequence(5, sort-disco/no_rsu)                                    0.0283 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 8)               0.0127 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
+    CLEAR.eval_sequence()                                                  0.0042 sec
+    Count.eval_sequence()                                                  0.0000 sec
+6 eval_sequence(8, sort-disco/no_rsu)                                    0.0291 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 91)              0.0128 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0122 sec
+    CLEAR.eval_sequence()                                                  0.0042 sec
+    Count.eval_sequence()                                                  0.0000 sec
+7 eval_sequence(91, sort-disco/no_rsu)                                   0.0293 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 92)              0.0114 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
+    CLEAR.eval_sequence()                                                  0.0041 sec
+    Count.eval_sequence()                                                  0.0000 sec
+8 eval_sequence(92, sort-disco/no_rsu)                                   0.0279 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 96)              0.0141 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0123 sec
+    CLEAR.eval_sequence()                                                  0.0043 sec
+    Count.eval_sequence()                                                  0.0000 sec
+9 eval_sequence(96, sort-disco/no_rsu)                                   0.0308 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 97)              0.0176 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0125 sec
     CLEAR.eval_sequence()                                                  0.0044 sec
     Count.eval_sequence()                                                  0.0000 sec
-1 eval_sequence(19, sort-upperbound/no_rsu)                              0.0341 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 27)         0.0146 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
-    CLEAR.eval_sequence()                                                  0.0042 sec
-    Count.eval_sequence()                                                  0.0000 sec
-2 eval_sequence(27, sort-upperbound/no_rsu)                              0.0311 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 28)         0.0145 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
-    CLEAR.eval_sequence()                                                  0.0043 sec
-    Count.eval_sequence()                                                  0.0000 sec
-3 eval_sequence(28, sort-upperbound/no_rsu)                              0.0310 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 29)         0.0127 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
-    CLEAR.eval_sequence()                                                  0.0042 sec
-    Count.eval_sequence()                                                  0.0000 sec
-4 eval_sequence(29, sort-upperbound/no_rsu)                              0.0290 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 5)          0.0119 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
-    CLEAR.eval_sequence()                                                  0.0041 sec
-    Count.eval_sequence()                                                  0.0000 sec
-5 eval_sequence(5, sort-upperbound/no_rsu)                               0.0281 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 8)          0.0125 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
-    CLEAR.eval_sequence()                                                  0.0042 sec
-    Count.eval_sequence()                                                  0.0000 sec
-6 eval_sequence(8, sort-upperbound/no_rsu)                               0.0288 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 91)         0.0128 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
-    CLEAR.eval_sequence()                                                  0.0042 sec
-    Count.eval_sequence()                                                  0.0000 sec
-7 eval_sequence(91, sort-upperbound/no_rsu)                              0.0291 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 92)         0.0112 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
-    CLEAR.eval_sequence()                                                  0.0041 sec
-    Count.eval_sequence()                                                  0.0000 sec
-8 eval_sequence(92, sort-upperbound/no_rsu)                              0.0273 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 96)         0.0150 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
-    CLEAR.eval_sequence()                                                  0.0043 sec
-    Count.eval_sequence()                                                  0.0000 sec
-9 eval_sequence(96, sort-upperbound/no_rsu)                              0.0316 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 97)         0.0178 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0124 sec
-    CLEAR.eval_sequence()                                                  0.0045 sec
-    Count.eval_sequence()                                                  0.0000 sec
-10 eval_sequence(97, sort-upperbound/no_rsu)                              0.0348 sec
+10 eval_sequence(97, sort-disco/no_rsu)                                   0.0347 sec
 
-All sequences for sort-upperbound/no_rsu finished in 0.31 seconds
+All sequences for sort-disco/no_rsu finished in 0.31 seconds
 
-CLEAR: sort-upperbound/no_rsu-pedestrianMOTA      MOTP      MODA      CLR_Re    CLR_Pr    MTR       PTR       MLR       sMOTA     CLR_TP    CLR_FN    CLR_FP    IDSW      MT        PT        ML        Frag      
-19                                 66.564    83.59     68.798    76.502    90.851    53.333    46.667    0         54.01     993       305       100       29        8         7         0         64        
-27                                 23.35     86.57     27.919    36.929    80.387    14.706    38.235    47.059    18.391    582       994       142       72        5         13        16        76        
-28                                 51.891    86.171    55.042    59.734    92.717    25        62.5      12.5      43.63     853       575       67        45        4         10        2         48        
-29                                 43.011    83.286    51.613    60.305    87.403    41.667    41.667    16.667    32.932    673       443       97        96        10        10        4         68        
-5                                  88.578    88.529    90.146    91.041    99.026    81.818    18.182    0         78.135    813       80        8         14        9         2         0         20        
-8                                  70.472    85.54     72.358    75        96.598    78.571    14.286    7.1429    59.627    795       265       28        20        11        2         1         39        
-91                                 52.691    86.206    65.061    73.277    89.919    38.462    57.692    3.8462    42.584    776       283       87        131       10        15        1         86        
-92                                 29.613    83.313    36.243    47.845    80.483    10.714    71.429    17.857    21.629    433       472       105       60        3         20        5         76        
-96                                 77.094    85.495    80.53     81.89     98.366    70.588    23.529    5.8824    65.216    1144      253       19        48        12        4         1         24        
-97                                 45.327    83.166    50.26     58.879    87.231    36        36        28        35.416    1134      792       166       95        9         9         7         83        
-COMBINED                           53.46     85.165    58.279    64.75     90.915    38.571    43.81     17.619    43.855    8196      4462      819       610       81        92        37        584       
+CLEAR: sort-disco/no_rsu-pedestrianMOTA      MOTP      MODA      CLR_Re    CLR_Pr    MTR       PTR       MLR       sMOTA     CLR_TP    CLR_FN    CLR_FP    IDSW      MT        PT        ML        Frag      
+19                                 78.659    80.402    80.277    81.587    98.42     73.333    20        6.6667    62.67     1059      239       17        21        11        3         1         30        
+27                                 28.299    83.535    34.772    42.069    85.219    14.706    41.176    44.118    21.373    663       913       115       102       5         14        15        84        
+28                                 63.445    84.524    65.686    67.717    97.088    50        43.75     6.25      52.965    967       461       29        32        8         7         1         49        
+29                                 38.889    83.678    45.072    52.778    87.259    25        50        25        30.274    589       527       86        69        6         12        6         73        
+5                                  90.705    87.522    91.937    91.937    100       81.818    18.182    0         79.233    821       72        0         11        9         2         0         6         
+8                                  76.038    85.158    77.264    79.434    97.341    71.429    21.429    7.1429    64.248    842       218       23        13        10        3         1         19        
+91                                 61.379    85.697    73.371    77.432    95.017    53.846    38.462    7.6923    50.304    820       239       43        127       14        10        2         76        
+92                                 41.436    83.278    52.707    59.006    90.355    7.1429    78.571    14.286    31.57     534       371       57        102       2         22        4         85        
+96                                 63.994    86.469    65.999    66.213    99.677    41.176    41.176    17.647    55.035    925       472       3         28        7         7         3         18        
+97                                 49.533    84.674    53.115    58.411    91.687    36        40        24        40.581    1125      801       102       69        9         10        6         84        
+COMBINED                           57.639    84.493    62.174    65.927    94.615    38.571    42.857    18.571    47.416    8345      4313      475       574       81        90        39        524       
 
-Count: sort-upperbound/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
-19                                 1093      1298      17        15        
-27                                 724       1576      21        34        
-28                                 920       1428      21        16        
-29                                 770       1116      26        24        
-5                                  821       893       10        11        
-8                                  823       1060      15        14        
-91                                 863       1059      24        26        
-92                                 538       905       23        28        
-96                                 1163      1397      15        17        
-97                                 1300      1926      22        25        
-COMBINED                           9015      12658     194       210       
+Count: sort-disco/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
+19                                 1076      1298      15        15        
+27                                 778       1576      28        34        
+28                                 996       1428      17        16        
+29                                 675       1116      28        24        
+5                                  821       893       9         11        
+8                                  865       1060      14        14        
+91                                 863       1059      28        26        
+92                                 591       905       39        28        
+96                                 928       1397      12        17        
+97                                 1227      1926      21        25        
+COMBINED                           8820      12658     211       210       
 
 Timing analysis:
-MotChallenge2DBox.get_raw_seq_data                                     0.1400 sec
-MotChallenge2DBox.get_preprocessed_seq_data                            0.1208 sec
-CLEAR.eval_sequence                                                    0.0425 sec
+MotChallenge2DBox.get_raw_seq_data                                     0.1414 sec
+MotChallenge2DBox.get_preprocessed_seq_data                            0.1227 sec
+CLEAR.eval_sequence                                                    0.0426 sec
 Count.eval_sequence                                                    0.0000 sec
-eval_sequence                                                          0.3050 sec
-Evaluator.evaluate                                                     0.3060 sec
+eval_sequence                                                          0.3083 sec
+Evaluator.evaluate                                                     0.3094 sec
 
 Eval Config:
 USE_PARALLEL         : False                         
@@ -311,7 +311,7 @@ PRINT_CONFIG         : True
 GT_FOLDER            : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/gt/mot_challenge/
 TRACKERS_FOLDER      : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/trackers/mot_challenge/
 OUTPUT_FOLDER        : None                          
-TRACKERS_TO_EVAL     : ['sort-upperbound/no_rsu']    
+TRACKERS_TO_EVAL     : ['sort-disco/no_rsu']         
 CLASSES_TO_EVAL      : ['pedestrian']                
 BENCHMARK            : V2X                           
 SPLIT_TO_EVAL        : test3                         
@@ -346,94 +346,94 @@ PRINT_CONFIG         : True
 Evaluating 1 tracker(s) on 10 sequence(s) for 1 class(es) on MotChallenge2DBox dataset using the following metrics: CLEAR, Count
 
 
-Evaluating sort-upperbound/no_rsu
+Evaluating sort-disco/no_rsu
 
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 19)         0.0183 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0122 sec
-    CLEAR.eval_sequence()                                                  0.0043 sec
-    Count.eval_sequence()                                                  0.0000 sec
-1 eval_sequence(19, sort-upperbound/no_rsu)                              0.0350 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 27)         0.0122 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
-    CLEAR.eval_sequence()                                                  0.0041 sec
-    Count.eval_sequence()                                                  0.0000 sec
-2 eval_sequence(27, sort-upperbound/no_rsu)                              0.0284 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 28)         0.0137 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 19)              0.0177 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0123 sec
     CLEAR.eval_sequence()                                                  0.0042 sec
     Count.eval_sequence()                                                  0.0000 sec
-3 eval_sequence(28, sort-upperbound/no_rsu)                              0.0300 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 29)         0.0130 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
-    CLEAR.eval_sequence()                                                  0.0042 sec
-    Count.eval_sequence()                                                  0.0000 sec
-4 eval_sequence(29, sort-upperbound/no_rsu)                              0.0293 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 5)          0.0116 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
-    CLEAR.eval_sequence()                                                  0.0041 sec
-    Count.eval_sequence()                                                  0.0000 sec
-5 eval_sequence(5, sort-upperbound/no_rsu)                               0.0277 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 8)          0.0105 sec
+1 eval_sequence(19, sort-disco/no_rsu)                                   0.0345 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 27)              0.0123 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
     CLEAR.eval_sequence()                                                  0.0040 sec
     Count.eval_sequence()                                                  0.0000 sec
-6 eval_sequence(8, sort-upperbound/no_rsu)                               0.0264 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 91)         0.0123 sec
+2 eval_sequence(27, sort-disco/no_rsu)                                   0.0283 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 28)              0.0140 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0122 sec
+    CLEAR.eval_sequence()                                                  0.0042 sec
+    Count.eval_sequence()                                                  0.0000 sec
+3 eval_sequence(28, sort-disco/no_rsu)                                   0.0306 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 29)              0.0131 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
+    CLEAR.eval_sequence()                                                  0.0042 sec
+    Count.eval_sequence()                                                  0.0000 sec
+4 eval_sequence(29, sort-disco/no_rsu)                                   0.0295 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 5)               0.0118 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
+    CLEAR.eval_sequence()                                                  0.0041 sec
+    Count.eval_sequence()                                                  0.0000 sec
+5 eval_sequence(5, sort-disco/no_rsu)                                    0.0280 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 8)               0.0105 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
+    CLEAR.eval_sequence()                                                  0.0040 sec
+    Count.eval_sequence()                                                  0.0000 sec
+6 eval_sequence(8, sort-disco/no_rsu)                                    0.0265 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 91)              0.0123 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
+    CLEAR.eval_sequence()                                                  0.0041 sec
+    Count.eval_sequence()                                                  0.0000 sec
+7 eval_sequence(91, sort-disco/no_rsu)                                   0.0286 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 92)              0.0107 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
     CLEAR.eval_sequence()                                                  0.0041 sec
     Count.eval_sequence()                                                  0.0000 sec
-7 eval_sequence(91, sort-upperbound/no_rsu)                              0.0286 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 92)         0.0107 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
-    CLEAR.eval_sequence()                                                  0.0041 sec
+8 eval_sequence(92, sort-disco/no_rsu)                                   0.0268 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 96)              0.0181 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0124 sec
+    CLEAR.eval_sequence()                                                  0.0044 sec
     Count.eval_sequence()                                                  0.0000 sec
-8 eval_sequence(92, sort-upperbound/no_rsu)                              0.0267 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 96)         0.0186 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
-    CLEAR.eval_sequence()                                                  0.0045 sec
-    Count.eval_sequence()                                                  0.0000 sec
-9 eval_sequence(96, sort-upperbound/no_rsu)                              0.0353 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 97)         0.0171 sec
+9 eval_sequence(96, sort-disco/no_rsu)                                   0.0351 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 97)              0.0166 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0122 sec
-    CLEAR.eval_sequence()                                                  0.0045 sec
+    CLEAR.eval_sequence()                                                  0.0044 sec
     Count.eval_sequence()                                                  0.0000 sec
-10 eval_sequence(97, sort-upperbound/no_rsu)                              0.0339 sec
+10 eval_sequence(97, sort-disco/no_rsu)                                   0.0334 sec
 
-All sequences for sort-upperbound/no_rsu finished in 0.30 seconds
+All sequences for sort-disco/no_rsu finished in 0.30 seconds
 
-CLEAR: sort-upperbound/no_rsu-pedestrianMOTA      MOTP      MODA      CLR_Re    CLR_Pr    MTR       PTR       MLR       sMOTA     CLR_TP    CLR_FN    CLR_FP    IDSW      MT        PT        ML        Frag      
-19                                 62.186    83.715    66.802    74.17     90.963    56.25     37.5      6.25      50.108    916       319       91        57        9         6         1         49        
-27                                 29.185    75.413    32.252    38.3      86.364    6.6667    66.667    26.667    19.768    437       704       69        35        1         10        4         52        
-28                                 21.999    83.509    26.815    38.174    77.068    2.7778    66.667    30.556    15.703    531       860       158       67        1         24        11        83        
-29                                 47.419    84.842    55.993    64.042    88.835    32        52        16        37.711    732       411       92        98        8         13        4         63        
-5                                  61.253    88.221    62.527    66.454    94.419    53.846    23.077    23.077    53.425    626       316       37        12        7         3         3         21        
-8                                  67.608    85.704    69.086    70.161    98.491    70        20        10        57.578    522       222       8         11        7         2         1         17        
-91                                 33.662    84.609    41.293    50        85.168    14.286    75        10.714    25.967    557       557       97        85        4         21        3         90        
-92                                 38.175    84.645    41.897    49.82     86.279    7.6923    50        42.308    30.525    415       418       66        31        2         13        11        42        
-96                                 48.956    82.572    51.336    58.961    88.549    30.435    52.174    17.391    38.68     1214      845       157       49        7         12        4         75        
-97                                 72.206    83.547    75.695    79.184    95.78     60        40        0         59.177    1339      352       59        59        12        8         0         85        
-COMBINED                           48.41     83.745    52.51     59.294    89.733    27.358    52.83     19.811    38.771    7289      5004      834       504       58        112       42        577       
+CLEAR: sort-disco/no_rsu-pedestrianMOTA      MOTP      MODA      CLR_Re    CLR_Pr    MTR       PTR       MLR       sMOTA     CLR_TP    CLR_FN    CLR_FP    IDSW      MT        PT        ML        Frag      
+19                                 62.105    86.598    66.235    69.312    95.749    50        37.5      12.5      52.816    856       379       38        51        8         6         2         48        
+27                                 41.543    78.126    43.471    47.064    92.907    33.333    40        26.667    31.248    537       604       41        22        5         6         4         39        
+28                                 32.207    83.652    38.821    47.304    84.794    2.7778    72.222    25        24.474    658       733       118       92        1         26        9         83        
+29                                 50.131    82.961    58.443    65.092    90.732    40        44        16        39.04     744       399       76        95        10        11        4         72        
+5                                  65.711    87.065    67.622    70.701    95.827    53.846    30.769    15.385    56.566    666       276       29        18        7         4         2         32        
+8                                  71.237    86.634    72.581    72.581    100       70        10        20        61.535    540       204       0         10        7         1         2         4         
+91                                 42.998    85.609    51.795    54.847    94.729    14.286    82.143    3.5714    35.105    611       503       34        98        4         23        1         83        
+92                                 42.377    84.394    48.019    52.821    91.667    7.6923    53.846    38.462    34.134    440       393       40        47        2         14        10        44        
+96                                 46.916    82.897    48.422    53.181    91.785    21.739    56.522    21.739    37.82     1095      964       98        31        5         13        5         50        
+97                                 68.539    82.811    70.668    72.561    97.458    50        45        5         56.067    1227      464       32        36        10        9         1         60        
+COMBINED                           51.802    84.003    55.869    59.985    93.579    27.83     53.302    18.868    42.206    7374      4919      506       500       59        113       40        515       
 
-Count: sort-upperbound/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
-19                                 1007      1235      21        16        
-27                                 506       1141      20        15        
-28                                 689       1391      22        36        
-29                                 824       1143      24        25        
-5                                  663       942       11        13        
-8                                  530       744       10        10        
-91                                 654       1114      23        28        
-92                                 481       833       18        26        
-96                                 1371      2059      21        23        
-97                                 1398      1691      19        20        
-COMBINED                           8123      12293     189       212       
+Count: sort-disco/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
+19                                 894       1235      16        16        
+27                                 578       1141      14        15        
+28                                 776       1391      35        36        
+29                                 820       1143      29        25        
+5                                  695       942       11        13        
+8                                  540       744       7         10        
+91                                 645       1114      24        28        
+92                                 480       833       27        26        
+96                                 1193      2059      18        23        
+97                                 1259      1691      18        20        
+COMBINED                           7880      12293     199       212       
 
 Timing analysis:
-MotChallenge2DBox.get_raw_seq_data                                     0.1380 sec
-MotChallenge2DBox.get_preprocessed_seq_data                            0.1197 sec
-CLEAR.eval_sequence                                                    0.0421 sec
+MotChallenge2DBox.get_raw_seq_data                                     0.1371 sec
+MotChallenge2DBox.get_preprocessed_seq_data                            0.1207 sec
+CLEAR.eval_sequence                                                    0.0418 sec
 Count.eval_sequence                                                    0.0000 sec
-eval_sequence                                                          0.3015 sec
-Evaluator.evaluate                                                     0.3025 sec
+eval_sequence                                                          0.3013 sec
+Evaluator.evaluate                                                     0.3023 sec
 
 Eval Config:
 USE_PARALLEL         : False                         
@@ -456,7 +456,7 @@ PRINT_CONFIG         : True
 GT_FOLDER            : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/gt/mot_challenge/
 TRACKERS_FOLDER      : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/trackers/mot_challenge/
 OUTPUT_FOLDER        : None                          
-TRACKERS_TO_EVAL     : ['sort-upperbound/no_rsu']    
+TRACKERS_TO_EVAL     : ['sort-disco/no_rsu']         
 CLASSES_TO_EVAL      : ['pedestrian']                
 BENCHMARK            : V2X                           
 SPLIT_TO_EVAL        : test4                         
@@ -491,94 +491,94 @@ PRINT_CONFIG         : True
 Evaluating 1 tracker(s) on 10 sequence(s) for 1 class(es) on MotChallenge2DBox dataset using the following metrics: CLEAR, Count
 
 
-Evaluating sort-upperbound/no_rsu
+Evaluating sort-disco/no_rsu
 
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 19)         0.0191 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0123 sec
-    CLEAR.eval_sequence()                                                  0.0043 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 19)              0.0151 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
+    CLEAR.eval_sequence()                                                  0.0042 sec
     Count.eval_sequence()                                                  0.0000 sec
-1 eval_sequence(19, sort-upperbound/no_rsu)                              0.0359 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 27)         0.0044 sec
+1 eval_sequence(19, sort-disco/no_rsu)                                   0.0316 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 27)              0.0044 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0042 sec
     CLEAR.eval_sequence()                                                  0.0000 sec
     Count.eval_sequence()                                                  0.0000 sec
-2 eval_sequence(27, sort-upperbound/no_rsu)                              0.0088 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 28)         0.0044 sec
+2 eval_sequence(27, sort-disco/no_rsu)                                   0.0088 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 28)              0.0044 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0042 sec
     CLEAR.eval_sequence()                                                  0.0000 sec
     Count.eval_sequence()                                                  0.0000 sec
-3 eval_sequence(28, sort-upperbound/no_rsu)                              0.0088 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 29)         0.0143 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
-    CLEAR.eval_sequence()                                                  0.0043 sec
+3 eval_sequence(28, sort-disco/no_rsu)                                   0.0088 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 29)              0.0141 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
+    CLEAR.eval_sequence()                                                  0.0042 sec
     Count.eval_sequence()                                                  0.0000 sec
-4 eval_sequence(29, sort-upperbound/no_rsu)                              0.0308 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 5)          0.0110 sec
+4 eval_sequence(29, sort-disco/no_rsu)                                   0.0306 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 5)               0.0112 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
     CLEAR.eval_sequence()                                                  0.0040 sec
     Count.eval_sequence()                                                  0.0000 sec
-5 eval_sequence(5, sort-upperbound/no_rsu)                               0.0270 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 8)          0.0094 sec
+5 eval_sequence(5, sort-disco/no_rsu)                                    0.0272 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 8)               0.0094 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0117 sec
     CLEAR.eval_sequence()                                                  0.0040 sec
     Count.eval_sequence()                                                  0.0000 sec
-6 eval_sequence(8, sort-upperbound/no_rsu)                               0.0252 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 91)         0.0110 sec
+6 eval_sequence(8, sort-disco/no_rsu)                                    0.0252 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 91)              0.0110 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
     CLEAR.eval_sequence()                                                  0.0041 sec
     Count.eval_sequence()                                                  0.0000 sec
-7 eval_sequence(91, sort-upperbound/no_rsu)                              0.0271 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 92)         0.0044 sec
+7 eval_sequence(91, sort-disco/no_rsu)                                   0.0270 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 92)              0.0044 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0042 sec
     CLEAR.eval_sequence()                                                  0.0000 sec
     Count.eval_sequence()                                                  0.0000 sec
-8 eval_sequence(92, sort-upperbound/no_rsu)                              0.0088 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 96)         0.0172 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0122 sec
+8 eval_sequence(92, sort-disco/no_rsu)                                   0.0088 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 96)              0.0174 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0123 sec
     CLEAR.eval_sequence()                                                  0.0044 sec
     Count.eval_sequence()                                                  0.0000 sec
-9 eval_sequence(96, sort-upperbound/no_rsu)                              0.0339 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 97)         0.0144 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
-    CLEAR.eval_sequence()                                                  0.0043 sec
+9 eval_sequence(96, sort-disco/no_rsu)                                   0.0343 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 97)              0.0138 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
+    CLEAR.eval_sequence()                                                  0.0041 sec
     Count.eval_sequence()                                                  0.0000 sec
-10 eval_sequence(97, sort-upperbound/no_rsu)                              0.0309 sec
+10 eval_sequence(97, sort-disco/no_rsu)                                   0.0299 sec
 
-All sequences for sort-upperbound/no_rsu finished in 0.24 seconds
+All sequences for sort-disco/no_rsu finished in 0.23 seconds
 
-CLEAR: sort-upperbound/no_rsu-pedestrianMOTA      MOTP      MODA      CLR_Re    CLR_Pr    MTR       PTR       MLR       sMOTA     CLR_TP    CLR_FN    CLR_FP    IDSW      MT        PT        ML        Frag      
-19                                 63.082    84.911    64.588    66.953    96.587    66.667    20        13.333    52.98     934       461       33        21        10        3         2         43        
+CLEAR: sort-disco/no_rsu-pedestrianMOTA      MOTP      MODA      CLR_Re    CLR_Pr    MTR       PTR       MLR       sMOTA     CLR_TP    CLR_FN    CLR_FP    IDSW      MT        PT        ML        Frag      
+19                                 46.523    80.745    47.24     49.104    96.343    26.667    46.667    26.667    37.068    685       710       26        10        4         7         4         22        
 27                                 0         0         0         0         0         0         0         100       0         0         0         0         0         0         0         0         0         
 28                                 0         0         0         0         0         0         0         100       0         0         0         0         0         0         0         0         0         
-29                                 54.405    84.701    60.587    67.62     90.58     29.167    54.167    16.667    44.06     875       419       91        80        7         13        4         69        
-5                                  44.349    92.563    46.071    47.255    97.556    17.647    52.941    29.412    40.834    439       490       11        16        3         9         5         36        
-8                                  57.265    82.519    60.513    60.684    99.719    50        40        10        46.657    355       230       1         19        5         4         1         13        
-91                                 43.167    84.955    48.807    50.868    96.107    25        65        10        35.514    469       453       19        52        5         13        2         56        
+29                                 57.11     84.134    62.133    66.924    93.319    33.333    54.167    12.5      46.491    866       428       62        65        8         13        3         57        
+5                                  53.391    90.13     55.328    55.436    99.806    17.647    52.941    29.412    47.919    515       414       1         18        3         9         5         21        
+8                                  56.239    86.306    59.316    61.026    97.275    30        50        20        47.883    357       228       10        18        3         5         2         11        
+91                                 45.336    85.647    50.108    50.759    98.734    35        60        5         38.051    468       454       6         44        7         12        1         42        
 92                                 0         0         0         0         0         0         0         100       0         0         0         0         0         0         0         0         0         
-96                                 44.439    84.502    46.54     50.794    92.272    18.182    59.091    22.727    36.566    991       960       83        41        4         13        5         68        
-97                                 66.211    83.344    68.641    74.487    92.722    56.25     43.75     0         53.804    981       336       77        32        9         7         0         50        
-COMBINED                           53.235    84.991    56.345    60.098    94.122    34.677    50        15.323    44.215    5044      3349      315       261       43        62        19        335       
+96                                 47.207    83.944    49.052    54.485    90.932    27.273    45.455    27.273    38.459    1063      888       106       36        6         10        6         42        
+97                                 66.211    87.07     67.882    68.337    99.338    62.5      25        12.5      57.375    900       417       6         22        10        4         2         34        
+COMBINED                           52.711    85.1      55.248    57.834    95.721    33.065    48.387    18.548    44.094    4854      3539      217       213       41        60        23        229       
 
-Count: sort-upperbound/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
-19                                 967       1395      20        15        
+Count: sort-disco/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
+19                                 711       1395      14        15        
 27                                 0         0         0         0         
 28                                 0         0         0         0         
-29                                 966       1294      27        24        
-5                                  450       929       7         17        
-8                                  356       585       8         10        
-91                                 488       922       15        20        
+29                                 928       1294      24        24        
+5                                  516       929       6         17        
+8                                  367       585       9         10        
+91                                 474       922       14        20        
 92                                 0         0         0         0         
-96                                 1074      1951      18        22        
-97                                 1058      1317      18        16        
-COMBINED                           5359      8393      113       124       
+96                                 1169      1951      17        22        
+97                                 906       1317      12        16        
+COMBINED                           5071      8393      96        124       
 
 Timing analysis:
-MotChallenge2DBox.get_raw_seq_data                                     0.1097 sec
-MotChallenge2DBox.get_preprocessed_seq_data                            0.0965 sec
-CLEAR.eval_sequence                                                    0.0292 sec
+MotChallenge2DBox.get_raw_seq_data                                     0.1054 sec
+MotChallenge2DBox.get_preprocessed_seq_data                            0.0962 sec
+CLEAR.eval_sequence                                                    0.0291 sec
 Count.eval_sequence                                                    0.0000 sec
-eval_sequence                                                          0.2370 sec
-Evaluator.evaluate                                                     0.2381 sec
+eval_sequence                                                          0.2322 sec
+Evaluator.evaluate                                                     0.2332 sec
 
 Eval Config:
 USE_PARALLEL         : False                         
@@ -601,7 +601,7 @@ PRINT_CONFIG         : True
 GT_FOLDER            : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/gt/mot_challenge/
 TRACKERS_FOLDER      : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/trackers/mot_challenge/
 OUTPUT_FOLDER        : None                          
-TRACKERS_TO_EVAL     : ['sort-upperbound/no_rsu']    
+TRACKERS_TO_EVAL     : ['sort-disco/no_rsu']         
 CLASSES_TO_EVAL      : ['pedestrian']                
 BENCHMARK            : V2X                           
 SPLIT_TO_EVAL        : test5                         
@@ -636,94 +636,94 @@ PRINT_CONFIG         : True
 Evaluating 1 tracker(s) on 10 sequence(s) for 1 class(es) on MotChallenge2DBox dataset using the following metrics: CLEAR, Count
 
 
-Evaluating sort-upperbound/no_rsu
+Evaluating sort-disco/no_rsu
 
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 19)         0.0061 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0052 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 19)              0.0045 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0044 sec
     CLEAR.eval_sequence()                                                  0.0000 sec
     Count.eval_sequence()                                                  0.0000 sec
-1 eval_sequence(19, sort-upperbound/no_rsu)                              0.0115 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 27)         0.0044 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0043 sec
+1 eval_sequence(19, sort-disco/no_rsu)                                   0.0090 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 27)              0.0044 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0042 sec
     CLEAR.eval_sequence()                                                  0.0000 sec
     Count.eval_sequence()                                                  0.0000 sec
-2 eval_sequence(27, sort-upperbound/no_rsu)                              0.0089 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 28)         0.0044 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0043 sec
+2 eval_sequence(27, sort-disco/no_rsu)                                   0.0088 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 28)              0.0044 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0042 sec
     CLEAR.eval_sequence()                                                  0.0000 sec
     Count.eval_sequence()                                                  0.0000 sec
-3 eval_sequence(28, sort-upperbound/no_rsu)                              0.0089 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 29)         0.0044 sec
+3 eval_sequence(28, sort-disco/no_rsu)                                   0.0088 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 29)              0.0044 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0046 sec
     CLEAR.eval_sequence()                                                  0.0000 sec
     Count.eval_sequence()                                                  0.0000 sec
-4 eval_sequence(29, sort-upperbound/no_rsu)                              0.0091 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 5)          0.0044 sec
+4 eval_sequence(29, sort-disco/no_rsu)                                   0.0091 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 5)               0.0044 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0043 sec
     CLEAR.eval_sequence()                                                  0.0000 sec
     Count.eval_sequence()                                                  0.0000 sec
-5 eval_sequence(5, sort-upperbound/no_rsu)                               0.0088 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 8)          0.0095 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
+5 eval_sequence(5, sort-disco/no_rsu)                                    0.0089 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 8)               0.0100 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
     CLEAR.eval_sequence()                                                  0.0040 sec
     Count.eval_sequence()                                                  0.0000 sec
-6 eval_sequence(8, sort-upperbound/no_rsu)                               0.0255 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 91)         0.0044 sec
+6 eval_sequence(8, sort-disco/no_rsu)                                    0.0260 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 91)              0.0044 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0043 sec
     CLEAR.eval_sequence()                                                  0.0000 sec
     Count.eval_sequence()                                                  0.0000 sec
-7 eval_sequence(91, sort-upperbound/no_rsu)                              0.0088 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 92)         0.0044 sec
+7 eval_sequence(91, sort-disco/no_rsu)                                   0.0088 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 92)              0.0044 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0043 sec
     CLEAR.eval_sequence()                                                  0.0000 sec
     Count.eval_sequence()                                                  0.0000 sec
-8 eval_sequence(92, sort-upperbound/no_rsu)                              0.0089 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 96)         0.0158 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0122 sec
+8 eval_sequence(92, sort-disco/no_rsu)                                   0.0088 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 96)              0.0160 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0123 sec
     CLEAR.eval_sequence()                                                  0.0044 sec
     Count.eval_sequence()                                                  0.0000 sec
-9 eval_sequence(96, sort-upperbound/no_rsu)                              0.0326 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 97)         0.0168 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0122 sec
+9 eval_sequence(96, sort-disco/no_rsu)                                   0.0328 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 97)              0.0169 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0123 sec
     CLEAR.eval_sequence()                                                  0.0044 sec
     Count.eval_sequence()                                                  0.0000 sec
-10 eval_sequence(97, sort-upperbound/no_rsu)                              0.0336 sec
+10 eval_sequence(97, sort-disco/no_rsu)                                   0.0338 sec
 
-All sequences for sort-upperbound/no_rsu finished in 0.16 seconds
+All sequences for sort-disco/no_rsu finished in 0.16 seconds
 
-CLEAR: sort-upperbound/no_rsu-pedestrianMOTA      MOTP      MODA      CLR_Re    CLR_Pr    MTR       PTR       MLR       sMOTA     CLR_TP    CLR_FN    CLR_FP    IDSW      MT        PT        ML        Frag      
+CLEAR: sort-disco/no_rsu-pedestrianMOTA      MOTP      MODA      CLR_Re    CLR_Pr    MTR       PTR       MLR       sMOTA     CLR_TP    CLR_FN    CLR_FP    IDSW      MT        PT        ML        Frag      
 19                                 0         0         0         0         0         0         0         100       0         0         0         0         0         0         0         0         0         
 27                                 0         0         0         0         0         0         0         100       0         0         0         0         0         0         0         0         0         
 28                                 0         0         0         0         0         0         0         100       0         0         0         0         0         0         0         0         0         
 29                                 0         0         0         0         0         0         0         100       0         0         0         0         0         0         0         0         0         
 5                                  0         0         0         0         0         0         0         100       0         0         0         0         0         0         0         0         0         
-8                                  55.532    89.16     57.62     60.96     94.805    43.75     37.5      18.75     48.924    292       187       16        10        7         6         3         11        
+8                                  62.839    88.644    64.718    65.762    98.438    43.75     37.5      18.75     55.371    315       164       5         9         7         6         3         13        
 91                                 0         0         0         0         0         0         0         100       0         0         0         0         0         0         0         0         0         
 92                                 0         0         0         0         0         0         0         100       0         0         0         0         0         0         0         0         0         
-96                                 44.668    84.123    50.941    58.595    88.447    28        44        28        35.364    934       660       122       100       7         11        7         87        
-97                                 46.966    85.566    50.054    55.309    91.324    30.435    60.87     8.6957    38.983    1021      825       97        57        7         14        2         59        
-COMBINED                           47.078    85.433    51.34     57.336    90.532    32.812    48.438    18.75     38.726    2247      1672      235       167       21        31        12        157       
+96                                 49.561    82.907    53.701    61.167    89.122    40        48        12        39.105    975       619       119       66        10        12        3         73        
+97                                 46.046    85.348    47.779    54.93     88.482    34.783    52.174    13.043    37.997    1014      832       132       32        8         12        3         59        
+COMBINED                           49.528    84.765    52.258    58.791    90        39.062    46.875    14.062    40.571    2304      1615      256       107       25        30        9         145       
 
-Count: sort-upperbound/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
+Count: sort-disco/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
 19                                 0         0         0         0         
 27                                 0         0         0         0         
 28                                 0         0         0         0         
 29                                 0         0         0         0         
 5                                  0         0         0         0         
-8                                  308       479       12        16        
+8                                  320       479       11        16        
 91                                 0         0         0         0         
 92                                 0         0         0         0         
-96                                 1056      1594      20        25        
-97                                 1118      1846      18        23        
-COMBINED                           2482      3919      50        64        
+96                                 1094      1594      22        25        
+97                                 1146      1846      19        23        
+COMBINED                           2560      3919      52        64        
 
 Timing analysis:
-MotChallenge2DBox.get_raw_seq_data                                     0.0749 sec
-MotChallenge2DBox.get_preprocessed_seq_data                            0.0675 sec
+MotChallenge2DBox.get_raw_seq_data                                     0.0739 sec
+MotChallenge2DBox.get_preprocessed_seq_data                            0.0667 sec
 CLEAR.eval_sequence                                                    0.0128 sec
 Count.eval_sequence                                                    0.0000 sec
-eval_sequence                                                          0.1567 sec
-Evaluator.evaluate                                                     0.1576 sec
+eval_sequence                                                          0.1549 sec
+Evaluator.evaluate                                                     0.1559 sec
 
 Eval Config:
 USE_PARALLEL         : False                         
@@ -746,7 +746,7 @@ PRINT_CONFIG         : True
 GT_FOLDER            : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/gt/mot_challenge/
 TRACKERS_FOLDER      : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/trackers/mot_challenge/
 OUTPUT_FOLDER        : None                          
-TRACKERS_TO_EVAL     : ['sort-upperbound/no_rsu']    
+TRACKERS_TO_EVAL     : ['sort-disco/no_rsu']         
 CLASSES_TO_EVAL      : ['pedestrian']                
 BENCHMARK            : V2X                           
 SPLIT_TO_EVAL        : test1                         
@@ -776,94 +776,94 @@ xxxxxxxxxxxxxxxxxxxxxxxx ['pedestrian']
 Evaluating 1 tracker(s) on 10 sequence(s) for 1 class(es) on MotChallenge2DBox dataset using the following metrics: HOTA, Count
 
 
-Evaluating sort-upperbound/no_rsu
+Evaluating sort-disco/no_rsu
 
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 19)         0.0175 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 19)              0.0180 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0124 sec
-    HOTA.eval_sequence()                                                   0.0261 sec
+    HOTA.eval_sequence()                                                   0.0260 sec
     Count.eval_sequence()                                                  0.0000 sec
-1 eval_sequence(19, sort-upperbound/no_rsu)                              0.0561 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 27)         0.0138 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
-    HOTA.eval_sequence()                                                   0.0255 sec
+1 eval_sequence(19, sort-disco/no_rsu)                                   0.0566 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 27)              0.0136 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
+    HOTA.eval_sequence()                                                   0.0252 sec
     Count.eval_sequence()                                                  0.0000 sec
-2 eval_sequence(27, sort-upperbound/no_rsu)                              0.0516 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 28)         0.0139 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
+2 eval_sequence(27, sort-disco/no_rsu)                                   0.0509 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 28)              0.0136 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
     HOTA.eval_sequence()                                                   0.0257 sec
     Count.eval_sequence()                                                  0.0000 sec
-3 eval_sequence(28, sort-upperbound/no_rsu)                              0.0517 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 29)         0.0144 sec
+3 eval_sequence(28, sort-disco/no_rsu)                                   0.0514 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 29)              0.0142 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0123 sec
+    HOTA.eval_sequence()                                                   0.0264 sec
+    Count.eval_sequence()                                                  0.0000 sec
+4 eval_sequence(29, sort-disco/no_rsu)                                   0.0530 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 5)               0.0119 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
-    HOTA.eval_sequence()                                                   0.0268 sec
+    HOTA.eval_sequence()                                                   0.0258 sec
     Count.eval_sequence()                                                  0.0000 sec
-4 eval_sequence(29, sort-upperbound/no_rsu)                              0.0534 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 5)          0.0116 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
+5 eval_sequence(5, sort-disco/no_rsu)                                    0.0501 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 8)               0.0126 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
+    HOTA.eval_sequence()                                                   0.0258 sec
+    Count.eval_sequence()                                                  0.0000 sec
+6 eval_sequence(8, sort-disco/no_rsu)                                    0.0507 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 91)              0.0108 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
     HOTA.eval_sequence()                                                   0.0254 sec
     Count.eval_sequence()                                                  0.0000 sec
-5 eval_sequence(5, sort-upperbound/no_rsu)                               0.0491 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 8)          0.0127 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
-    HOTA.eval_sequence()                                                   0.0254 sec
-    Count.eval_sequence()                                                  0.0000 sec
-6 eval_sequence(8, sort-upperbound/no_rsu)                               0.0502 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 91)         0.0108 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
-    HOTA.eval_sequence()                                                   0.0245 sec
-    Count.eval_sequence()                                                  0.0000 sec
-7 eval_sequence(91, sort-upperbound/no_rsu)                              0.0473 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 92)         0.0107 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
-    HOTA.eval_sequence()                                                   0.0247 sec
-    Count.eval_sequence()                                                  0.0000 sec
-8 eval_sequence(92, sort-upperbound/no_rsu)                              0.0474 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 96)         0.0147 sec
+7 eval_sequence(91, sort-disco/no_rsu)                                   0.0484 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 92)              0.0108 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
-    HOTA.eval_sequence()                                                   0.0259 sec
+    HOTA.eval_sequence()                                                   0.0253 sec
     Count.eval_sequence()                                                  0.0000 sec
-9 eval_sequence(96, sort-upperbound/no_rsu)                              0.0528 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 97)         0.0157 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
+8 eval_sequence(92, sort-disco/no_rsu)                                   0.0483 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 96)              0.0138 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
     HOTA.eval_sequence()                                                   0.0261 sec
     Count.eval_sequence()                                                  0.0000 sec
-10 eval_sequence(97, sort-upperbound/no_rsu)                              0.0540 sec
+9 eval_sequence(96, sort-disco/no_rsu)                                   0.0522 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 97)              0.0157 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0123 sec
+    HOTA.eval_sequence()                                                   0.0266 sec
+    Count.eval_sequence()                                                  0.0000 sec
+10 eval_sequence(97, sort-disco/no_rsu)                                   0.0547 sec
 
-All sequences for sort-upperbound/no_rsu finished in 0.51 seconds
+All sequences for sort-disco/no_rsu finished in 0.52 seconds
 
-HOTA: sort-upperbound/no_rsu-pedestrianHOTA      DetA      AssA      DetRe     DetPr     AssRe     AssPr     LocA      RHOTA     HOTA(0)   LocA(0)   HOTALocA(0)
-19                                 41.787    47.741    37.307    51.067    81.351    51.867    51.475    86.027    43.398    48.852    82.846    40.472    
-27                                 36.752    24.68     55.526    25.171    88.98     66.314    69.117    89.626    37.187    39.906    87.425    34.888    
-28                                 32.714    39.25     29.033    41.281    82.561    39.259    50.112    87.278    33.766    36.133    84.366    30.484    
-29                                 35.715    50.729    26.106    53.454    85.951    39.498    46.624    89.466    36.831    39.283    86.788    34.093    
-5                                  56.96     60.69     58.06     66.361    81.148    72.326    68.44     86.724    60.215    66.314    81.699    54.178    
-8                                  46.658    60.498    36.355    63.931    86.377    47.997    56.086    88.245    48.115    53.161    85.057    45.217    
-91                                 26.255    37.816    18.392    39.235    85.071    30.83     37.651    87.571    26.8      29.665    84.965    25.205    
-92                                 32        37.255    27.943    41.11     73.189    38.764    47.25     84.1      33.742    39.856    77.278    30.8      
-96                                 38.245    62.981    23.503    65.587    86.201    39.161    38.986    87.037    39.165    43.846    85.174    37.345    
-97                                 25.705    33.545    20.286    37.762    70.228    30.375    37.102    85.131    27.403    30.926    75.255    23.274    
-COMBINED                           37.559    44.437    32.867    47.375    81.988    45.65     49.88     87.148    38.976    42.894    83.097    35.644    
+HOTA: sort-disco/no_rsu-pedestrian HOTA      DetA      AssA      DetRe     DetPr     AssRe     AssPr     LocA      RHOTA     HOTA(0)   LocA(0)   HOTALocA(0)
+19                                 39.13     44.461    34.72     45.368    91.841    51.097    50.863    90.737    39.603    42.467    89.625    38.062    
+27                                 34.726    22.528    54.23     22.915    90.049    65.029    67.569    90.659    35.081    37.05     88.319    32.722    
+28                                 37.286    40.774    34.926    41.922    89.45     47.05     51.387    90.049    37.943    40.185    87.704    35.244    
+29                                 37.87     52.393    28.674    54.313    86.351    44.466    46.743    87.333    38.796    42.659    84.929    36.23     
+5                                  54.248    58.317    55.36     68.474    74.236    69.926    66.261    86.169    59.46     61.815    79.432    49.101    
+8                                  43.432    55.542    34.855    58.253    84.981    47.733    52.994    86.786    44.732    50.186    83.69     42.001    
+91                                 28.546    38.593    21.591    39.643    88.906    35.228    39.51     89.484    29.027    31.681    87.158    27.612    
+92                                 35.528    40.803    32.895    44.276    76.896    42.528    56.706    85.05     37.321    41.871    78.169    32.73     
+96                                 37.222    48.463    29.31     50.931    82.785    46.963    42.637    85.599    38.33     45.175    81.798    36.952    
+97                                 29.339    37.739    23.236    40.818    76.643    38.605    35.051    84.972    30.632    35.652    79.377    28.299    
+COMBINED                           37.832    43.019    34.394    45.354    83.582    48.685    50.125    87.436    39.047    42.813    83.695    35.832    
 
-Count: sort-upperbound/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
-19                                 887       1413      17        19        
-27                                 458       1619      7         21        
-28                                 718       1436      21        21        
-29                                 880       1415      22        18        
-5                                  727       889       9         11        
-8                                  826       1116      19        17        
-91                                 422       915       15        20        
-92                                 478       851       14        20        
-96                                 1050      1380      15        17        
-97                                 941       1750      25        35        
-COMBINED                           7387      12784     164       199       
+Count: sort-disco/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
+19                                 698       1413      10        19        
+27                                 412       1619      6         21        
+28                                 673       1436      11        21        
+29                                 890       1415      15        18        
+5                                  820       889       22        11        
+8                                  765       1116      15        17        
+91                                 408       915       10        20        
+92                                 490       851       26        20        
+96                                 849       1380      11        17        
+97                                 932       1750      28        35        
+COMBINED                           6937      12784     154       199       
 
 Timing analysis:
-MotChallenge2DBox.get_raw_seq_data                                     0.1359 sec
-MotChallenge2DBox.get_preprocessed_seq_data                            0.1199 sec
-HOTA.eval_sequence                                                     0.2562 sec
+MotChallenge2DBox.get_raw_seq_data                                     0.1350 sec
+MotChallenge2DBox.get_preprocessed_seq_data                            0.1212 sec
+HOTA.eval_sequence                                                     0.2584 sec
 Count.eval_sequence                                                    0.0000 sec
-eval_sequence                                                          0.5136 sec
-Evaluator.evaluate                                                     1.2325 sec
+eval_sequence                                                          0.5162 sec
+Evaluator.evaluate                                                     1.2240 sec
 
 Eval Config:
 USE_PARALLEL         : False                         
@@ -886,7 +886,7 @@ PRINT_CONFIG         : True
 GT_FOLDER            : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/gt/mot_challenge/
 TRACKERS_FOLDER      : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/trackers/mot_challenge/
 OUTPUT_FOLDER        : None                          
-TRACKERS_TO_EVAL     : ['sort-upperbound/no_rsu']    
+TRACKERS_TO_EVAL     : ['sort-disco/no_rsu']         
 CLASSES_TO_EVAL      : ['pedestrian']                
 BENCHMARK            : V2X                           
 SPLIT_TO_EVAL        : test2                         
@@ -916,94 +916,94 @@ xxxxxxxxxxxxxxxxxxxxxxxx ['pedestrian']
 Evaluating 1 tracker(s) on 10 sequence(s) for 1 class(es) on MotChallenge2DBox dataset using the following metrics: HOTA, Count
 
 
-Evaluating sort-upperbound/no_rsu
+Evaluating sort-disco/no_rsu
 
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 19)         0.0195 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0126 sec
-    HOTA.eval_sequence()                                                   0.0265 sec
-    Count.eval_sequence()                                                  0.0000 sec
-1 eval_sequence(19, sort-upperbound/no_rsu)                              0.0588 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 27)         0.0147 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 19)              0.0195 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0122 sec
+    HOTA.eval_sequence()                                                   0.0262 sec
+    Count.eval_sequence()                                                  0.0000 sec
+1 eval_sequence(19, sort-disco/no_rsu)                                   0.0581 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 27)              0.0147 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
+    HOTA.eval_sequence()                                                   0.0258 sec
+    Count.eval_sequence()                                                  0.0000 sec
+2 eval_sequence(27, sort-disco/no_rsu)                                   0.0524 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 28)              0.0148 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
+    HOTA.eval_sequence()                                                   0.0264 sec
+    Count.eval_sequence()                                                  0.0000 sec
+3 eval_sequence(28, sort-disco/no_rsu)                                   0.0534 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 29)              0.0125 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
+    HOTA.eval_sequence()                                                   0.0256 sec
+    Count.eval_sequence()                                                  0.0000 sec
+4 eval_sequence(29, sort-disco/no_rsu)                                   0.0501 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 5)               0.0119 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
+    HOTA.eval_sequence()                                                   0.0253 sec
+    Count.eval_sequence()                                                  0.0000 sec
+5 eval_sequence(5, sort-disco/no_rsu)                                    0.0492 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 8)               0.0127 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
+    HOTA.eval_sequence()                                                   0.0258 sec
+    Count.eval_sequence()                                                  0.0000 sec
+6 eval_sequence(8, sort-disco/no_rsu)                                    0.0506 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 91)              0.0128 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
     HOTA.eval_sequence()                                                   0.0260 sec
     Count.eval_sequence()                                                  0.0000 sec
-2 eval_sequence(27, sort-upperbound/no_rsu)                              0.0530 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 28)         0.0145 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0122 sec
-    HOTA.eval_sequence()                                                   0.0268 sec
+7 eval_sequence(91, sort-disco/no_rsu)                                   0.0508 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 92)              0.0114 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
+    HOTA.eval_sequence()                                                   0.0253 sec
     Count.eval_sequence()                                                  0.0000 sec
-3 eval_sequence(28, sort-upperbound/no_rsu)                              0.0537 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 29)         0.0127 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0122 sec
-    HOTA.eval_sequence()                                                   0.0263 sec
-    Count.eval_sequence()                                                  0.0000 sec
-4 eval_sequence(29, sort-upperbound/no_rsu)                              0.0513 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 5)          0.0119 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
+8 eval_sequence(92, sort-disco/no_rsu)                                   0.0487 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 96)              0.0141 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
     HOTA.eval_sequence()                                                   0.0259 sec
     Count.eval_sequence()                                                  0.0000 sec
-5 eval_sequence(5, sort-upperbound/no_rsu)                               0.0501 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 8)          0.0126 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
-    HOTA.eval_sequence()                                                   0.0260 sec
+9 eval_sequence(96, sort-disco/no_rsu)                                   0.0520 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 97)              0.0175 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0122 sec
+    HOTA.eval_sequence()                                                   0.0266 sec
     Count.eval_sequence()                                                  0.0000 sec
-6 eval_sequence(8, sort-upperbound/no_rsu)                               0.0509 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 91)         0.0129 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
-    HOTA.eval_sequence()                                                   0.0263 sec
-    Count.eval_sequence()                                                  0.0000 sec
-7 eval_sequence(91, sort-upperbound/no_rsu)                              0.0515 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 92)         0.0112 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
-    HOTA.eval_sequence()                                                   0.0257 sec
-    Count.eval_sequence()                                                  0.0000 sec
-8 eval_sequence(92, sort-upperbound/no_rsu)                              0.0490 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 96)         0.0150 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0123 sec
-    HOTA.eval_sequence()                                                   0.0269 sec
-    Count.eval_sequence()                                                  0.0000 sec
-9 eval_sequence(96, sort-upperbound/no_rsu)                              0.0543 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 97)         0.0178 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0124 sec
-    HOTA.eval_sequence()                                                   0.0270 sec
-    Count.eval_sequence()                                                  0.0000 sec
-10 eval_sequence(97, sort-upperbound/no_rsu)                              0.0574 sec
+10 eval_sequence(97, sort-disco/no_rsu)                                   0.0564 sec
 
-All sequences for sort-upperbound/no_rsu finished in 0.53 seconds
+All sequences for sort-disco/no_rsu finished in 0.52 seconds
 
-HOTA: sort-upperbound/no_rsu-pedestrianHOTA      DetA      AssA      DetRe     DetPr     AssRe     AssPr     LocA      RHOTA     HOTA(0)   LocA(0)   HOTALocA(0)
-19                                 52.612    62.473    44.717    67.971    80.719    58.422    60.353    85.177    55.066    65.186    80.276    52.329    
-27                                 33.779    31.567    37.006    34.424    74.935    50.878    51.222    86.524    35.396    40.324    77.467    31.238    
-28                                 38.327    50.305    30.08     53.689    83.335    40.878    47.542    87.532    39.797    43.642    83.071    36.253    
-29                                 34.447    47.479    25.872    52.636    76.288    37.66     41.908    85.271    36.495    41.268    78.808    32.522    
-5                                  68.868    79.609    59.852    82.637    89.884    75.202    68.064    89.493    70.292    77.874    88.037    68.557    
-8                                  57.062    62.327    53.307    66.048    85.067    66.295    68.531    87.235    58.981    66.487    84.26     56.022    
-91                                 34.956    59.736    20.845    65.876    80.838    33.19     36.358    87.285    36.865    41.541    82.66     34.338    
-92                                 35.806    38.347    36.28     42.966    72.275    43.71     54.075    84.49     38.262    40.695    76.306    31.053    
-96                                 42.399    68.239    27.244    71.654    86.071    43.697    42.785    87.329    43.755    48.758    84.806    41.35     
-97                                 42.895    45.825    40.746    50.76     75.202    51.749    56.546    84.848    45.303    50.851    81.317    41.35     
-COMBINED                           44.379    52.975    38.041    57.529    80.777    51.035    53.146    86.555    46.464    52.047    82.067    42.713    
+HOTA: sort-disco/no_rsu-pedestrian HOTA      DetA      AssA      DetRe     DetPr     AssRe     AssPr     LocA      RHOTA     HOTA(0)   LocA(0)   HOTALocA(0)
+19                                 55.272    63.282    49.356    67.213    81.08     63.452    63.852    83.99     57.306    68.538    79.735    54.649    
+27                                 33.92     33.852    35.078    36.855    74.658    49.622    47.666    85.41     35.567    39.828    79.044    31.482    
+28                                 44.003    56.056    35.557    59.163    84.824    46.007    55.802    86.863    45.477    50.978    83.22     42.424    
+29                                 34.989    42.744    29.614    46.557    76.975    40.331    48.525    85.233    36.725    42.639    78.283    33.38     
+5                                  69.528    79.472    61.577    82.213    89.422    76.852    69.464    88.915    70.981    78.398    87.522    68.615    
+8                                  63.495    65.354    62.196    69.618    85.312    74.998    73.828    87.422    65.717    75.27     84.194    63.373    
+91                                 38.009    63.54     23.295    68.108    83.576    35.12     41.23     87.394    39.541    44.274    84.436    37.384    
+92                                 39.253    47.352    35.742    51.457    78.796    41.523    58.201    85.588    41.394    44.772    79.369    35.535    
+96                                 42.754    56.53     33.258    58.418    87.942    49.677    49.628    88.239    43.637    48.758    86.32     42.088    
+97                                 48.602    47.666    50.082    51.216    80.393    60.662    64.833    86.035    50.529    58.502    79.456    46.483    
+COMBINED                           47.444    53.824    42.764    57.507    82.531    55.26     58.23     86.513    49.278    55.864    82.237    45.941    
 
-Count: sort-upperbound/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
-19                                 1093      1298      17        15        
-27                                 724       1576      21        34        
-28                                 920       1428      21        16        
-29                                 770       1116      26        24        
-5                                  821       893       10        11        
-8                                  823       1060      15        14        
-91                                 863       1059      24        26        
-92                                 538       905       23        28        
-96                                 1163      1397      15        17        
-97                                 1300      1926      22        25        
-COMBINED                           9015      12658     194       210       
+Count: sort-disco/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
+19                                 1076      1298      15        15        
+27                                 778       1576      28        34        
+28                                 996       1428      17        16        
+29                                 675       1116      28        24        
+5                                  821       893       9         11        
+8                                  865       1060      14        14        
+91                                 863       1059      28        26        
+92                                 591       905       39        28        
+96                                 928       1397      12        17        
+97                                 1227      1926      21        25        
+COMBINED                           8820      12658     211       210       
 
 Timing analysis:
-MotChallenge2DBox.get_raw_seq_data                                     0.1427 sec
-MotChallenge2DBox.get_preprocessed_seq_data                            0.1221 sec
-HOTA.eval_sequence                                                     0.2636 sec
+MotChallenge2DBox.get_raw_seq_data                                     0.1417 sec
+MotChallenge2DBox.get_preprocessed_seq_data                            0.1196 sec
+HOTA.eval_sequence                                                     0.2588 sec
 Count.eval_sequence                                                    0.0000 sec
-eval_sequence                                                          0.5301 sec
-Evaluator.evaluate                                                     1.2608 sec
+eval_sequence                                                          0.5218 sec
+Evaluator.evaluate                                                     1.2548 sec
 
 Eval Config:
 USE_PARALLEL         : False                         
@@ -1026,7 +1026,7 @@ PRINT_CONFIG         : True
 GT_FOLDER            : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/gt/mot_challenge/
 TRACKERS_FOLDER      : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/trackers/mot_challenge/
 OUTPUT_FOLDER        : None                          
-TRACKERS_TO_EVAL     : ['sort-upperbound/no_rsu']    
+TRACKERS_TO_EVAL     : ['sort-disco/no_rsu']         
 CLASSES_TO_EVAL      : ['pedestrian']                
 BENCHMARK            : V2X                           
 SPLIT_TO_EVAL        : test3                         
@@ -1056,94 +1056,94 @@ xxxxxxxxxxxxxxxxxxxxxxxx ['pedestrian']
 Evaluating 1 tracker(s) on 10 sequence(s) for 1 class(es) on MotChallenge2DBox dataset using the following metrics: HOTA, Count
 
 
-Evaluating sort-upperbound/no_rsu
+Evaluating sort-disco/no_rsu
 
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 19)         0.0181 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0123 sec
-    HOTA.eval_sequence()                                                   0.0263 sec
-    Count.eval_sequence()                                                  0.0000 sec
-1 eval_sequence(19, sort-upperbound/no_rsu)                              0.0568 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 27)         0.0121 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
-    HOTA.eval_sequence()                                                   0.0255 sec
-    Count.eval_sequence()                                                  0.0000 sec
-2 eval_sequence(27, sort-upperbound/no_rsu)                              0.0497 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 28)         0.0137 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 19)              0.0176 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
-    HOTA.eval_sequence()                                                   0.0253 sec
+    HOTA.eval_sequence()                                                   0.0261 sec
     Count.eval_sequence()                                                  0.0000 sec
-3 eval_sequence(28, sort-upperbound/no_rsu)                              0.0512 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 29)         0.0131 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
-    HOTA.eval_sequence()                                                   0.0255 sec
-    Count.eval_sequence()                                                  0.0000 sec
-4 eval_sequence(29, sort-upperbound/no_rsu)                              0.0508 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 5)          0.0117 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
+1 eval_sequence(19, sort-disco/no_rsu)                                   0.0559 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 27)              0.0122 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0115 sec
     HOTA.eval_sequence()                                                   0.0254 sec
     Count.eval_sequence()                                                  0.0000 sec
-5 eval_sequence(5, sort-upperbound/no_rsu)                               0.0492 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 8)          0.0105 sec
+2 eval_sequence(27, sort-disco/no_rsu)                                   0.0493 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 28)              0.0138 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
+    HOTA.eval_sequence()                                                   0.0259 sec
+    Count.eval_sequence()                                                  0.0000 sec
+3 eval_sequence(28, sort-disco/no_rsu)                                   0.0518 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 29)              0.0129 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
+    HOTA.eval_sequence()                                                   0.0260 sec
+    Count.eval_sequence()                                                  0.0000 sec
+4 eval_sequence(29, sort-disco/no_rsu)                                   0.0509 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 5)               0.0117 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
-    HOTA.eval_sequence()                                                   0.0251 sec
+    HOTA.eval_sequence()                                                   0.0257 sec
     Count.eval_sequence()                                                  0.0000 sec
-6 eval_sequence(8, sort-upperbound/no_rsu)                               0.0475 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 91)         0.0123 sec
+5 eval_sequence(5, sort-disco/no_rsu)                                    0.0493 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 8)               0.0104 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0117 sec
+    HOTA.eval_sequence()                                                   0.0253 sec
+    Count.eval_sequence()                                                  0.0000 sec
+6 eval_sequence(8, sort-disco/no_rsu)                                    0.0476 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 91)              0.0122 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
+    HOTA.eval_sequence()                                                   0.0255 sec
+    Count.eval_sequence()                                                  0.0000 sec
+7 eval_sequence(91, sort-disco/no_rsu)                                   0.0497 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 92)              0.0107 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0117 sec
+    HOTA.eval_sequence()                                                   0.0254 sec
+    Count.eval_sequence()                                                  0.0000 sec
+8 eval_sequence(92, sort-disco/no_rsu)                                   0.0480 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 96)              0.0178 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0122 sec
+    HOTA.eval_sequence()                                                   0.0265 sec
+    Count.eval_sequence()                                                  0.0000 sec
+9 eval_sequence(96, sort-disco/no_rsu)                                   0.0566 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 97)              0.0164 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
-    HOTA.eval_sequence()                                                   0.0252 sec
+    HOTA.eval_sequence()                                                   0.0273 sec
     Count.eval_sequence()                                                  0.0000 sec
-7 eval_sequence(91, sort-upperbound/no_rsu)                              0.0496 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 92)         0.0106 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
-    HOTA.eval_sequence()                                                   0.0251 sec
-    Count.eval_sequence()                                                  0.0000 sec
-8 eval_sequence(92, sort-upperbound/no_rsu)                              0.0477 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 96)         0.0186 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0123 sec
-    HOTA.eval_sequence()                                                   0.0267 sec
-    Count.eval_sequence()                                                  0.0000 sec
-9 eval_sequence(96, sort-upperbound/no_rsu)                              0.0578 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 97)         0.0169 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
-    HOTA.eval_sequence()                                                   0.0271 sec
-    Count.eval_sequence()                                                  0.0000 sec
-10 eval_sequence(97, sort-upperbound/no_rsu)                              0.0563 sec
+10 eval_sequence(97, sort-disco/no_rsu)                                   0.0558 sec
 
-All sequences for sort-upperbound/no_rsu finished in 0.52 seconds
+All sequences for sort-disco/no_rsu finished in 0.52 seconds
 
-HOTA: sort-upperbound/no_rsu-pedestrianHOTA      DetA      AssA      DetRe     DetPr     AssRe     AssPr     LocA      RHOTA     HOTA(0)   LocA(0)   HOTALocA(0)
-19                                 41.587    58.451    30.45     64.62     79.251    42.479    46.422    85.755    43.999    48.555    81.577    39.61     
-27                                 33.037    27.725    45.593    30.177    68.047    50.975    64.535    81.182    34.912    38.974    72.181    28.132    
-28                                 21.078    31.069    14.731    34.61     69.872    26.683    26.754    84.358    22.35     25.607    75.698    19.384    
-29                                 36.724    52.388    25.95     57.305    79.49     35.763    40.888    85.947    38.51     43.547    81.041    35.291    
-5                                  57.93     56.409    60.878    60.152    85.465    74.165    70.054    89.456    60.087    63.723    87.186    55.558    
-8                                  59.878    58.493    62.635    61.616    86.495    73.256    75.673    88.082    61.757    67.057    85.154    57.102    
-91                                 26.205    40.334    17.29     44.524    75.841    34.607    30.219    86.131    27.626    30.912    80.587    24.911    
-92                                 42.536    40.542    46.336    44.38     76.857    52.024    63.411    86.014    44.764    48.968    80.724    39.529    
-96                                 37.071    47.935    28.986    51.686    77.623    41.643    43.393    83.675    38.604    44.948    79.099    35.553    
-97                                 52.177    64.206    43.125    68.577    82.949    54.786    57.664    85.613    54.147    62.677    82.012    51.402    
-COMBINED                           41.367    47.754    37.164    52.008    78.707    48.85     51.445    85.546    43.428    48.234    80.714    38.932    
+HOTA: sort-disco/no_rsu-pedestrian HOTA      DetA      AssA      DetRe     DetPr     AssRe     AssPr     LocA      RHOTA     HOTA(0)   LocA(0)   HOTALocA(0)
+19                                 41.452    58.393    30.271    61.781    85.347    42.76     45.956    88.079    42.838    46.946    84.753    39.789    
+27                                 42.275    36.625    53.265    38.738    76.471    59.577    69.487    82.568    43.945    51.149    75.604    38.671    
+28                                 25.937    40.209    17.294    43.293    77.604    28.13     33.117    84.518    27.078    31.867    77.233    24.612    
+29                                 38.383    51.641    29.562    56.361    78.562    39.355    47.712    84.89     40.367    46.73     78.81     36.828    
+5                                  58.646    59.643    59.436    63.426    85.967    71.379    70.217    88.759    60.868    65.141    85.716    55.836    
+8                                  65.584    61.63     70.659    64.212    88.47     80.883    78.914    88.797    67.174    74.271    86.634    64.344    
+91                                 30.29     46.237    20.09     48.687    84.088    34.4      35.821    87.247    31.181    35.305    83.112    29.343    
+92                                 43.804    43.565    48.039    46.547    80.779    52.891    65.07     86.277    45.714    48.843    81.061    39.592    
+96                                 38.297    42.462    35.57     45.525    78.572    46.773    52.62     84.844    39.837    48.862    77.19     37.717    
+97                                 54.574    57.959    52.2      61.536    82.651    62.866    64.589    85.61     56.502    65.264    82.013    53.526    
+COMBINED                           44.14     49.024    41.315    52.344    81.658    52.05     56.112    86.06     45.904    51.98     80.988    42.097    
 
-Count: sort-upperbound/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
-19                                 1007      1235      21        16        
-27                                 506       1141      20        15        
-28                                 689       1391      22        36        
-29                                 824       1143      24        25        
-5                                  663       942       11        13        
-8                                  530       744       10        10        
-91                                 654       1114      23        28        
-92                                 481       833       18        26        
-96                                 1371      2059      21        23        
-97                                 1398      1691      19        20        
-COMBINED                           8123      12293     189       212       
+Count: sort-disco/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
+19                                 894       1235      16        16        
+27                                 578       1141      14        15        
+28                                 776       1391      35        36        
+29                                 820       1143      29        25        
+5                                  695       942       11        13        
+8                                  540       744       7         10        
+91                                 645       1114      24        28        
+92                                 480       833       27        26        
+96                                 1193      2059      18        23        
+97                                 1259      1691      18        20        
+COMBINED                           7880      12293     199       212       
 
 Timing analysis:
-MotChallenge2DBox.get_raw_seq_data                                     0.1376 sec
-MotChallenge2DBox.get_preprocessed_seq_data                            0.1201 sec
-HOTA.eval_sequence                                                     0.2572 sec
+MotChallenge2DBox.get_raw_seq_data                                     0.1357 sec
+MotChallenge2DBox.get_preprocessed_seq_data                            0.1184 sec
+HOTA.eval_sequence                                                     0.2592 sec
 Count.eval_sequence                                                    0.0000 sec
-eval_sequence                                                          0.5166 sec
-Evaluator.evaluate                                                     1.2534 sec
+eval_sequence                                                          0.5149 sec
+Evaluator.evaluate                                                     1.2417 sec
 
 Eval Config:
 USE_PARALLEL         : False                         
@@ -1166,7 +1166,7 @@ PRINT_CONFIG         : True
 GT_FOLDER            : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/gt/mot_challenge/
 TRACKERS_FOLDER      : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/trackers/mot_challenge/
 OUTPUT_FOLDER        : None                          
-TRACKERS_TO_EVAL     : ['sort-upperbound/no_rsu']    
+TRACKERS_TO_EVAL     : ['sort-disco/no_rsu']         
 CLASSES_TO_EVAL      : ['pedestrian']                
 BENCHMARK            : V2X                           
 SPLIT_TO_EVAL        : test4                         
@@ -1196,94 +1196,94 @@ xxxxxxxxxxxxxxxxxxxxxxxx ['pedestrian']
 Evaluating 1 tracker(s) on 10 sequence(s) for 1 class(es) on MotChallenge2DBox dataset using the following metrics: HOTA, Count
 
 
-Evaluating sort-upperbound/no_rsu
+Evaluating sort-disco/no_rsu
 
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 19)         0.0184 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 19)              0.0178 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0123 sec
-    HOTA.eval_sequence()                                                   0.0271 sec
-    Count.eval_sequence()                                                  0.0000 sec
-1 eval_sequence(19, sort-upperbound/no_rsu)                              0.0580 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 27)         0.0045 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0043 sec
-    HOTA.eval_sequence()                                                   0.0001 sec
-    Count.eval_sequence()                                                  0.0000 sec
-2 eval_sequence(27, sort-upperbound/no_rsu)                              0.0089 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 28)         0.0045 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0043 sec
-    HOTA.eval_sequence()                                                   0.0001 sec
-    Count.eval_sequence()                                                  0.0000 sec
-3 eval_sequence(28, sort-upperbound/no_rsu)                              0.0089 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 29)         0.0144 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
-    HOTA.eval_sequence()                                                   0.0272 sec
-    Count.eval_sequence()                                                  0.0000 sec
-4 eval_sequence(29, sort-upperbound/no_rsu)                              0.0538 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 5)          0.0111 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
     HOTA.eval_sequence()                                                   0.0259 sec
     Count.eval_sequence()                                                  0.0000 sec
-5 eval_sequence(5, sort-upperbound/no_rsu)                               0.0490 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 8)          0.0094 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0117 sec
-    HOTA.eval_sequence()                                                   0.0240 sec
-    Count.eval_sequence()                                                  0.0000 sec
-6 eval_sequence(8, sort-upperbound/no_rsu)                               0.0453 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 91)         0.0111 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
-    HOTA.eval_sequence()                                                   0.0247 sec
-    Count.eval_sequence()                                                  0.0000 sec
-7 eval_sequence(91, sort-upperbound/no_rsu)                              0.0479 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 92)         0.0045 sec
+1 eval_sequence(19, sort-disco/no_rsu)                                   0.0562 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 27)              0.0044 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0042 sec
     HOTA.eval_sequence()                                                   0.0001 sec
     Count.eval_sequence()                                                  0.0000 sec
-8 eval_sequence(92, sort-upperbound/no_rsu)                              0.0089 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 96)         0.0172 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0123 sec
-    HOTA.eval_sequence()                                                   0.0270 sec
+2 eval_sequence(27, sort-disco/no_rsu)                                   0.0088 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 28)              0.0044 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0042 sec
+    HOTA.eval_sequence()                                                   0.0001 sec
     Count.eval_sequence()                                                  0.0000 sec
-9 eval_sequence(96, sort-upperbound/no_rsu)                              0.0566 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 97)         0.0144 sec
+3 eval_sequence(28, sort-disco/no_rsu)                                   0.0088 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 29)              0.0142 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
+    HOTA.eval_sequence()                                                   0.0264 sec
+    Count.eval_sequence()                                                  0.0000 sec
+4 eval_sequence(29, sort-disco/no_rsu)                                   0.0528 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 5)               0.0112 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
+    HOTA.eval_sequence()                                                   0.0255 sec
+    Count.eval_sequence()                                                  0.0000 sec
+5 eval_sequence(5, sort-disco/no_rsu)                                    0.0487 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 8)               0.0093 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0118 sec
+    HOTA.eval_sequence()                                                   0.0249 sec
+    Count.eval_sequence()                                                  0.0000 sec
+6 eval_sequence(8, sort-disco/no_rsu)                                    0.0462 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 91)              0.0110 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0119 sec
+    HOTA.eval_sequence()                                                   0.0253 sec
+    Count.eval_sequence()                                                  0.0000 sec
+7 eval_sequence(91, sort-disco/no_rsu)                                   0.0483 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 92)              0.0044 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0042 sec
+    HOTA.eval_sequence()                                                   0.0001 sec
+    Count.eval_sequence()                                                  0.0000 sec
+8 eval_sequence(92, sort-disco/no_rsu)                                   0.0088 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 96)              0.0173 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0124 sec
+    HOTA.eval_sequence()                                                   0.0272 sec
+    Count.eval_sequence()                                                  0.0000 sec
+9 eval_sequence(96, sort-disco/no_rsu)                                   0.0570 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 97)              0.0137 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0120 sec
-    HOTA.eval_sequence()                                                   0.0270 sec
+    HOTA.eval_sequence()                                                   0.0263 sec
     Count.eval_sequence()                                                  0.0000 sec
-10 eval_sequence(97, sort-upperbound/no_rsu)                              0.0535 sec
+10 eval_sequence(97, sort-disco/no_rsu)                                   0.0522 sec
 
-All sequences for sort-upperbound/no_rsu finished in 0.39 seconds
+All sequences for sort-disco/no_rsu finished in 0.39 seconds
 
-HOTA: sort-upperbound/no_rsu-pedestrianHOTA      DetA      AssA      DetRe     DetPr     AssRe     AssPr     LocA      RHOTA     HOTA(0)   LocA(0)   HOTALocA(0)
-19                                 49.695    55.227    45.239    58.306    84.113    57.006    61.476    86.919    51.209    57.808    84.026    48.574    
+HOTA: sort-disco/no_rsu-pedestrian HOTA      DetA      AssA      DetRe     DetPr     AssRe     AssPr     LocA      RHOTA     HOTA(0)   LocA(0)   HOTALocA(0)
+19                                 43.437    39.002    49.011    40.887    80.221    57.57     64.83     84.1      44.579    54.495    79.159    43.137    
 27                                 0         0         0         0         0         0         0         100       0         0         100       0         
 28                                 0         0         0         0         0         0         0         100       0         0         100       0         
-29                                 42.073    54.789    33.86     59.794    80.097    44.872    51.636    86.11     44.263    48.94     81.468    39.871    
-5                                  40.434    43.625    37.552    44.745    92.374    51.794    49.318    93.186    40.976    43.318    91.978    39.843    
-8                                  37.811    49.962    28.77     51.138    84.033    45.396    46.324    84.408    38.317    44.872    82.519    37.028    
-91                                 28.165    42.902    18.687    44.606    84.275    33.053    35.821    86.403    28.775    32.804    83.514    27.396    
+29                                 43.441    54.468    36.537    58.46     81.517    47.86     55.449    85.94     45.358    51.346    81.021    41.601    
+5                                  44.432    49.494    40.271    50.96     91.748    54.112    50.63     91.697    45.189    47.356    89.976    42.609    
+8                                  39.889    51.656    31.242    53.783    85.731    45.395    52.019    87.826    40.838    45.092    86.306    38.917    
+91                                 28.302    43.067    18.714    44.531    86.62     35.434    34.218    87.762    28.826    32.681    85.197    27.843    
 92                                 0         0         0         0         0         0         0         100       0         0         100       0         
-96                                 35.662    41.559    30.879    44.245    80.373    43.38     45.828    86.162    36.877    42.393    82.318    34.898    
-97                                 48.677    58.936    41.797    64.061    79.743    56.084    60.144    85.397    51.098    57.814    81.28     46.991    
-COMBINED                           41.624    49.553    35.796    52.664    82.48     49.045    52.288    86.693    43.091    48.333    83.22     40.222    
+96                                 38.594    44.448    34.63     47.676    79.569    47.861    50.908    85.193    40.143    49.782    78.184    38.921    
+97                                 52.102    59.052    46.874    60.944    88.591    62.621    62.959    88.494    53.141    58.152    86.737    50.439    
+COMBINED                           42.446    48.18     38.217    50.736    83.973    51.41     54.455    86.911    43.744    50.136    82.811    41.518    
 
-Count: sort-upperbound/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
-19                                 967       1395      20        15        
+Count: sort-disco/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
+19                                 711       1395      14        15        
 27                                 0         0         0         0         
 28                                 0         0         0         0         
-29                                 966       1294      27        24        
-5                                  450       929       7         17        
-8                                  356       585       8         10        
-91                                 488       922       15        20        
+29                                 928       1294      24        24        
+5                                  516       929       6         17        
+8                                  367       585       9         10        
+91                                 474       922       14        20        
 92                                 0         0         0         0         
-96                                 1074      1951      18        22        
-97                                 1058      1317      18        16        
-COMBINED                           5359      8393      113       124       
+96                                 1169      1951      17        22        
+97                                 906       1317      12        16        
+COMBINED                           5071      8393      96        124       
 
 Timing analysis:
-MotChallenge2DBox.get_raw_seq_data                                     0.1093 sec
-MotChallenge2DBox.get_preprocessed_seq_data                            0.0969 sec
-HOTA.eval_sequence                                                     0.1831 sec
+MotChallenge2DBox.get_raw_seq_data                                     0.1077 sec
+MotChallenge2DBox.get_preprocessed_seq_data                            0.0970 sec
+HOTA.eval_sequence                                                     0.1815 sec
 Count.eval_sequence                                                    0.0000 sec
-eval_sequence                                                          0.3908 sec
-Evaluator.evaluate                                                     1.1248 sec
+eval_sequence                                                          0.3878 sec
+Evaluator.evaluate                                                     1.1187 sec
 
 Eval Config:
 USE_PARALLEL         : False                         
@@ -1306,7 +1306,7 @@ PRINT_CONFIG         : True
 GT_FOLDER            : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/gt/mot_challenge/
 TRACKERS_FOLDER      : /home/sas20048/code/coperception_mod/tools/track/TrackEval/data/trackers/mot_challenge/
 OUTPUT_FOLDER        : None                          
-TRACKERS_TO_EVAL     : ['sort-upperbound/no_rsu']    
+TRACKERS_TO_EVAL     : ['sort-disco/no_rsu']         
 CLASSES_TO_EVAL      : ['pedestrian']                
 BENCHMARK            : V2X                           
 SPLIT_TO_EVAL        : test5                         
@@ -1336,92 +1336,92 @@ xxxxxxxxxxxxxxxxxxxxxxxx ['pedestrian']
 Evaluating 1 tracker(s) on 10 sequence(s) for 1 class(es) on MotChallenge2DBox dataset using the following metrics: HOTA, Count
 
 
-Evaluating sort-upperbound/no_rsu
+Evaluating sort-disco/no_rsu
 
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 19)         0.0064 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0053 sec
-    HOTA.eval_sequence()                                                   0.0001 sec
-    Count.eval_sequence()                                                  0.0000 sec
-1 eval_sequence(19, sort-upperbound/no_rsu)                              0.0119 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 27)         0.0045 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 19)              0.0046 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0044 sec
     HOTA.eval_sequence()                                                   0.0001 sec
     Count.eval_sequence()                                                  0.0000 sec
-2 eval_sequence(27, sort-upperbound/no_rsu)                              0.0090 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 28)         0.0045 sec
+1 eval_sequence(19, sort-disco/no_rsu)                                   0.0092 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 27)              0.0044 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0043 sec
     HOTA.eval_sequence()                                                   0.0001 sec
     Count.eval_sequence()                                                  0.0000 sec
-3 eval_sequence(28, sort-upperbound/no_rsu)                              0.0090 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 29)         0.0046 sec
+2 eval_sequence(27, sort-disco/no_rsu)                                   0.0089 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 28)              0.0044 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0043 sec
+    HOTA.eval_sequence()                                                   0.0001 sec
+    Count.eval_sequence()                                                  0.0000 sec
+3 eval_sequence(28, sort-disco/no_rsu)                                   0.0089 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 29)              0.0044 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0046 sec
     HOTA.eval_sequence()                                                   0.0001 sec
     Count.eval_sequence()                                                  0.0000 sec
-4 eval_sequence(29, sort-upperbound/no_rsu)                              0.0094 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 5)          0.0045 sec
+4 eval_sequence(29, sort-disco/no_rsu)                                   0.0092 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 5)               0.0044 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0043 sec
     HOTA.eval_sequence()                                                   0.0001 sec
     Count.eval_sequence()                                                  0.0000 sec
-5 eval_sequence(5, sort-upperbound/no_rsu)                               0.0090 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 8)          0.0096 sec
+5 eval_sequence(5, sort-disco/no_rsu)                                    0.0089 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 8)               0.0096 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0121 sec
-    HOTA.eval_sequence()                                                   0.0254 sec
+    HOTA.eval_sequence()                                                   0.0250 sec
     Count.eval_sequence()                                                  0.0000 sec
-6 eval_sequence(8, sort-upperbound/no_rsu)                               0.0473 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 91)         0.0045 sec
+6 eval_sequence(8, sort-disco/no_rsu)                                    0.0469 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 91)              0.0044 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0043 sec
     HOTA.eval_sequence()                                                   0.0001 sec
     Count.eval_sequence()                                                  0.0000 sec
-7 eval_sequence(91, sort-upperbound/no_rsu)                              0.0090 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 92)         0.0045 sec
+7 eval_sequence(91, sort-disco/no_rsu)                                   0.0089 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 92)              0.0044 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0043 sec
     HOTA.eval_sequence()                                                   0.0001 sec
     Count.eval_sequence()                                                  0.0000 sec
-8 eval_sequence(92, sort-upperbound/no_rsu)                              0.0090 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 96)         0.0159 sec
-    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0122 sec
-    HOTA.eval_sequence()                                                   0.0267 sec
-    Count.eval_sequence()                                                  0.0000 sec
-9 eval_sequence(96, sort-upperbound/no_rsu)                              0.0551 sec
-    MotChallenge2DBox.get_raw_seq_data(sort-upperbound/no_rsu, 97)         0.0169 sec
+8 eval_sequence(92, sort-disco/no_rsu)                                   0.0089 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 96)              0.0160 sec
     MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0125 sec
+    HOTA.eval_sequence()                                                   0.0269 sec
+    Count.eval_sequence()                                                  0.0000 sec
+9 eval_sequence(96, sort-disco/no_rsu)                                   0.0557 sec
+    MotChallenge2DBox.get_raw_seq_data(sort-disco/no_rsu, 97)              0.0171 sec
+    MotChallenge2DBox.get_preprocessed_seq_data(pedestrian)                0.0124 sec
     HOTA.eval_sequence()                                                   0.0270 sec
     Count.eval_sequence()                                                  0.0000 sec
-10 eval_sequence(97, sort-upperbound/no_rsu)                              0.0566 sec
+10 eval_sequence(97, sort-disco/no_rsu)                                   0.0566 sec
 
-All sequences for sort-upperbound/no_rsu finished in 0.23 seconds
+All sequences for sort-disco/no_rsu finished in 0.22 seconds
 
-HOTA: sort-upperbound/no_rsu-pedestrianHOTA      DetA      AssA      DetRe     DetPr     AssRe     AssPr     LocA      RHOTA     HOTA(0)   LocA(0)   HOTALocA(0)
+HOTA: sort-disco/no_rsu-pedestrian HOTA      DetA      AssA      DetRe     DetPr     AssRe     AssPr     LocA      RHOTA     HOTA(0)   LocA(0)   HOTALocA(0)
 19                                 0         0         0         0         0         0         0         100       0         0         100       0         
 27                                 0         0         0         0         0         0         0         100       0         0         100       0         
 28                                 0         0         0         0         0         0         0         100       0         0         100       0         
 29                                 0         0         0         0         0         0         0         100       0         0         100       0         
 5                                  0         0         0         0         0         0         0         100       0         0         100       0         
-8                                  46.123    53.213    40.242    56.159    87.338    57.489    54.954    90.218    47.482    51.076    87.581    44.733    
+8                                  49.087    57.7      42.008    59.906    89.671    59.944    55.485    90.025    50.116    55.215    87.87     48.517    
 91                                 0         0         0         0         0         0         0         100       0         0         100       0         
 92                                 0         0         0         0         0         0         0         100       0         0         100       0         
-96                                 37.882    47.136    31.512    51.737    78.095    43.689    47.33     85.853    39.926    45.136    79.288    35.787    
-97                                 35.085    45.585    27.37     48.905    80.75     43.162    41.411    86.83     36.453    40.243    83.327    33.534    
-COMBINED                           37.746    47.103    30.965    50.943    80.438    45.699    45.815    86.886    39.431    43.688    82.134    35.883    
+96                                 42.469    47.817    39.921    52.585    76.619    52.932    55.299    84.982    44.872    49.827    78.908    39.317    
+97                                 41.249    45.309    38.267    49.25     79.333    54.175    53.24     86.246    43.188    49.818    78.453    39.084    
+COMBINED                           42.73     47.746    39.249    51.909    79.465    54.369    54.136    86.216    44.783    50.502    79.849    40.325    
 
-Count: sort-upperbound/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
+Count: sort-disco/no_rsu-pedestrianDets      GT_Dets   IDs       GT_IDs    
 19                                 0         0         0         0         
 27                                 0         0         0         0         
 28                                 0         0         0         0         
 29                                 0         0         0         0         
 5                                  0         0         0         0         
-8                                  308       479       12        16        
+8                                  320       479       11        16        
 91                                 0         0         0         0         
 92                                 0         0         0         0         
-96                                 1056      1594      20        25        
-97                                 1118      1846      18        23        
-COMBINED                           2482      3919      50        64        
+96                                 1094      1594      22        25        
+97                                 1146      1846      19        23        
+COMBINED                           2560      3919      52        64        
 
 Timing analysis:
-MotChallenge2DBox.get_raw_seq_data                                     0.0758 sec
-MotChallenge2DBox.get_preprocessed_seq_data                            0.0684 sec
-HOTA.eval_sequence                                                     0.0796 sec
+MotChallenge2DBox.get_raw_seq_data                                     0.0738 sec
+MotChallenge2DBox.get_preprocessed_seq_data                            0.0675 sec
+HOTA.eval_sequence                                                     0.0793 sec
 Count.eval_sequence                                                    0.0000 sec
-eval_sequence                                                          0.2253 sec
-Evaluator.evaluate                                                     0.9502 sec
-Namespace(from_agent=1, mode='upperbound', name='center_rh_ind_nll_cfk_100000', rsu='no_rsu', scene_idxes_file='/home/sas20048/code/coperception_mod/tools/utils/test_scenes.txt', split='test', to_agent=6)
+eval_sequence                                                          0.2220 sec
+Evaluator.evaluate                                                     0.9568 sec
+Namespace(from_agent=1, mode='disco', name='center_rh_ind_nll_cfk_2000', rsu='no_rsu', scene_idxes_file='/home/sas20048/code/coperception_mod/tools/utils/test_scenes.txt', split='test', to_agent=6)
