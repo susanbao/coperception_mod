@@ -26,7 +26,7 @@ boot_start := 0
 # end of bootstrap for testing, include the boot_end 25
 boot_end := 25
 output_name := name
-nll_threshold := 2000
+nll_threshold := 1000
 max_age := 1
 
 .PHONY: sort
@@ -37,9 +37,6 @@ create_data:
 sort:
 	cd sort && python sort.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --max_age $(max_age)
     
-sort_cov:
-	cd sort && python sort.py --mode $(mode)/$(rsu) --split $(split) --output_cov --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path)
-    
 mbb_sort:
 	cd sort && python sort_mbb.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --bootstrap_start $(boot_start) --bootstrap_end ${boot_end}
 
@@ -49,11 +46,20 @@ eval:
 mbb_eval:
 	python mbb_run_multi_agent_mot_challenge.py --mode $(mode) --rsu $(rsu) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --split $(split) --bootstrap_start $(boot_start) --bootstrap_end ${boot_end}
     
-sort_uq:
-	cd sort && python sort_uq.py --mode $(mode)/$(rsu) --split $(split) --output_cov --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --nll_threshold $(nll_threshold) --max_age $(max_age)
+sort_no:
+	cd sort && python sort_uq.py --mode $(mode)/$(rsu) --split $(split)  --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --max_age $(max_age)
+    
+sort_cfk:
+	cd sort && python sort_uq.py --mode $(mode)/$(rsu) --split $(split)  --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --output_cov --max_age $(max_age)
+
+sort_nlla:
+	cd sort && python sort_uq.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --nll_ass --nll_threshold $(nll_threshold) --max_age $(max_age)
+
+sort_cfk_nlla:
+	cd sort && python sort_uq.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --output_cov --nll_ass --nll_threshold $(nll_threshold) --max_age $(max_age)
 
 sort_uq_output:
-	cd sort && python sort_uq_out.py --mode $(mode)/$(rsu) --split $(split) --output_cov --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --nll_threshold $(nll_threshold) --max_age $(max_age)
+	cd sort && python sort_uq_out.py --mode $(mode)/$(rsu) --split $(split) --output_cov --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --nll_ass --nll_threshold $(nll_threshold) --max_age $(max_age)
     
 sort_output:
 	cd sort && python sort_out.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --max_age $(max_age)

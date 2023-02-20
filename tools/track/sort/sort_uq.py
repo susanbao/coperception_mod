@@ -493,7 +493,7 @@ if __name__ == "__main__":
     mode_type = args.mode.split("/")[0]
     expand_scalar = var_cp_dict[mode_type]
     cp_thred = std_cp_dict[mode_type]
-    global output_cov, nll_ass
+    #global output_cov, nll_ass
     output_cov = args.output_cov
     nll_ass = args.nll_ass
 
