@@ -110,6 +110,7 @@ if __name__ == "__main__":
     matched_num = 0
     unmatched_det = 0
     unmatched_trk = 0
+    improved_matched_by_nll = 0
 
     for current_agent in range(args.from_agent, args.to_agent):
         total_time = 0.0
@@ -153,10 +154,11 @@ if __name__ == "__main__":
                             % (frame, track_id, tlwh[0], tlwh[1], tlwh[2], tlwh[3]),
                             file=out_file,
                         )
-            matched_num_step, unmatched_det_step, unmatched_trk_step = mot_tracker.return_match_result()
+            matched_num_step, unmatched_det_step, unmatched_trk_step, improved_matched_by_nll_step = mot_tracker.return_match_result()
             matched_num += matched_num_step
             unmatched_det += unmatched_det_step
             unmatched_trk += unmatched_trk_step
+            improved_matched_by_nll += improved_matched_by_nll_step
 
         eval_dir = f"../TrackEval/data/trackers/mot_challenge/V2X-{args.split}{current_agent}/sort-{args.mode}/data"
         os.makedirs(eval_dir, exist_ok=True)
@@ -171,4 +173,4 @@ if __name__ == "__main__":
             % (total_time, total_frames, total_frames / total_time)
         )
         print("Saved results to ", eval_dir)
-        print("matched count: {}, unmatched detection: {}, unmatched prediction: {}".format(matched_num, unmatched_det, unmatched_trk))
+        print("matched count: {}, unmatched detection: {}, unmatched prediction: {}, improved_matched_by_nll: {}".format(matched_num, unmatched_det, unmatched_trk,improved_matched_by_nll))

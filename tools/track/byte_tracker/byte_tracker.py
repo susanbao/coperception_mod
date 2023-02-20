@@ -185,9 +185,10 @@ class BYTETracker(object):
         self.matched_num = 0
         self.unmatched_det = 0
         self.unmatched_trk = 0
+        self.improved_matched_by_nll = 0
     
     def return_match_result(self):
-        return self.matched_num, self.unmatched_det, self.unmatched_trk
+        return self.matched_num, self.unmatched_det, self.unmatched_trk, self.improved_matched_by_nll
 
     def compute_variance(self, log_var):
         out = np.exp(log_var) * np.array(var_cp_dict[self.mode])
@@ -301,6 +302,7 @@ class BYTETracker(object):
                         continue
                     if start_det <= idet < end_det:
                         removed_u_track.append(idet-start_det)
+                    self.improved_matched_by_nll += 1
                     track = r_tracked_stracks[itracked]
                     det = detections_third[idet]
                     if track.state == TrackState.Tracked:
