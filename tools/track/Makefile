@@ -76,3 +76,15 @@ byte_track_nlla:
     
 byter_track_cfk_nlla:
 	cd byte_tracker && python byte_main.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --nll_ass --nll_threshold $(nll_threshold) --output_cov
+    
+byte_track_out:
+	cd byte_tracker && python byte_main_out.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path)
+    
+byte_track_cfk_out:
+	cd byte_tracker && python byte_main_out.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --output_cov
+    
+byte_track_nlla_out:
+	cd byte_tracker && python byte_main_out.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --nll_ass --nll_threshold $(nll_threshold)
+    
+byter_track_cfk_nlla_out:
+	cd byte_tracker && python byte_main_out.py --mode $(mode)/$(rsu) --split $(split) --from_agent $(from_agent) --to_agent $(to_agent) --scene_idxes_file $(scene_idxes_file) --det_logs_path $(det_logs_path) --nll_ass --nll_threshold $(nll_threshold) --output_cov

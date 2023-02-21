@@ -131,6 +131,14 @@ class STrack(BaseTrack):
     # @jit(nopython=True)
     def stdrh(self):
         return self._stdrh
+    
+    @property
+    # @jit(nopython=True)
+    def covrh(self):
+        var = []
+        for i in range(4):
+            var.append(self.covariance[i,i])
+        return var
 
     @staticmethod
     # @jit(nopython=True)
