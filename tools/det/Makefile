@@ -205,6 +205,21 @@ test_no_rsu_val:
 	--rsu 0 \
 	--loss_type $(loss_type)
 
+test_no_rsu_val_cov:
+	python $(testing_script) \
+	--data $(val_data) \
+	--com $(com) \
+	--resume $(logpath)/$(com)/no_rsu/epoch_$(nepoch).pth \
+	--logpath $(logpath) \
+	--apply_late_fusion $(apply_late_fusion) \
+	--visualization $(visualization) \
+	--inference $(inference) \
+	--warp_flag $(warp_flag) \
+	--tracking \
+	--output_cov \
+	--rsu 0 \
+	--loss_type $(loss_type)
+
 test_no_rsu_cov:
 	python $(testing_script) \
 	--data $(testing_data) \
