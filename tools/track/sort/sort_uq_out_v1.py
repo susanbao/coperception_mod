@@ -46,8 +46,6 @@ cp_thred = None
 matched_num = 0
 unmatched_det = 0
 unmatched_trk = 0
-output_cov = False
-nll_ass = False
 
 def linear_assignment(cost_matrix):
     try:
@@ -150,7 +148,7 @@ class KalmanBoxTracker(object):
         )
 
         self.kf.R[2:, 2:] *= 10.0
-        if output_cov:
+        if len(bbox) > 5:
             self.kf.R[0,0] = expand_scalar[0] * math.exp(bbox[8])
             self.kf.R[1,1] = expand_scalar[1] * math.exp(bbox[9])
             self.kf.R[2,2] = expand_scalar[2] * math.exp(bbox[10])
@@ -180,7 +178,7 @@ class KalmanBoxTracker(object):
         self.history = []
         self.hits += 1
         self.hit_streak += 1
-        if output_cov:
+        if len(bbox) > 5:
             self.kf.R[0,0] = expand_scalar[0] * math.exp(bbox[8])
             self.kf.R[1,1] = expand_scalar[1] * math.exp(bbox[9])
             self.kf.R[2,2] = expand_scalar[2] * math.exp(bbox[10])
@@ -203,15 +201,9 @@ class KalmanBoxTracker(object):
         self.history.append(convert_x_to_bbox(self.kf.x))
         return self.history[-1]
 
-    def get_center_state(self):
-        """
-        Returns the current bounding box estimate of center format with x,y,s,r.
-        """
-        return self.kf.x
-    
     def get_state(self):
         """
-        Returns the current bounding box estimate.
+        Returns the current bounding box estimate and variance.
         """
         bbox = convert_x_to_bbox(self.kf.x)[:4]
         var = []
@@ -220,6 +212,12 @@ class KalmanBoxTracker(object):
         var = np.array(var).reshape((1,4))
         state = np.concatenate((bbox, var), axis=1)
         return state
+    
+    def get_center_state(self):
+        """
+        Returns the current bounding box estimate of center format with x,y,s,r.
+        """
+        return self.kf.x
 
 
 def associate_detections_to_trackers(detections, trackers, iou_threshold=0.3):
@@ -382,17 +380,17 @@ class Sort(object):
         trks = np.ma.compress_rows(np.ma.masked_invalid(trks))
         for t in reversed(to_del):
             self.trackers.pop(t)
+        trks_center = np.zeros((len(self.trackers), 5))
+        for t, trk in enumerate(trks_center):
+            pos = self.trackers[t].get_center_state()
+            trk[:] = [pos[0], pos[1], pos[2], pos[3], 0]
         matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers(
             dets, trks, self.iou_threshold
         )
-        if nll_ass:
-            trks_center = np.zeros((len(self.trackers), 5))
-            for t, trk in enumerate(trks_center):
-                pos = self.trackers[t].get_center_state()
-                trk[:] = [pos[0], pos[1], pos[2], pos[3], 0]
-            matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers_by_NLL(
-                matched, unmatched_dets, unmatched_trks, dets, trks_center, self.nll_threshold
-            ) 
+
+        matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers_by_NLL(
+            matched, unmatched_dets, unmatched_trks, dets, trks_center, self.nll_threshold
+        ) 
         matched_num += len(matched)
         unmatched_det += len(unmatched_dets)
         unmatched_trk += len(unmatched_trks)
@@ -483,8 +481,7 @@ def parse_args():
         "--det_logs_path", default='', type=str, help="Det logs path (to get the tracking input)"
     )
     parser.add_argument("--split", type=str, help="[test/val]")
-    parser.add_argument("--output_cov", default=False, action="store_true", help = "Enable to use variance of x,y as input of Filter for kalman filter")
-    parser.add_argument("--nll_ass", default=False, action="store_true", help = "Enable to use variance of x,y as input of Filter for association")
+    parser.add_argument("--output_cov", action="store_true", help = "Enable to use variance of x,y as input of Filter for SOTR")
     args = parser.parse_args()
     return args
 
@@ -499,9 +496,6 @@ if __name__ == "__main__":
     mode_type = args.mode.split("/")[0]
     expand_scalar = var_cp_dict[mode_type]
     cp_thred = std_cp_dict[mode_type]
-    #global output_cov, nll_ass
-    output_cov = args.output_cov
-    nll_ass = args.nll_ass
 
     for current_agent in range(args.from_agent, args.to_agent):
         total_time = 0.0
@@ -509,14 +503,7 @@ if __name__ == "__main__":
         root = os.path.join(os.path.join(args.det_logs_path, f'{args.mode}/tracking{current_agent}'))
         order_det_res(root)
         det_results = os.listdir(root)
-        if args.output_cov and args.nll_ass:
-            save_path = f"./cov/cfk_nlla/{args.mode}/tracking{current_agent}"
-        elif args.output_cov:
-            save_path = f"./cov/cfk/{args.mode}/tracking{current_agent}"
-        elif args.nll_ass:
-            save_path = f"./cov/nlla/{args.mode}/tracking{current_agent}"
-        else:
-            save_path = f"./cov/origin/{args.mode}/tracking{current_agent}"
+        save_path = f"./{args.mode}/tracking{current_agent}"
         os.makedirs(save_path, exist_ok=True)
         for seq in det_results:
             if seq[-4:] != ".txt":
@@ -537,7 +524,7 @@ if __name__ == "__main__":
                 print("Processing %s." % (os.path.join(root, seq)))
                 for frame in range(int(seq_dets[:, 0].max())):
                     frame += 1  # detection and frame numbers begin at 1
-                    if output_cov or nll_ass:
+                    if args.output_cov:
                         dets = seq_dets[seq_dets[:, 0] == frame, 2:]
                     else:
                         dets = seq_dets[seq_dets[:, 0] == frame, 2:7]
