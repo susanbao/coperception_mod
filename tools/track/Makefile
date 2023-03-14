@@ -9,11 +9,11 @@ rsu := no_rsu
 # Index of current agent
 current_agent := 0
 # [train / test / val]
-split := test
+split := val
 # det path
 det_path := ~/code/coperception_mod/tools/det
 # file containing idxes of scenes to run tracking
-scene_idxes_file := ~/code/coperception_mod/tools/utils/test_scenes.txt
+scene_idxes_file := ~/code/coperception_mod/tools/utils/val_scenes.txt
 # Index of the start agent
 from_agent := 1
 # Index of the end agent + 1
