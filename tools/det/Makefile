@@ -20,6 +20,7 @@ testing_script := test_codet.py
 # Path to the test/val data
 testing_data := $(create_data_save_path)/test
 val_data :=$(create_data_save_path)/val
+train_data :=$(create_data_save_path)/train
 # [lowerbound / upperbound / v2v / disco / when2com / max / mean / sum / agent]
 com := disco
 batch_size := 1
@@ -208,6 +209,21 @@ test_no_rsu_val:
 test_no_rsu_val_cov:
 	python $(testing_script) \
 	--data $(val_data) \
+	--com $(com) \
+	--resume $(logpath)/$(com)/no_rsu/epoch_$(nepoch).pth \
+	--logpath $(logpath) \
+	--apply_late_fusion $(apply_late_fusion) \
+	--visualization $(visualization) \
+	--inference $(inference) \
+	--warp_flag $(warp_flag) \
+	--tracking \
+	--output_cov \
+	--rsu 0 \
+	--loss_type $(loss_type)
+    
+test_no_rsu_train_cov:
+	python $(testing_script) \
+	--data $(train_data) \
 	--com $(com) \
 	--resume $(logpath)/$(com)/no_rsu/epoch_$(nepoch).pth \
 	--logpath $(logpath) \

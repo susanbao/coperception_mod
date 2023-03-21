@@ -514,13 +514,13 @@ if __name__ == "__main__":
         order_det_res(root)
         det_results = os.listdir(root)
         if args.output_cov and args.nll_ass:
-            save_path = f"./cov/cfk_nlla/{args.mode}/tracking{current_agent}"
+            save_path = f"./train/cfk_nlla/{args.mode}/tracking{current_agent}"
         elif args.output_cov:
-            save_path = f"./cov/cfk/{args.mode}/tracking{current_agent}"
+            save_path = f"./train/cfk/{args.mode}/tracking{current_agent}"
         elif args.nll_ass:
-            save_path = f"./cov/nlla/{args.mode}/tracking{current_agent}"
+            save_path = f"./train/nlla/{args.mode}/tracking{current_agent}"
         else:
-            save_path = f"./cov/origin/{args.mode}/tracking{current_agent}"
+            save_path = f"./train/origin/{args.mode}/tracking{current_agent}"
         os.makedirs(save_path, exist_ok=True)
         for seq in det_results:
             if seq[-4:] != ".txt":
@@ -561,6 +561,7 @@ if __name__ == "__main__":
                         )
 
         eval_dir = f"../TrackEval/data/trackers/mot_challenge/V2X-{args.split}{current_agent}/sort-{args.mode}/data"
+        print(eval_dir)
         os.makedirs(eval_dir, exist_ok=True)
         for seq in scene_idxes:
             tracker_txt = os.path.join(save_path, f"{seq}.txt")

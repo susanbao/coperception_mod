@@ -119,13 +119,13 @@ if __name__ == "__main__":
         order_det_res(root)
         det_results = os.listdir(root)
         if args.output_cov and args.nll_ass:
-            save_path = f"./cov/cfk_nlla/{args.mode}/tracking{current_agent}"
+            save_path = f"./val/cfk_nlla/{args.mode}/tracking{current_agent}"
         elif args.output_cov:
-            save_path = f"./cov/cfk/{args.mode}/tracking{current_agent}"
+            save_path = f"./val/cfk/{args.mode}/tracking{current_agent}"
         elif args.nll_ass:
-            save_path = f"./cov/nlla/{args.mode}/tracking{current_agent}"
+            save_path = f"./val/nlla/{args.mode}/tracking{current_agent}"
         else:
-            save_path = f"./cov/origin/{args.mode}/tracking{current_agent}"
+            save_path = f"./val/origin/{args.mode}/tracking{current_agent}"
         os.makedirs(save_path, exist_ok=True)
         for seq in det_results:
             if seq[-4:] != ".txt":

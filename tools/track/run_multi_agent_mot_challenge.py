@@ -40,7 +40,7 @@ if __name__ == "__main__":
         os.system(f'python ./TrackEval/scripts/run_mot_challenge.py --BENCHMARK V2X --SPLIT_TO_EVAL {split}{current_agent} --TRACKERS_TO_EVAL sort-{mode}/{rsu} --METRICS CLEAR --DO_PREPROC False')
 
         # collect results
-        eval_output_path = f'./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/pedestrian_summary.txt'
+        eval_output_path = f'./TrackEval/data/trackers/mot_challenge/V2X-{split}{current_agent}/sort-{mode}/{rsu}/pedestrian_summary.txt'
         eval_output_file = open(eval_output_path, 'r')
         # skip header
         eval_output_file.readline()
@@ -55,7 +55,7 @@ if __name__ == "__main__":
         os.system(f'python ./TrackEval/scripts/run_mot_challenge.py --BENCHMARK V2X --SPLIT_TO_EVAL {split}{current_agent} --TRACKERS_TO_EVAL sort-{mode}/{rsu} --METRICS HOTA --DO_PREPROC False')
 
         # collect results
-        eval_output_path = f'./TrackEval/data/trackers/mot_challenge/V2X-test{current_agent}/sort-{mode}/{rsu}/pedestrian_summary.txt'
+        eval_output_path = f'./TrackEval/data/trackers/mot_challenge/V2X-{split}{current_agent}/sort-{mode}/{rsu}/pedestrian_summary.txt'
         eval_output_file = open(eval_output_path, 'r')
         # skip header
         eval_output_file.readline()
