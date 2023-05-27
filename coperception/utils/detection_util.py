@@ -1156,6 +1156,9 @@ def late_fusion(ego_agent, num_agent, result, trans_matrices, box_color_map):
             result[ego_agent][0][0][0]["selected_idx"],
             result[j][0][0][0]["selected_idx"],
         )
+        if "pred_covar" in result[j][0][0][0]:
+            result[ego_agent][0][0][0]["pred_covar"] = np.append(
+                result[ego_agent][0][0][0]["pred_covar"], result[j][0][0][0]["pred_covar"])
         box_colors = np.append(box_colors, [box_color_map[j] for _ in points])
 
     # nms
@@ -1165,6 +1168,10 @@ def late_fusion(ego_agent, num_agent, result, trans_matrices, box_color_map):
         result[ego_agent][0][0][0]["pred"] = np.take(
             result[ego_agent][0][0][0]["pred"], pick, axis=0
         )
+        if "pred_covar" in result[ego_agent][0][0][0]:
+            result[ego_agent][0][0][0]["pred_covar"] = np.take(
+                result[ego_agent][0][0][0]["pred_covar"], pick, axis=0
+            )
         box_colors = np.take(box_colors, pick, axis=0)
 
     return box_colors

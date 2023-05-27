@@ -303,6 +303,8 @@ def main(args):
                 pred_restore = result[k][0][0][0]["pred"]
                 score_restore = result[k][0][0][0]["score"]
                 selected_idx_restore = result[k][0][0][0]["selected_idx"]
+                if "pred_covar" in result[k][0][0][0]:
+                    pred_cover_restore =  result[k][0][0][0]["pred_covar"]
 
             data_agents = {
                 "bev_seq": torch.unsqueeze(padded_voxel_points[k, :, :, :, :], 1),
@@ -443,6 +445,7 @@ def main(args):
                 result[k][0][0][0]["pred"] = pred_restore
                 result[k][0][0][0]["score"] = score_restore
                 result[k][0][0][0]["selected_idx"] = selected_idx_restore
+                result[k][0][0][0]["pred_covar"] = pred_cover_restore
 
         print("Validation scene {}, at frame {}".format(seq_name, idx))
         print("Takes {} s\n".format(str(time.time() - t)))
