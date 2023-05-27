@@ -21,7 +21,7 @@ testing_script := test_codet.py
 testing_data := $(create_data_save_path)/test
 val_data :=$(create_data_save_path)/val
 train_data :=$(create_data_save_path)/train
-# [lowerbound / upperbound / v2v / disco / when2com / max / mean / sum / agent]
+# [colowerbound / lowerbound / upperbound / v2v / disco / when2com / max / mean / sum / agent]
 com := disco
 batch_size := 1
 # [train / test / val]

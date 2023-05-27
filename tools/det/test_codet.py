@@ -52,7 +52,7 @@ def main(args):
             flag = flag + "_warp"
     elif args.com in {"v2v", "disco", "sum", "mean", "max", "cat", "agent"}:
         flag = args.com
-    elif args.com == "lowerbound":
+    elif args.com == "lowerbound" or args.com == "colowerbound":
         flag = "lowerbound"
         if args.box_com:
             flag += "_box_com"
