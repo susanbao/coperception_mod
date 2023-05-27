@@ -272,6 +272,7 @@ def apply_nms_det_one(box_preds, cls_preds, anchors, code_type, config, batch_mo
     )  # [N, pred_len,4 ,2]
     if box_preds_covar is not None:
         box_corner_covar = box_preds_covar.view(-1, box_preds_covar.shape[-2], box_preds_covar.shape[-1])
+        box_corner_covar = box_corner_covar.cpu().detach().numpy()
 
     if config.pred_type == "motion":
         cur_det = None
@@ -724,7 +725,7 @@ def cal_local_mAP(config, data, det_results, annotations, return_local = False):
             cls_score = cls_pred_scores
             if "pred_covar" in pred_selected[k]:
                 #pred_corners_covar = pred_selected[k]["pred_covar"][:, p].cpu().numpy()
-                pred_corners_covar = pred_selected[k]["pred_covar"][:, p].cpu().detach().numpy()
+                pred_corners_covar = pred_selected[k]["pred_covar"][:, p]
                 covar_exist = True
 
         ## iou calculation
@@ -1157,8 +1158,8 @@ def late_fusion(ego_agent, num_agent, result, trans_matrices, box_color_map):
             result[j][0][0][0]["selected_idx"],
         )
         if "pred_covar" in result[j][0][0][0]:
-            result[ego_agent][0][0][0]["pred_covar"] = np.append(
-                result[ego_agent][0][0][0]["pred_covar"], result[j][0][0][0]["pred_covar"])
+            result[ego_agent][0][0][0]["pred_covar"] = np.vstack(
+                (result[ego_agent][0][0][0]["pred_covar"], result[j][0][0][0]["pred_covar"]))
         box_colors = np.append(box_colors, [box_color_map[j] for _ in points])
 
     # nms
