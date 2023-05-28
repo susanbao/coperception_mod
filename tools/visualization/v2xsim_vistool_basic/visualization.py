@@ -37,7 +37,7 @@ def render_gif():
     ims = [imageio.imread(file) for file in images_path_list]
     os.makedirs(output_gif_inner_dir, exist_ok=True)
     output_gif_path = f"{output_gif_inner_dir}/out.gif"
-    imageio.mimwrite(output_gif_path, ims, fps=5)
+    imageio.mimwrite(output_gif_path, ims, duration=90)
 
     print(f"Rendered {output_gif_path}")
 
@@ -292,9 +292,9 @@ if __name__ == "__main__":
 
             plt.close("all")
 
-    if (
-        data_carscenes.seq_scenes[0][idx] != last_scene_idx
-        or idx == len(data_carscenes) - 1
-    ):  # last scene finishes, output gif
-        render_gif()
-        last_scene_idx = data_carscenes.seq_scenes[0][idx]
+        if (
+            data_carscenes.seq_scenes[0][idx] != last_scene_idx
+            or idx == len(data_carscenes) - 1
+        ):  # last scene finishes, output gif
+            render_gif()
+            last_scene_idx = data_carscenes.seq_scenes[0][idx]
