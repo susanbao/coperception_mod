@@ -50,16 +50,16 @@ def set_title_for_axes(ax, title):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--agent_idx", default=0, type=int, help="which agent")
-    parser.add_argument("--split", default="train", type=str)
+    parser.add_argument("--agent_idx", default=1, type=int, help="which agent")
+    parser.add_argument("--split", default="test", type=str)
     args = parser.parse_args()
 
     split = args.split
     config = Config(binary=True, split=split, use_vis=True)
 
     agent_idx = args.agent_idx
-    data_path = f"/scratch/dm4524/data/V2X-Sim-seg/{split}/agent{agent_idx}"
-    data_path_det = f"/scratch/dm4524/data/V2X-Sim-det/{split}/agent{agent_idx}"
+    data_path = f"/data/v2x-sim-nyu/V2X-Sim-seg/{split}/agent{agent_idx}"
+    data_path_det = f"/data/v2x-sim-nyu/V2X-Sim-det/{split}/agent{agent_idx}"
 
     data_carscenes = V2XSimSeg(
         dataset_roots=[data_path],
@@ -68,7 +68,7 @@ if __name__ == "__main__":
         val=True,
         kd_flag=True,
         bound="both",
-        no_cross_road=False,
+        rsu=True,
     )
 
     data_carscenes_no_cross_road = V2XSimSeg(
@@ -78,7 +78,7 @@ if __name__ == "__main__":
         val=True,
         kd_flag=True,
         bound="both",
-        no_cross_road=True,
+        rsu=False,
     )
 
     config_global = ConfigGlobal(binary=True, split=split)
@@ -96,7 +96,7 @@ if __name__ == "__main__":
         config_global=config_global,
         config=config,
         val=True,
-        no_cross_road=True,
+        rsu=False,
         bound="both",
     )
 
