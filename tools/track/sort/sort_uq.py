@@ -500,6 +500,8 @@ if __name__ == "__main__":
     #global output_cov, nll_ass
     output_cov = args.output_cov
     nll_ass = args.nll_ass
+    # scene_idxes = [27,28,29,92] # hard part
+    scene_idxes = [5,8,19,91,96,97] # easy part
 
     for current_agent in range(args.from_agent, args.to_agent):
         total_time = 0.0
@@ -511,6 +513,9 @@ if __name__ == "__main__":
         os.makedirs(save_path, exist_ok=True)
         for seq in det_results:
             if seq[-4:] != ".txt":
+                continue
+            seq_index = int(seq.split('.')[0].split('_')[1])
+            if seq_index not in scene_idxes:
                 continue
             mot_tracker = Sort(
                 max_age=args.max_age,
@@ -557,7 +562,7 @@ if __name__ == "__main__":
             shutil.copy(tracker_txt, os.path.join(eval_dir, f"{seq}.txt"))
         print(
             "Total Tracking took: %.3f seconds for %d frames or %.1f FPS"
-            % (total_time, total_frames, total_frames / total_time)
+            % (total_time, total_frames, total_frames if total_time == 0 else total_frames / total_time )
         )
         print("Saved results to ", eval_dir)
         print("matched count: {}, unmatched detection: {}, unmatched prediction: {}".format(matched_num, unmatched_det, unmatched_trk))
