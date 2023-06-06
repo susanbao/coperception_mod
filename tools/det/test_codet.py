@@ -320,9 +320,14 @@ def main(args):
 
             # late fusion
             if apply_late_fusion == 1 and len(result[k]) != 0:
-                box_colors = late_fusion(
+                if args.apply_late_fusion_var:
+                    box_colors = late_fusion_var(
                     k, num_agent, result, trans_matrices, box_color_map
-                )
+                    )
+                else:
+                    box_colors = late_fusion(
+                        k, num_agent, result, trans_matrices, box_color_map
+                    )
 
             result_temp = result[k]
 
@@ -616,6 +621,7 @@ if __name__ == "__main__":
     parser.add_argument("--output_cov", action="store_true", help = "Enable to use variance of x,y as input of Filter for SOTR")
     parser.add_argument("--box_com", action="store_true")
     parser.add_argument("--rsu", default=0, type=int, help="0: no RSU, 1: RSU")
+    parser.add_argument("--apply_late_fusion_var", action="store_true")
     # scene_batch => batch size in each scene
     parser.add_argument(
         "--num_agent", default=6, type=int, help="The total number of agents"
