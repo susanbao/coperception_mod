@@ -8,6 +8,7 @@ from coperception.utils.postprocess import *
 import torch.nn.functional as F
 from coperception.utils.obj_util import *
 from torch import stack as tstack
+from scipy.optimize import linear_sum_assignment
 
 matplotlib.use("Agg")
 
@@ -1126,6 +1127,35 @@ def late_fusion_var(ego_agent, num_agent, result, trans_matrices, box_color_map)
         [box_color_map[ego_agent] for _ in result[ego_agent][0][0][0]["pred"]]
     )
 
+    preds = []
+    for j in range(num_agent):
+        one_agent_pred = {}
+        one_agent_pred["score"] = result[j][0][0][0]["score"]
+        one_agent_pred["selected_idx"] = result[j][0][0][0]["selected_idx"]
+        if "pred_covar" in result[j][0][0][0]:
+            one_agent_pred["pred_covar"] = result[j][0][0][0]["pred_covar"]
+        if j == ego_agent:
+            one_agent_pred["pred"] = result[j][0][0][0]["pred"]
+        else:
+            trans_mat_j2ego = trans_matrices[0, ego_agent, j]
+
+            # remove z-axis
+            trans_mat_j2ego = np.delete(trans_mat_j2ego, 2, axis=1)
+            trans_mat_j2ego = np.delete(trans_mat_j2ego, 2, axis=0)
+
+            boxes_j = np.array(result[j][0][0][0]["pred"])  # [0][0][0] ==> squeeze
+            points = boxes_j.reshape(-1, 2).T
+            points[0, :] = -points[0, :]
+            points = np.dot(trans_mat_j2ego, np.vstack((points, np.ones(points.shape[1]))))[
+                :2, :
+            ]
+            points[0, :] = -points[0, :]
+            points = points.T.reshape(-1, 1, 4, 2)
+            one_agent_pred["pred"] = points
+    
+    
+
+
     for j in range(num_agent):
         if j == ego_agent or len(result[ego_agent]) == 0 or len(result[j]) == 0:
             continue
@@ -1180,6 +1210,7 @@ def late_fusion(ego_agent, num_agent, result, trans_matrices, box_color_map):
     box_colors = np.array(
         [box_color_map[ego_agent] for _ in result[ego_agent][0][0][0]["pred"]]
     )
+
 
     for j in range(num_agent):
         if j == ego_agent or len(result[ego_agent]) == 0 or len(result[j]) == 0:
