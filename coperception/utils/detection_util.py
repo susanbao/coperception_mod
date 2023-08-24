@@ -1132,8 +1132,8 @@ def late_fusion_var(ego_agent, num_agent, result, trans_matrices, box_color_map)
         one_agent_pred = {}
         one_agent_pred["score"] = result[j][0][0][0]["score"]
         one_agent_pred["selected_idx"] = result[j][0][0][0]["selected_idx"]
-        if "pred_covar" in result[j][0][0][0]:
-            one_agent_pred["pred_covar"] = result[j][0][0][0]["pred_covar"]
+        assert "pred_covar" in result[j][0][0][0]
+        one_agent_pred["pred_covar"] = result[j][0][0][0]["pred_covar"]
         if j == ego_agent:
             one_agent_pred["pred"] = result[j][0][0][0]["pred"]
         else:
@@ -1152,6 +1152,8 @@ def late_fusion_var(ego_agent, num_agent, result, trans_matrices, box_color_map)
             points[0, :] = -points[0, :]
             points = points.T.reshape(-1, 1, 4, 2)
             one_agent_pred["pred"] = points
+        preds.append(one_agent_pred)
+
     
     
 
